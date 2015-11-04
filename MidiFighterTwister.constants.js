@@ -33,3 +33,11 @@ var COLOR =
     PURPLE:112,
     DARK_PURPLE:115,
 };
+
+var MixerMode =
+{
+    VOLUME:0,
+    PAN:1,
+	SEND:2,
+	Mix4:3,
+};
