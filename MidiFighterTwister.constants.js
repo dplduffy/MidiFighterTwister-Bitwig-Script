@@ -36,8 +36,16 @@ var COLOR =
 
 var MixerMode =
 {
-    VOLUME:0,
-    PAN:1,
-	SEND:2,
-	Mix4:3,
+    VOLUME_PAN:0,
+    SEND:1,
+    Mix4:2,
 };
+
+var statusType =
+{
+   SIDEBUTTON_RELEASE:131,
+   SIDEBUTTON_PRESS:147,
+   ENCODER_PRESS:177,
+   ENCODER_TURN:176,
+}
+      
