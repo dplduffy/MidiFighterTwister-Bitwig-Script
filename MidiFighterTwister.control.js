@@ -11,9 +11,9 @@ var volume = initArray(0, 8);
 var pan = initArray(0, 8);
 var mute = initArray(0, 8);
 var solo = initArray(0, 8);
+var color = initArray(0, 8);
 var isSelected = initArray(0, 8);
 var send = initArray(0, 8);
-var color = initArray(0, 8);
 var activePage = null;
 var pendingRGBLEDs = new Array(16);
 var activeRGBLEDs = new Array(16);
@@ -22,42 +22,38 @@ var active11segLEDs = new Array(16);
 var MIXERMODE = 0;
 var encoderNum = -1;
 var encoderValue = 0;
+var channelStepSize = 4;
 
 function init()
 {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
-    
-    trackBank4 = host.createMainTrackBank(4, 8, 4);
-    for(var t=0; t<4; t++)
-    {
-       var track = trackBank4.getChannel(t);
-	   
-       track.getVolume().addValueObserver(126, getTrackObserverFunc(t, volume));
-       track.getPan().addValueObserver(126, getTrackObserverFunc(t, pan));
-       //track.getSend(0).addValueObserver(126, getTrackObserverFunc(t, sendA));
-       //track.getSend(1).addValueObserver(8, getTrackObserverFunc(t, sendB));    
-       track.getMute().addValueObserver(getTrackObserverFunc(t, mute));
-       track.getSolo().addValueObserver(getTrackObserverFunc(t, solo));
-       track.addIsSelectedObserver(getTrackObserverFunc(t, isSelected));
-    }
 	
-	trackBank8 = host.createMainTrackBank(8, 8, 8);
+	trackBank = host.createMainTrackBank(8, 8, 8);
     for(var t=0; t<8; t++)
     {
-       var track = trackBank8.getChannel(t);
-	   
-       track.getVolume().addValueObserver(126, getTrackObserverFunc(t, volume));
-       track.getPan().addValueObserver(126, getTrackObserverFunc(t, pan));
-       //track.getSend(0).addValueObserver(126, getTrackObserverFunc(t, sendA));
-       //track.getSend(1).addValueObserver(8, getTrackObserverFunc(t, sendB));    
-       track.getMute().addValueObserver(getTrackObserverFunc(t, mute));
-       track.getSolo().addValueObserver(getTrackObserverFunc(t, solo));
-       track.addIsSelectedObserver(getTrackObserverFunc(t, isSelected));
-	   track.addColorObserver(handleColor);
+		var track = trackBank.getChannel(t);
+		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, volume));
+		track.getPan().addValueObserver(126, getTrackObserverFunc(t, pan));
+		//track.getSend(0).addValueObserver(126, getTrackObserverFunc(t, sendA));
+		//track.getSend(1).addValueObserver(8, getTrackObserverFunc(t, sendB));    
+		track.getMute().addValueObserver(getTrackObserverFunc(t, mute));
+		track.getSolo().addValueObserver(getTrackObserverFunc(t, solo));
+		track.addIsSelectedInMixerObserver(getTrackObserverFunc(t, isSelected));
+		track.addColorObserver(getTrackObserverFunc(t, color));
     }
 	
+	trackBank.addCanScrollTracksUpObserver(function(canScroll)
+   {
+      mixerPage.canScrollTracksUp = canScroll;
+   });
+   trackBank.addCanScrollTracksDownObserver(function(canScroll)
+   {
+      mixerPage.canScrollTracksDown = canScroll;
+   });
+   
+    trackBank.setChannelScrollStepSize(channelStepSize);
 	setActivePage(mixerPage);
 }
 
@@ -77,9 +73,19 @@ function setActivePage(page)
 
 function getTrackObserverFunc(track, varToStore)
 {
-	return function(value)
+	if (varToStore == color)
 	{
-	   varToStore[track] = value;
+		return function(r, g, b)
+		{
+			varToStore[track] = handleColor(r,g,b);
+		}
+	}
+	else
+	{
+		return function(value)
+		{
+			varToStore[track] = value;
+		}
 	}
 }
 
@@ -87,6 +93,7 @@ function onMidi(status, data1, data2)
 {
 	printMidi(status, data1, data2);
     var isActive = data2 > 0;
+	var isPressed = data1 > 0;
 	
 	if (status == statusType.ENCODER_TURN)
 	{
@@ -95,32 +102,49 @@ function onMidi(status, data1, data2)
 		activePage.onEncoderTurn(isActive);
 	}
 	
-    //if (status==177)
-    //{
-    //    if (data2==127)
-    //    {
-    //        //create function for encoder press
-    //    }
-    //    if(data2==0)
-    //    {
-    //        //create function for encoder release
-    //    }
-    //}
-    //
-    //if (status==176)
-    //{
-    //    //create function for encoder turn cases
-    //}
-    //
-    //if(status==147)
-    //{
-    //    //create function for side button press
-    //}
-    //
-    //if(status==131)
-    //{
-    //    //create function for side button release
-    //} 
+	if (status == statusType.ENCODER_PRESS && data2 == 127) //data2 == 127 for encoder press
+	{
+		encoderNum = data1;
+		encoderValue = data2;
+		activePage.onEncoderPress(isActive);
+	}
+	
+	if (status == statusType.ENCODER_PRESS && data2 == 127) //data2 == 0 for encoder release
+	{
+		encoderNum = data1;
+		encoderValue = data2;
+		activePage.onEncoderRelease(isActive);
+	}
+	
+	if (status == statusType.SIDEBUTTON_PRESS)
+	{
+		switch(data1)
+		{
+		case SIDE_BUTTON.LH_BOTTOM:
+            activePage.onLeftBottom(isPressed);
+			break;
+		case SIDE_BUTTON.LH_MIDDLE:
+			activePage.onLeftMiddle(isPressed);
+			break
+		case SIDE_BUTTON.LH_TOP:
+			activePage.onLeftTop(isPressed);
+			break;
+		case SIDE_BUTTON.RH_BOTTOM:
+            activePage.onRightBottom(isPressed);
+			break;
+		case SIDE_BUTTON.RH_MIDDLE:
+			activePage.onRightMiddle(isPressed);
+			break
+		case SIDE_BUTTON.RH_TOP:
+			activePage.onRightTop(isPressed);
+			break;
+		}
+	}
+
+	if (status == statusType.SIDEBUTTON_RELEASE)
+	{
+		
+	}
 }
 
 function page()
@@ -189,18 +213,17 @@ function flushLEDs()
 		}
 }
 
-function handleColor(r, g, b)
+function handleColor(red, green, blue)
 {
-	for (var i = 0; i < trackColors.length; i++)
+    for (var i = 0; i < trackColors.length; i++)
     {
-        var color = trackColors[i];
-        
-		if ((Math.abs (color[0] - r ) < 0.0001) && (Math.abs (color[1] - g) < 0.0001) && (Math.abs (color[2] - b) < 0.0001))
+        var currentColor = trackColors[i];
+        if (Math.abs (currentColor[0] - red ) < 0.0001 && Math.abs (currentColor[1] - green) < 0.0001 && Math.abs (currentColor[2] - blue) < 0.0001)
 		{
-        return color[3];
+        return currentColor[3];
 		}
-    }
-}
+    }    
+};
 
 var trackColors =
 [

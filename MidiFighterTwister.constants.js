@@ -1,8 +1,11 @@
-var RIGHT_BUTTON =
+var SIDE_BUTTON =
 {
-   TOP:11,
-   MIDDLE:12,
-   BOTTOM:13,
+   LH_TOP:8,
+   LH_MIDDLE:9,
+   LH_BOTTOM:10,
+   RH_TOP:11,
+   RH_MIDDLE:12,
+   RH_BOTTOM:13,
 };
 
 var LEFT_BUTTON =
@@ -48,4 +51,6 @@ var statusType =
    ENCODER_PRESS:177,
    ENCODER_TURN:176,
 }
+
+var channelStepSizeArray = [1, 4, 8];
       
