@@ -14,9 +14,11 @@ mixerPage.updateOutputState = function()
     this.updateIndicators();
 }
 
+var tempvar = 0;
+
 mixerPage.onEncoderPress = function(isActive)
 {
-     if (MIXERMODE == MixerMode.VOLUME_PAN)
+     if (MIXERMODE == mixerMode.VOLUME_PAN)
     {
         if(encoderNum<4)
         {
@@ -35,6 +37,26 @@ mixerPage.onEncoderPress = function(isActive)
         trackBank.getChannel(encoderNum-8).getMute().toggle();
         }
     }
+
+    if (MIXERMODE == mixerMode.SEND)
+    {
+        if(encoderNum<4)
+        {
+        trackBank.getChannel(encoderNum).getSolo().toggle();
+        }
+        if(encoderNum>=4 && encoderNum<8)
+        {
+        trackBank.getChannel(encoderNum-4).getArm().toggle();
+        }
+        if(encoderNum>=8 && encoderNum<12)
+        {
+        trackBank.getChannel(encoderNum-4).getSolo().toggle();
+        }
+        if(encoderNum>=12)
+        {
+        trackBank.getChannel(encoderNum-8).getArm().toggle();
+        }
+    }
 }
 
 mixerPage.onEncoderRelease = function(isActive)
@@ -43,11 +65,11 @@ mixerPage.onEncoderRelease = function(isActive)
 
 mixerPage.onEncoderTurn = function(isActive)
 {
-    if (MIXERMODE == MixerMode.Mix4)
+    if (MIXERMODE == mixerMode.Mix4)
     {
     }
     
-    if (MIXERMODE == MixerMode.VOLUME_PAN)
+    if (MIXERMODE == mixerMode.VOLUME_PAN)
     {
         if(encoderNum<4)
         {
@@ -78,7 +100,8 @@ mixerPage.onLeftMiddle = function(isPressed)
 
 mixerPage.onLeftTop = function(isPressed)
 {
-    
+    MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
+    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
 }
 
 mixerPage.onRightBottom = function(isPressed)
@@ -89,9 +112,9 @@ mixerPage.onRightBottom = function(isPressed)
 mixerPage.onRightMiddle = function(isPressed)
 {
     var index = channelStepSizeArray.indexOf(channelStepSize);
-    index == (channelStepSizeArray.length - 1) ? index = 0 : index = index + 1;
+    index == (channelStepSizeArray.length - 1) ? index = 0 : index = index++;
     channelStepSize = channelStepSizeArray[index];
-    host.showPopupNotification("Channel Step Size = "+channelStepSize);
+    host.showPopupNotification("Channel Step Size: "+channelStepSize);
     trackBank.setChannelScrollStepSize(channelStepSize);
 }
 
@@ -103,25 +126,48 @@ mixerPage.onRightTop = function(isPressed)
 
 mixerPage.updateRGBLEDs = function() //TODO: feedback for mute, solo, & selected
 {
-    if (MIXERMODE == MixerMode.VOLUME_PAN) 
+    if (MIXERMODE == mixerMode.VOLUME_PAN) 
     {
         for(var i=0; i<16; i++)
         {
             if(i<4)
             {
-            setRGBLED(i, color[i]);
+            isSelected[i] ? setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) : setRGBLED(i, color[i], STROBE.OFF);
             }
             if(i>=4 && i <8)
             {
-            setRGBLED(i, color[i-4]);
+            mute[i-4] ? setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) : setRGBLED(i, color[i-4], STROBE.OFF);
             }
             if(i>=8 && i<12)
             {
-            setRGBLED(i, color[i-4]);
+            isSelected[i-4] ? setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) : setRGBLED(i, color[i-4], STROBE.OFF);
             }
             if(i>=12)
             {
-            setRGBLED(i, color[i-8]);
+            mute[i-8] ? setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) : setRGBLED(i, color[i-8], STROBE.OFF);
+            }
+        }
+    }
+    
+    if (MIXERMODE == mixerMode.SEND) 
+    {
+        for(var i=0; i<16; i++)
+        {
+            if(i<4)
+            {
+            solo[i] ? setRGBLED(i, COLOR.DARK_BLUE, STROBE.PULSE1) : setRGBLED(i, color[i], STROBE.OFF);
+            }
+            if(i>=4 && i <8)
+            {
+            arm[i-4] ? setRGBLED(i, COLOR.RED, STROBE.PULSE1) : setRGBLED(i, color[i-4], STROBE.OFF);
+            }
+            if(i>=8 && i<12)
+            {
+            solo[i-4] ? setRGBLED(i, COLOR.DARK_BLUE, STROBE.PULSE1) : setRGBLED(i, color[i-4], STROBE.OFF);
+            }
+            if(i>=12)
+            {
+            arm[i-8] ? setRGBLED(i, COLOR.RED, STROBE.PULSE1) : setRGBLED(i, color[i-8], STROBE.OFF);
             }
         }
     }
@@ -130,7 +176,7 @@ mixerPage.updateRGBLEDs = function() //TODO: feedback for mute, solo, & selected
 mixerPage.update11segLEDs = function()
 {
     //TODO: only set PAN leds if track exists
-    if (MIXERMODE == MixerMode.VOLUME_PAN)
+    if (MIXERMODE == mixerMode.VOLUME_PAN)
     {
         for(var i=0; i<16; i++)
         {
@@ -153,25 +199,31 @@ mixerPage.update11segLEDs = function()
         }
     }
     
-    if (MIXERMODE == MixerMode.PAN)
+    if (MIXERMODE == mixerMode.PAN)
     {
     }
 }
 
 mixerPage.updateIndicators = function()
-{
-    if (MIXERMODE == MixerMode.Mix4)
-    {
-    }
-    
-    if (MIXERMODE == MixerMode.VOLUME_PAN)
+{   
+    if (MIXERMODE == mixerMode.VOLUME_PAN)
     {
         for(var i=0; i<8; i++)
         {
-            trackBank.getChannel(i).getVolume().setIndication(MIXERMODE == MixerMode.VOLUME_PAN);
-            trackBank.getChannel(i).getPan().setIndication(MIXERMODE == MixerMode.VOLUME_PAN);
+            trackBank.getChannel(i).getVolume().setIndication(MIXERMODE == mixerMode.VOLUME_PAN);
+            trackBank.getChannel(i).getPan().setIndication(MIXERMODE == mixerMode.VOLUME_PAN);
         }
     }
+    
+    if (MIXERMODE == mixerMode.SEND)
+    {
+    }
+    
+    if (MIXERMODE == mixerMode.Mix4)
+    {
+    }
+    
+    
 }
 
 //mixerPage.setMixerMode = function(mode)
