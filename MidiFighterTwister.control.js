@@ -14,25 +14,19 @@ var solo = initArray(0, 8);
 var arm = initArray(0, 8);
 var color = initArray(0, 8);
 var isSelected = initArray(0, 8);
-var send1 = initArray(0, 8);
-var send2 = initArray(0, 8);
-var send3 = initArray(0, 8);
-var send4 = initArray(0, 8);
-var send5 = initArray(0, 8);
-var send6 = initArray(0, 8);
-var send7 = initArray(0, 8);
-var send8 = initArray(0, 8);
 var activePage = null;
-var pendingRGBLEDs = new Array(16);
-var activeRGBLEDs = new Array(16);
-var pendingRGBSTROBEs = new Array(16);
-var activeRGBSTROBEs = new Array(16);
-var pending11segLEDs = new Array(16);
-var active11segLEDs = new Array(16);
+var pendingRGBLEDs = new Array(64);
+var activeRGBLEDs = new Array(64);
+var pendingRGBSTROBEs = new Array(64);
+var activeRGBSTROBEs = new Array(64);
+var pending11segLEDs = new Array(64);
+var active11segLEDs = new Array(64);
 var MIXERMODE = 0;
+var ENCODERBANK = 0;
 var encoderNum = -1;
 var encoderValue = 0;
 var channelStepSize = 4;
+var currentSend = 0;
 
 function init()
 {
@@ -40,20 +34,18 @@ function init()
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
 	
-	trackBank = host.createMainTrackBank(8, 8, 8);
+	trackBank = host.createMainTrackBank(8, 11, 8);
     for(var t=0; t<8; t++)
     {
 		var track = trackBank.getChannel(t);
 		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, volume));
 		track.getPan().addValueObserver(126, getTrackObserverFunc(t, pan));
-		track.getSend(0).addValueObserver(126, getTrackObserverFunc(t, send1));
-		track.getSend(1).addValueObserver(126, getTrackObserverFunc(t, send2));    
-		track.getSend(2).addValueObserver(126, getTrackObserverFunc(t, send3)); 
-		track.getSend(3).addValueObserver(126, getTrackObserverFunc(t, send4)); 
-		track.getSend(4).addValueObserver(126, getTrackObserverFunc(t, send5)); 
-		track.getSend(5).addValueObserver(126, getTrackObserverFunc(t, send6)); 
-		track.getSend(6).addValueObserver(126, getTrackObserverFunc(t, send7)); 
-		track.getSend(7).addValueObserver(126, getTrackObserverFunc(t, send8));  
+		
+		for(var s=0; s<11; s++)
+			{
+			track.getSend(s).addValueObserver(126, getSendObserverFunc(t, s));
+			}
+			
 		track.getMute().addValueObserver(getTrackObserverFunc(t, mute));
 		track.getSolo().addValueObserver(getTrackObserverFunc(t, solo));
 		track.addIsSelectedInMixerObserver(getTrackObserverFunc(t, isSelected));
@@ -69,7 +61,8 @@ function init()
    {
       mixerPage.canScrollTracksDown = canScroll;
    });
-   
+    
+	sendMidi(147, ENCODERBANK, 127);
     trackBank.setChannelScrollStepSize(channelStepSize);
 	setActivePage(mixerPage);
 }
@@ -88,8 +81,18 @@ function setActivePage(page)
    }
 }
 
-function getTrackObserverFunc(track, varToStore)
+function getSendObserverFunc(t, s)
 {
+	return function(value)
+	{
+	sendArray[t][s] = value;
+	}
+}
+
+
+
+function getTrackObserverFunc(track, varToStore)
+{	
 	if (varToStore == color)
 	{
 		return function(r, g, b)
@@ -215,7 +218,7 @@ function flushLEDs()
 
    if (changedRGBCount == 0 && changed11segCount == 0 && changedRGBStrobeCount == 0) return;
    
-	for(var i = 0; i<16; i++)
+	for(var i = 0; i<64; i++)
 		{
 			if (pendingRGBLEDs[i] != activeRGBLEDs[i])
 			{

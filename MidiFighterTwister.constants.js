@@ -105,6 +105,12 @@ var STROBE =
 
 var encoderBank =
 {
-   
+   BANK1:12,
+   BANK2:13,
+   BANK3:14,
+   BANK4:15,
 }
+
+var sendArray = [ [] , [] , [] , [] , [] , [] , [], [] ];
+
       
