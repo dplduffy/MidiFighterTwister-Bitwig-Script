@@ -27,6 +27,7 @@ var encoderNum = -1;
 var encoderValue = 0;
 var channelStepSize = 4;
 var currentSend = 0;
+var currentSend11Seg = 1;
 
 function init()
 {
@@ -61,7 +62,7 @@ function init()
    {
       mixerPage.canScrollTracksDown = canScroll;
    });
-    
+   
 	sendMidi(147, ENCODERBANK, 127);
     trackBank.setChannelScrollStepSize(channelStepSize);
 	setActivePage(mixerPage);
@@ -179,9 +180,10 @@ page.prototype.updateOutputState = function()
 
 function clear()
 {
-   for(var i=0; i<16; i++)
+   for(var i=0; i<64; i++)
    {
       pendingRGBLEDs[i] = 0;
+	  pendingRGBSTROBEs[i] = 0
 	  pending11segLEDs[i] = 0;
    }
 }
@@ -209,7 +211,7 @@ function flushLEDs()
    var changedRGBStrobeCount = 0;
    var changed11segCount = 0;
    
-   for(var i=0; i<16; i++)
+   for(var i=0; i<64; i++)
    {
       if (pendingRGBLEDs[i] != activeRGBLEDs[i]) changedRGBCount++;
 	  if (pending11segLEDs[i] != active11segLEDs[i]) changed11segCount++;
