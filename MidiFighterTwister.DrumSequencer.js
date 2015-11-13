@@ -60,7 +60,6 @@ drumSequencerPage.onLeftTop = function(isPressed)
 drumSequencerPage.onLeftMiddle = function(isPressed)
 {
     CURRENTSEQMODE = 1;
-    //cursorClip.setStepSize(Math.pow(0.5,1));
     setActivePage(melodicSequencerPage);
 }
 

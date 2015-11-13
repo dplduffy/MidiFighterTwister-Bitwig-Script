@@ -227,7 +227,7 @@ var Bank4 =
 var stepData = [];
 var activeStep = 0;
 var playingStep = -1;
-var stepSize = 1;
+var STEP_SIZE = 0.25;
 var SEQ_STEPS = 16;
 var SEQ_KEYS = 128;
 var KEYS_OCT_LO = 0;
@@ -235,8 +235,9 @@ var KEYS_OCT_HI = 48;
 var CURRENT_OCT = 0;
 var OCTAVE_RANGE = 3;
 var ROOT_NOTE = 0;
+var CURRENT_MODERN_MODE = 0;
 var VELOCITY = 127;
-var NOTE_LENGTH = 0.25;
+//var NOTE_LENGTH = 0.25;
 var CURRENTSEQMODE = 0;
 var MELODICSEQMODE = 0;
 var MELODICSEQNOTEPAGE = 0;
@@ -244,6 +245,11 @@ var MELODICSEQPATTERNPAGE = 0;
 var MELODICSEQSETTINGSPAGE = 0;
 var DURMSEQMODE = 0;
 var DRUMSEQNOTEPAGE = 0;
+var stepSizeNameArray = ['1/32', '1/16', '1/8', '1/4', '1/2', '1']
+var stepSizeArray = [0.125, 0.25, 0.5, 1, 2, 4]
+
+
+
 var currentSeqMode =
 {
 	DRUM:0,
@@ -278,9 +284,6 @@ var drumSeqDrumPage =
 	PAD:0,
 	PATTERN:1,
 }
-
-var CURRENT_MODERN_MODE = 0;
-
 var modernModes =
 [
  [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -310,7 +313,6 @@ var modernModes =
  [ 0, 1, 3, 7, 8] ,
  [ 0, 1, 4, 5, 7, 9, 10] 
 ];
-
 var modernModesNames =
 [
   ['Chromatic'],
@@ -340,19 +342,19 @@ var modernModesNames =
   ['Pelog'],
   ['Spanish']
 ];
-
 var rootNoteNames = 
 [
   ['C'],
   ['C#'],
   ['D'],
-  ['D# / Eb'],
+  ['D#'],
   ['E'],
   ['F'],
   ['F#'],
   ['G'],
   ['G#'],
   ['A'],
-  ['A# / Bb'],
+  ['A#'],
   ['B']
 ];
+var octaveNoteNumbers = [ '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8']

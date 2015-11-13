@@ -13,9 +13,19 @@ melodicSequencerPage.updateOutputState = function()
 
 melodicSequencerPage.onEncoderPress = function(isActive)
 {
+    if (MELODICSEQMODE == melodicSeqMode.NOTE)
+    {
         var tempStepPress = encoderNum-encoderBankOffset.BANK4;
-        isAnyStepTrue (tempStepPress, stepData) ?
-        cursorClip.clearStep(tempStepPress, getFirstKey(tempStepPress, stepData)) : cursorClip.setStep(tempStepPress, ROOT_NOTE, VELOCITY, NOTE_LENGTH);
+        if (isAnyStepTrue (tempStepPress, stepData))
+        {
+        cursorClip.clearStep(tempStepPress, getFirstKey(tempStepPress, stepData))
+        }
+        else
+        {
+        cursorClip.setStep(tempStepPress, ROOT_NOTE, VELOCITY, STEP_SIZE);
+        host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
+        }
+    }
 }
 
 melodicSequencerPage.onEncoderRelease = function(isActive)
@@ -24,24 +34,31 @@ melodicSequencerPage.onEncoderRelease = function(isActive)
 
 melodicSequencerPage.onEncoderTurn = function(isActive)
 {
-        var tempStepTurn = encoderNum-encoderBankOffset.BANK4;
-        if (isAnyStepTrue (tempStepTurn, stepData))
+    if (MELODICSEQMODE == melodicSeqMode.NOTE)
+    {
+        if (MELODICSEQNOTEPAGE == melodicSeqModeNotePage.PITCH)
         {
-            var tempKey = scaleEncoderToKey(encoderValue);
-            if (modernModes[CURRENT_MODERN_MODE].indexOf(tempKey % 12) > -1)
+            var tempStepTurn = encoderNum-encoderBankOffset.BANK4;
+            if (isAnyStepTrue (tempStepTurn, stepData))
             {
-                for(i=0; i<128; i++)
+                var tempKey = scaleEncoderToKey(encoderValue);
+                if (modernModes[CURRENT_MODERN_MODE].indexOf((tempKey-ROOT_NOTE) % 12) > -1)
                 {
-                cursorClip.clearStep(tempStepTurn, i);
+                    for(i=0; i<128; i++)
+                    {
+                    cursorClip.clearStep(tempStepTurn, i);
+                    }
+                    cursorClip.setStep(tempStepTurn, tempKey, VELOCITY, STEP_SIZE);
+                    host.showPopupNotification(rootNoteNames[(tempKey%12)]+octaveNoteNumbers[((CURRENT_OCT)+(Math.floor(tempKey/12)))]);
                 }
-                cursorClip.setStep(tempStepTurn, tempKey, VELOCITY, NOTE_LENGTH);
             }
         }
-        
+    }   
 }
 
 melodicSequencerPage.onRightTop = function(isPressed)
 {
+    
 }
 
 melodicSequencerPage.onRightMiddle = function(isPressed)
@@ -50,6 +67,14 @@ melodicSequencerPage.onRightMiddle = function(isPressed)
 
 melodicSequencerPage.onRightBottom = function(isPressed)
 {
+    var curStepSizeIndex = stepSizeArray.indexOf(STEP_SIZE);
+    println(curStepSizeIndex)
+    println(stepSizeArray.length);
+    curStepSizeIndex == (stepSizeArray.length-1) ? STEP_SIZE = stepSizeArray[0] : STEP_SIZE = stepSizeArray[curStepSizeIndex+1];
+    println(STEP_SIZE);
+    println(stepSizeArray.indexOf(STEP_SIZE));
+    cursorClip.setStepSize(STEP_SIZE);
+    host.showPopupNotification('Step Size = ' + stepSizeNameArray[stepSizeArray.indexOf(STEP_SIZE)]);
 }
 
 melodicSequencerPage.onLeftTop = function(isPressed)
