@@ -6,28 +6,8 @@ host.addDeviceNameBasedDiscoveryPair(["Midi Fighter Twister"], ["Midi Fighter Tw
 
 load("MidiFighterTwister.constants.js")
 load("MidiFighterTwister.mixer.js")
-
-var volume = initArray(0, 8);
-var pan = initArray(0, 8);
-var mute = initArray(0, 8);
-var solo = initArray(0, 8);
-var arm = initArray(0, 8);
-var color = initArray(0, 8);
-var isSelected = initArray(0, 8);
-var activePage = null;
-var pendingRGBLEDs = new Array(64);
-var activeRGBLEDs = new Array(64);
-var pendingRGBSTROBEs = new Array(64);
-var activeRGBSTROBEs = new Array(64);
-var pending11segLEDs = new Array(64);
-var active11segLEDs = new Array(64);
-var MIXERMODE = 0;
-var ENCODERBANK = 0;
-var encoderNum = -1;
-var encoderValue = 0;
-var channelStepSize = 4;
-var currentSend = 0;
-var currentSend11Seg = 1;
+load("MidiFighterTwister.MelodicSequencer.js")
+load("MidiFighterTwister.DrumSequencer.js")
 
 function init()
 {
@@ -63,12 +43,21 @@ function init()
       mixerPage.canScrollTracksDown = canScroll;
    });
    
-	sendMidi(147, ENCODERBANK, 127);
+	for (var i=0; i<SEQ_STEPS; i++)
+	{
+		stepData[i] = initArray(false, SEQ_KEYS);
+	}
+   
+    cursorClip = host.createCursorClip(SEQ_STEPS, SEQ_KEYS);
+    cursorClip.addStepDataObserver(onStepExists);
+    cursorClip.addPlayingStepObserver(onStepPlaying);
+   
+	changeEncoderBank(ENCODERBANK);
     trackBank.setChannelScrollStepSize(channelStepSize);
 	setActivePage(mixerPage);
 }
 
-function setActivePage(page)
+function setActivePage(page) //TODO: make notification show active page within mode
 {
    var isInit = activePage == null;
 
@@ -78,6 +67,7 @@ function setActivePage(page)
       if (!isInit)
       {
          host.showPopupNotification(page.title);
+		 
       }
    }
 }
@@ -89,8 +79,6 @@ function getSendObserverFunc(t, s)
 	sendArray[t][s] = value;
 	}
 }
-
-
 
 function getTrackObserverFunc(track, varToStore)
 {	
@@ -256,3 +244,42 @@ function handleColor(red, green, blue)
 		}
     }    
 };
+
+function changeEncoderBank(bank)
+{
+	sendMidi(147, bank, 127);
+}
+
+function onStepExists (step, key, exists)
+{
+	stepData[step][key] = exists;
+}
+
+function isAnyStepTrue (step, array)
+{
+	for (k=0; k<SEQ_KEYS; k++)
+	{
+		if (array[step][k] === true)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+function getFirstKey(step, array)
+{
+	for (k=0; k<SEQ_KEYS; k++)
+	{
+		if (array[step][k] === true)
+		{
+			return k;
+		}
+	}
+	return 0;
+}
+
+function onStepPlaying(step)
+{
+	playingStep = (step);
+}

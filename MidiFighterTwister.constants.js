@@ -1,3 +1,21 @@
+var volume = initArray(0, 8);
+var pan = initArray(0, 8);
+var mute = initArray(0, 8);
+var solo = initArray(0, 8);
+var arm = initArray(0, 8);
+var color = initArray(0, 8);
+var isSelected = initArray(0, 8);
+var activePage = null;
+var channelStepSize = 4;
+var channelStepSizeArray = [1, 4, 8];
+
+var statusType =
+{
+   SIDEBUTTON_RELEASE:131,
+   SIDEBUTTON_PRESS:147,
+   ENCODER_PRESS:177,
+   ENCODER_TURN:176,
+}
 var SIDE_BUTTON =
 {
    LH_TOP:8,
@@ -7,7 +25,6 @@ var SIDE_BUTTON =
    RH_MIDDLE:12,
    RH_BOTTOM:13,
 };
-
 var LEFT_BUTTON =
 {
     TOP:8,
@@ -15,6 +32,12 @@ var LEFT_BUTTON =
     BOTTOM:10,
 };
 
+var pendingRGBLEDs = new Array(64);
+var activeRGBLEDs = new Array(64);
+var pendingRGBSTROBEs = new Array(64);
+var activeRGBSTROBEs = new Array(64);
+var pending11segLEDs = new Array(64);
+var active11segLEDs = new Array(64);
 var COLOR =
 {
     SILVER:0,
@@ -45,7 +68,13 @@ var COLOR =
     LIGHT_PURPLE2:117,
     DARK_PURPLE2:125,
 };
-
+var STROBE =
+{
+   RAINBOW:127,
+   PULSE1:12,
+   ON:1,
+   OFF:0,
+}
 var trackColors =
 [
     [ 0.3294117748737335 , 0.3294117748737335 , 0.3294117748737335 , COLOR.GREY],    // Dark Gray
@@ -76,6 +105,8 @@ var trackColors =
     [ 0.2666666805744171 , 0.7843137383460999 , 1                  , COLOR.LIGHT_BLUE]    // Blue
 ];
 
+var MIXERMODE = 0;
+var mixerModeArray = ["Volume / Pan", "Sends", "Mix 4"];
 var mixerMode =
 {
     VOLUME_PAN:0,
@@ -83,26 +114,31 @@ var mixerMode =
     Mix4:2,
 };
 
-var mixerModeArray = ["Volume / Pan", "Sends", "Mix 4"];
+var currentSend = 0;
+var currentSend11Seg = 1;
+var sendArray =
+[
+    [0,0,0,0,0,0,0,0,0,0,0] , //track1
+    [0,0,0,0,0,0,0,0,0,0,0] , //track2
+	[0,0,0,0,0,0,0,0,0,0,0] , //track3
+	[0,0,0,0,0,0,0,0,0,0,0] , //track3
+	[0,0,0,0,0,0,0,0,0,0,0] , //track4
+	[0,0,0,0,0,0,0,0,0,0,0] , //track5
+	[0,0,0,0,0,0,0,0,0,0,0] , //track6
+	[0,0,0,0,0,0,0,0,0,0,0] , //track7
+	[0,0,0,0,0,0,0,0,0,0,0] , //track8
+];
 
-var statusType =
+var ENCODERBANK = 0;
+var encoderNum = -1;
+var encoderValue = 0;
+var encoderBankOffset =
 {
-   SIDEBUTTON_RELEASE:131,
-   SIDEBUTTON_PRESS:147,
-   ENCODER_PRESS:177,
-   ENCODER_TURN:176,
+   BANK1:0,
+   BANK2:16,
+   BANK3:32,
+   BANK4:48,
 }
-
-var channelStepSizeArray = [1, 4, 8];
-
-var STROBE =
-{
-   RAINBOW:127,
-   PULSE1:12,
-   ON:1,
-   OFF:0,
-}
-
 var encoderBank =
 {
    BANK1:12,
@@ -110,17 +146,213 @@ var encoderBank =
    BANK3:14,
    BANK4:15,
 }
+var Bank1 =
+{
+	ENCODER1:1,
+	ENCODER2:2,
+	ENCODER3:3,
+	ENCODER4:4,
+	ENCODER5:5,
+	ENCODER6:6,
+	ENCODER7:7,
+	ENCODER8:8,
+	ENCODER9:9,
+	ENCODER10:10,
+	ENCODER11:11,
+	ENCODER12:12,
+	ENCODER13:13,
+	ENCODER14:14,
+	ENCODER15:15,
+	ENCODER16:16,
+}
+var Bank2 =
+{
+	ENCODER1:17,
+	ENCODER2:18,
+	ENCODER3:19,
+	ENCODER4:20,
+	ENCODER5:21,
+	ENCODER6:22,
+	ENCODER7:23,
+	ENCODER8:24,
+	ENCODER9:25,
+	ENCODER10:26,
+	ENCODER11:27,
+	ENCODER12:28,
+	ENCODER13:29,
+	ENCODER14:30,
+	ENCODER15:31,
+	ENCODER16:32,
+}
+var Bank3 =
+{
+	ENCODER1:33,
+	ENCODER2:34,
+	ENCODER3:35,
+	ENCODER4:36,
+	ENCODER5:37,
+	ENCODER6:38,
+	ENCODER7:39,
+	ENCODER8:40,
+	ENCODER9:41,
+	ENCODER10:42,
+	ENCODER11:43,
+	ENCODER12:44,
+	ENCODER13:45,
+	ENCODER14:46,
+	ENCODER15:47,
+	ENCODER16:48,
+}
+var Bank4 =
+{
+	ENCODER1:49,
+	ENCODER2:50,
+	ENCODER3:51,
+	ENCODER4:52,
+	ENCODER5:53,
+	ENCODER6:54,
+	ENCODER7:55,
+	ENCODER8:56,
+	ENCODER9:57,
+	ENCODER10:58,
+	ENCODER11:59,
+	ENCODER12:60,
+	ENCODER13:61,
+	ENCODER14:62,
+	ENCODER15:63,
+	ENCODER16:64,
+}
 
-var sendArray = [
-               [0,0,0,0,0,0,0,0,0,0,0] , //track1
-               [0,0,0,0,0,0,0,0,0,0,0] , //track2
-               [0,0,0,0,0,0,0,0,0,0,0] , //track3
-               [0,0,0,0,0,0,0,0,0,0,0] , //track3
-               [0,0,0,0,0,0,0,0,0,0,0] , //track4
-               [0,0,0,0,0,0,0,0,0,0,0] , //track5
-               [0,0,0,0,0,0,0,0,0,0,0] , //track6
-               [0,0,0,0,0,0,0,0,0,0,0] , //track7
-               [0,0,0,0,0,0,0,0,0,0,0] , //track8
-               ];
 
-      
+var stepData = [];
+var activeStep = 0;
+var playingStep = -1;
+var stepSize = 1;
+var SEQ_STEPS = 16;
+var SEQ_KEYS = 128;
+var KEYS_OCT_LO = 0;
+var KEYS_OCT_HI = 48;
+var CURRENT_OCT = 0;
+var OCTAVE_RANGE = 3;
+var ROOT_NOTE = 0;
+var VELOCITY = 127;
+var NOTE_LENGTH = 0.25;
+var CURRENTSEQMODE = 0;
+var MELODICSEQMODE = 0;
+var MELODICSEQNOTEPAGE = 0;
+var MELODICSEQPATTERNPAGE = 0;
+var MELODICSEQSETTINGSPAGE = 0;
+var DURMSEQMODE = 0;
+var DRUMSEQNOTEPAGE = 0;
+var currentSeqMode =
+{
+	DRUM:0,
+	MELODIC:1,
+}
+var melodicSeqMode =
+{
+	NOTE:0,
+	PATTERN:1,
+	SETTINGS:2,
+}
+var melodicSeqModeNotePage =
+{
+	PITCH:0,
+	LENGTH:1,
+	VELOCITY:2,
+	MODULATION:3,
+}
+var drumSeqMode =
+{
+	NOTE:0,
+	DRUM:1,
+	SETTINGS:2,
+}
+var drumSeqNotePage =
+{
+	LENGTH:1,
+	VELOCITY:2,
+}
+var drumSeqDrumPage =
+{
+	PAD:0,
+	PATTERN:1,
+}
+
+var CURRENT_MODERN_MODE = 0;
+
+var modernModes =
+[
+ [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+ [ 0, 2, 4, 5, 7, 9, 11] ,
+ [ 0, 2, 3, 5, 7, 8, 10] ,
+ [ 0, 2, 3, 5, 7, 9, 10] ,
+ [ 0, 2, 4, 5, 7, 9, 10] ,
+ [ 0, 2, 4, 6, 7, 9, 11] ,
+ [ 0, 1, 3, 5, 7, 8, 10] ,
+ [ 0, 1, 3, 4, 6, 8, 10] ,
+ [ 0, 1, 3, 4, 6, 7, 9] ,
+ [ 0, 2, 3, 5, 6, 8, 9] ,
+ [ 0, 2, 4, 6, 8, 10] ,
+ [ 0, 3, 5, 6, 7, 10] ,
+ [ 0, 3, 5, 7, 10] ,
+ [ 0, 2, 4, 7, 9] ,
+ [ 0, 2, 3, 5, 7, 8, 11] ,
+ [ 0, 2, 3, 5, 7, 9, 11] ,
+ [ 0, 1, 3, 4, 6, 8, 10] ,
+ [ 0, 1, 4, 5, 7, 8, 11] ,
+ [ 0, 2, 3, 6, 7, 8, 11] ,
+ [ 0, 1, 4, 5, 7, 8, 10] ,
+ [ 0, 4, 6, 7, 11] ,
+ [ 0, 1, 5, 7, 10] ,
+ [ 0, 1, 5, 6, 10] ,
+ [ 0, 2, 3, 7, 9] ,
+ [ 0, 1, 3, 7, 8] ,
+ [ 0, 1, 4, 5, 7, 9, 10] 
+];
+
+var modernModesNames =
+[
+  ['Chromatic'],
+  ['Major'],
+  ['Minor'],
+  ['Dorian'],
+  ['Mixolydian'],
+  ['Lydian'],
+  ['Phrygian'],
+  ['Locrian'],
+  ['Dimished'],
+  ['Whole-half'],
+  ['Whole Tone'],
+  ['Minor Blues'],
+  ['Minor Pentaonic'],
+  ['Marjor Pentatonic'],
+  ['Harmonic Minor'],
+  ['Melodic Minor'],
+  ['Super Locorian'],
+  ['Bhairav'],
+  ['Hungarian Minor'],
+  ['Minor Gypsy'],
+  ['Hirojoshi'],
+  ['In-Sen'],
+  ['Iwato'],
+  ['Kumoi'],
+  ['Pelog'],
+  ['Spanish']
+];
+
+var rootNoteNames = 
+[
+  ['C'],
+  ['C#'],
+  ['D'],
+  ['D# / Eb'],
+  ['E'],
+  ['F'],
+  ['F#'],
+  ['G'],
+  ['G#'],
+  ['A'],
+  ['A# / Bb'],
+  ['B']
+];

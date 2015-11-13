@@ -14,8 +14,6 @@ mixerPage.updateOutputState = function()
     this.updateIndicators();
 }
 
-var tempvar = 0;
-
 mixerPage.onEncoderPress = function(isActive)
 {
     if (MIXERMODE == mixerMode.VOLUME_PAN)
@@ -146,12 +144,23 @@ mixerPage.onEncoderTurn = function(isActive)
     }
 }
 
-mixerPage.onLeftBottom = function(isPressed)
+mixerPage.onRightTop = function(isPressed)
 {
+    trackBank.scrollChannelsUp();
 }
 
-mixerPage.onLeftMiddle = function(isPressed)
+mixerPage.onRightMiddle = function(isPressed)
 {
+    var index = channelStepSizeArray.indexOf(channelStepSize);
+    MIXERMODE == mixerMode.Mix4 ? index == (channelStepSizeArray.length - 2) ? index = 0 : index++ : index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
+    channelStepSize = channelStepSizeArray[index];
+    host.showPopupNotification("Channel Step Size: "+channelStepSize);
+    trackBank.setChannelScrollStepSize(channelStepSize);
+}
+
+mixerPage.onRightBottom = function(isPressed)
+{
+    trackBank.scrollChannelsDown();
 }
 
 mixerPage.onLeftTop = function(isPressed)
@@ -177,30 +186,31 @@ mixerPage.onLeftTop = function(isPressed)
             ENCODERBANK = 2;
             break
     }
-    sendMidi(147, ENCODERBANK, 127);
+    
+    changeEncoderBank(ENCODERBANK);
 }
 
-mixerPage.onRightBottom = function(isPressed)
+mixerPage.onLeftMiddle = function(isPressed)
 {
-    trackBank.scrollChannelsDown();
+    ENCODERBANK = 3;
+    changeEncoderBank(ENCODERBANK);
+	
+    if (CURRENTSEQMODE == currentSeqMode.DRUM)
+	{
+		setActivePage(drumSequencerPage);
+	}
+	
+    if (CURRENTSEQMODE == currentSeqMode.MELODIC)
+	{
+		setActivePage(melodicSequencerPage);
+	}
 }
 
-mixerPage.onRightMiddle = function(isPressed)
+mixerPage.onLeftBottom = function(isPressed)
 {
-    var index = channelStepSizeArray.indexOf(channelStepSize);
-    MIXERMODE == mixerMode.Mix4 ? index == (channelStepSizeArray.length - 2) ? index = 0 : index++ : index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
-    channelStepSize = channelStepSizeArray[index];
-    host.showPopupNotification("Channel Step Size: "+channelStepSize);
-    trackBank.setChannelScrollStepSize(channelStepSize);
 }
 
-mixerPage.onRightTop = function(isPressed)
-{
-    trackBank.scrollChannelsUp();
-}
-
-
-mixerPage.updateRGBLEDs = function() //TODO: feedback for mute, solo, & selected
+mixerPage.updateRGBLEDs = function()
 {
     if (MIXERMODE == mixerMode.VOLUME_PAN) 
     {
@@ -247,7 +257,7 @@ mixerPage.updateRGBLEDs = function() //TODO: feedback for mute, solo, & selected
             }
         }
     }
-    
+
     if (MIXERMODE == mixerMode.Mix4) 
     {
         for(var i=0; i<16; i++)
@@ -369,6 +379,13 @@ mixerPage.updateIndicators = function()
             for (var s=0; s<11; s++)
             {
             trackBank.getChannel(i).getSend(s).setIndication(currentSend == s);
+            }
+        }
+        for(var i=4; i<8; i++)
+        {
+            for (var s=0; s<11; s++)
+            {
+            trackBank.getChannel(i).getSend(s).setIndication(false);
             }
         }
     }
