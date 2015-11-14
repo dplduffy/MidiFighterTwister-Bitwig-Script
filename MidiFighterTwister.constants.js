@@ -224,6 +224,7 @@ var Bank4 =
 	ENCODER16:64,
 }
 
+var sequencerFollow = true;
 var stepData = [];
 var activeStep = 0;
 var playingStep = -1;

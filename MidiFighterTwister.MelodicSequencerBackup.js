@@ -11,7 +11,7 @@ var barsOnPage = 0;
 var currentSeqChunk = 0;
 var currentScrollStepOffset = 0;
 var currentScrollStepStart = 0;
-var currentScrollStepEnd = 15;
+var currentScrollStepEnd = 31;
 
 melodicSequencerPage.updateOutputState = function()
 {
@@ -26,7 +26,7 @@ melodicSequencerPage.onEncoderPress = function(isActive)
 {
     if (MELODICSEQMODE == melodicSeqMode.NOTE)
     {
-        var tempStepPress = (encoderNum-encoderBankOffset.BANK4);
+        var tempStepPress = ((encoderNum-encoderBankOffset.BANK4)+(currentSeqChunk*16));
         
         if (isAnyStepTrue (tempStepPress, stepData))
         {
@@ -89,7 +89,7 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
     {
         if (MELODICSEQNOTEPAGE == melodicSeqModeNotePage.PITCH)
         {
-            var tempStepTurn = (encoderNum-encoderBankOffset.BANK4);
+            var tempStepTurn = ((encoderNum-encoderBankOffset.BANK4)+(currentSeqChunk*16));
             
             if (isAnyStepTrue (tempStepTurn, stepData))
             {
@@ -101,7 +101,7 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
                     cursorClip.clearStep(tempStepTurn, i);
                     }
                     cursorClip.setStep(tempStepTurn, tempKey, VELOCITY, STEP_SIZE);
-                    host.showPopupNotification(rootNoteNames[(tempKey%12)]+octaveNoteNumbers[((CURRENT_OCT)+(Math.floor(tempKey/12)))]);
+                    //host.showPopupNotification(rootNoteNames[(tempKey%12)]+octaveNoteNumbers[((CURRENT_OCT)+(Math.floor(tempKey/12)))]);
                 }
             }
         }
@@ -187,9 +187,9 @@ melodicSequencerPage.updateRGBLEDs = function()
     {
         for(var i=0; i<16; i++)
             {
-                playingStep == (i + (currentScrollStepOffset*SEQ_STEPS)) ?
+                playingStep == (i + (currentSeqChunk*16)) ?
                     setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) :
-                        isAnyStepTrue(i, stepData) ? setRGBLED(i+encoderBankOffset.BANK4, COLOR.AQUA, STROBE.OFF) :
+                        isAnyStepTrue((i+(currentSeqChunk*16)), stepData) ? setRGBLED(i+encoderBankOffset.BANK4, COLOR.AQUA, STROBE.OFF) :
                             setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF);
             }
     }
@@ -223,9 +223,9 @@ melodicSequencerPage.update11segLEDs = function()
     {
         for(var i=0; i<16; i++)
             {
-                if(isAnyStepTrue(i,stepData))
+                if(isAnyStepTrue((i+(currentSeqChunk*16)),stepData))
                 {
-                set11segLED(i+encoderBankOffset.BANK4, scaleKeyToEncoder(getFirstKey(i, stepData)));
+                set11segLED(i+encoderBankOffset.BANK4, scaleKeyToEncoder(getFirstKey((i+(currentSeqChunk*16)), stepData)));
                 }
                 else
                 {
@@ -249,30 +249,38 @@ melodicSequencerPage.updateIndicators = function()
 
 melodicSequencerPage.updateSequencer = function()
 {
+    currentBar = Math.floor((playingStep*STEP_SIZE)/4);
+    barsOnPage = STEP_SIZE*4;
+    //println('something '+32/STEP_SIZE)
     customScrollStep();
+    println('currentScrollStepStart ' + currentScrollStepStart);
+    println('currentScrollStepEnd ' + currentScrollStepEnd);
+    println('playing step '+playingStep);
+    println('Loop Length '+clipLoopLength);
 }
 
 function customScrollStep()
 {
-    if (playingStep > -1)
+    if (playingStep > 0)
     {
-        while (playingStep>currentScrollStepEnd)
+        if (playingStep >= currentScrollStepStart && playingStep <= currentScrollStepEnd)
+        {
+            currentScrollStepOffset = currentScrollStepOffset
+        }
+        if(playingStep>currentScrollStepEnd)
         {
             cursorClip.scrollStepsPageForward();
             currentScrollStepOffset = currentScrollStepOffset + 1;
-            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
-            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;
         }
-        while (playingStep<currentScrollStepStart)
+        if(playingStep<currentScrollStepStart)
         {
             cursorClip.scrollStepsPageBackwards()
             currentScrollStepOffset = currentScrollStepOffset - 1;
-            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
-            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;             
         }
+        currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
+        currentScrollStepEnd = ((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS);
     }
 }
-
 function scaleKeyToEncoder(key)
 {
     var keytemp = key - (CURRENT_OCT*12);

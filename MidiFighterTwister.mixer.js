@@ -181,29 +181,6 @@ mixerPage.onLeftTopPressed = function(isActive)
 
 mixerPage.onLeftTopReleased = function(isActive)
 {
-    MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
-    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
-    
-    if (MIXERMODE == mixerMode.Mix4 && channelStepSize == 8)
-    {
-    channelStepSize = 4;
-    trackBank.setChannelScrollStepSize(channelStepSize);
-    }
-    
-    switch(MIXERMODE)
-    {
-        case mixerMode.VOLUME_PAN:
-            ENCODERBANK = 0;
-            break
-        case mixerMode.SEND:
-            ENCODERBANK = 1;
-            break
-        case mixerMode.Mix4:
-            ENCODERBANK = 2;
-            break
-    }
-    
-    changeEncoderBank(ENCODERBANK);
 }
 
 mixerPage.onLeftMiddlePressed = function(isActive)
