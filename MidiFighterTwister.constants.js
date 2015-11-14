@@ -38,6 +38,7 @@ var pendingRGBSTROBEs = new Array(64);
 var activeRGBSTROBEs = new Array(64);
 var pending11segLEDs = new Array(64);
 var active11segLEDs = new Array(64);
+var rainbowArray = [80, 67, 60, 40, 18, 100, 117];
 var COLOR =
 {
     SILVER:0,
@@ -250,6 +251,7 @@ var MELODICSEQPATTERNPAGE = 0;
 var MELODICSEQSETTINGSPAGE = 0;
 var DURMSEQMODE = 0;
 var DRUMSEQNOTEPAGE = 0;
+var octaveNoteNumbers = [ '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8']
 var stepSizeNameArray = ['1/32', '1/16', '1/8', '1/4', '1/2', '1']
 var stepSizeArray = [0.125, 0.25, 0.5, 1, 2, 4]
 
@@ -360,4 +362,9 @@ var rootNoteNames =
   ['A#'],
   ['B']
 ];
-var octaveNoteNumbers = [ '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8']
+var melodicEncoderSetting =
+{
+   ROOT : 12,
+   MODE : 13,
+   STEP : 14,
+}
