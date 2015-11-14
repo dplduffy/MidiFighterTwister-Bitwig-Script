@@ -144,12 +144,20 @@ mixerPage.onEncoderTurn = function(isActive)
     }
 }
 
-mixerPage.onRightTop = function(isPressed)
+mixerPage.onRightTopPressed = function(isActive)
+{
+}
+
+mixerPage.onRightTopReleased = function(isActive)
 {
     trackBank.scrollChannelsUp();
 }
 
-mixerPage.onRightMiddle = function(isPressed)
+mixerPage.onRightMiddlePressed = function(isActive)
+{
+}
+
+mixerPage.onRightMiddleReleased = function(isActive)
 {
     var index = channelStepSizeArray.indexOf(channelStepSize);
     MIXERMODE == mixerMode.Mix4 ? index == (channelStepSizeArray.length - 2) ? index = 0 : index++ : index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
@@ -158,12 +166,20 @@ mixerPage.onRightMiddle = function(isPressed)
     trackBank.setChannelScrollStepSize(channelStepSize);
 }
 
-mixerPage.onRightBottom = function(isPressed)
+mixerPage.onRightBottomPressed = function(isActive)
+{
+}
+
+mixerPage.onRightBottomReleased = function(isActive)
 {
     trackBank.scrollChannelsDown();
 }
 
-mixerPage.onLeftTop = function(isPressed)
+mixerPage.onLeftTopPressed = function(isActive)
+{
+}
+
+mixerPage.onLeftTopReleased = function(isActive)
 {
     MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
     host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
@@ -190,7 +206,11 @@ mixerPage.onLeftTop = function(isPressed)
     changeEncoderBank(ENCODERBANK);
 }
 
-mixerPage.onLeftMiddle = function(isPressed)
+mixerPage.onLeftMiddlePressed = function(isActive)
+{
+}
+
+mixerPage.onLeftMiddleReleased = function(isActive)
 {
     ENCODERBANK = 3;
     changeEncoderBank(ENCODERBANK);
@@ -206,7 +226,11 @@ mixerPage.onLeftMiddle = function(isPressed)
 	}
 }
 
-mixerPage.onLeftBottom = function(isPressed)
+mixerPage.onLeftBottomPressed = function(isActive)
+{
+}
+
+mixerPage.onLeftBottomReleased = function(isActive)
 {
 }
 

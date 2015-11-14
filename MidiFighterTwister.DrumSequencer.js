@@ -26,19 +26,35 @@ drumSequencerPage.onEncoderTurn = function(isActive)
 {   
 }
 
-drumSequencerPage.onRightTop = function(isPressed)
+drumSequencerPage.onRightTopPressed = function(isActive)
 {
 }
 
-drumSequencerPage.onRightMiddle = function(isPressed)
+drumSequencerPage.onRightTopReleased = function (isActive)
 {
 }
 
-drumSequencerPage.onRightBottom = function(isPressed)
+drumSequencerPage.onRightMiddlePressed = function(isActive)
 {
 }
 
-drumSequencerPage.onLeftTop = function(isPressed)
+drumSequencerPage.onRightMiddleReleased = function(isActive)
+{
+}
+
+drumSequencerPage.onRightBottomPressed = function(isActive)
+{
+}
+
+drumSequencerPage.onRightBottomReleased = function (isActive)
+{
+}
+
+drumSequencerPage.onLeftTopPressed = function(isActive)
+{
+}
+
+drumSequencerPage.onLeftTopReleased = function(isActive)
 {
     switch(MIXERMODE)
     {
@@ -57,13 +73,21 @@ drumSequencerPage.onLeftTop = function(isPressed)
 	setActivePage(mixerPage);
 }
 
-drumSequencerPage.onLeftMiddle = function(isPressed)
+drumSequencerPage.onLeftMiddlePressed = function(isActive)
+{
+}
+
+drumSequencerPage.onLeftMiddleReleased = function(isActve)
 {
     CURRENTSEQMODE = 1;
     setActivePage(melodicSequencerPage);
 }
 
-drumSequencerPage.onLeftBottom = function(isPressed)
+drumSequencerPage.onLeftBottomPressed = function(isActive)
+{
+}
+
+drumSequencerPage.onLeftBottomReleased = function(isActive)
 {
 }
 

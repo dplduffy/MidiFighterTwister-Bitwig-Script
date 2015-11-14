@@ -72,6 +72,7 @@ var STROBE =
 {
    RAINBOW:127,
    PULSE1:12,
+   PULSE2:13,
    ON:1,
    OFF:0,
 }
@@ -223,16 +224,19 @@ var Bank4 =
 	ENCODER16:64,
 }
 
-
 var stepData = [];
 var activeStep = 0;
 var playingStep = -1;
+var clipStart = 0.0;
+var clipStop  = 4.0;
+var clipLoopStart = 0.0;
+var clipLoopLength = 4.0;
 var STEP_SIZE = 0.25;
 var SEQ_STEPS = 16;
 var SEQ_KEYS = 128;
 var KEYS_OCT_LO = 0;
 var KEYS_OCT_HI = 48;
-var CURRENT_OCT = 0;
+var CURRENT_OCT = 2;
 var OCTAVE_RANGE = 3;
 var ROOT_NOTE = 0;
 var CURRENT_MODERN_MODE = 0;
@@ -247,8 +251,6 @@ var DURMSEQMODE = 0;
 var DRUMSEQNOTEPAGE = 0;
 var stepSizeNameArray = ['1/32', '1/16', '1/8', '1/4', '1/2', '1']
 var stepSizeArray = [0.125, 0.25, 0.5, 1, 2, 4]
-
-
 
 var currentSeqMode =
 {

@@ -48,13 +48,18 @@ function init()
 		stepData[i] = initArray(false, SEQ_KEYS);
 	}
    
+   	setActivePage(mixerPage);
+   
     cursorClip = host.createCursorClip(SEQ_STEPS, SEQ_KEYS);
     cursorClip.addStepDataObserver(onStepExists);
     cursorClip.addPlayingStepObserver(onStepPlaying);
+	cursorClip.getPlayStart().addRawValueObserver(getClipStart);
+	cursorClip.getPlayStop().addRawValueObserver(getClipStop);
+	cursorClip.getLoopStart().addRawValueObserver(getClipLoopStart);
+	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
    
 	changeEncoderBank(ENCODERBANK);
     trackBank.setChannelScrollStepSize(channelStepSize);
-	setActivePage(mixerPage);
 }
 
 function setActivePage(page) //TODO: make notification show active page within mode
@@ -98,11 +103,31 @@ function getTrackObserverFunc(track, varToStore)
 	}
 }
 
+function getClipStart (value)
+{
+	clipStart = value;
+}
+
+function getClipStop (value)
+{
+	clipStop = value;
+}
+
+function getClipLoopStart (value)
+{
+	clipLoopStart = value;
+}
+
+function getClipLoopLength (value)
+{
+	clipLoopLength = value;
+}
+
 function onMidi(status, data1, data2)
 {
 	printMidi(status, data1, data2);
-    var isActive = data2 > 0;
-	var isPressed = data1 > 0;
+    var isActive = (data2 > 0);
+	var isPressed = (data2 > 0);
 	
 	if (status == statusType.ENCODER_TURN)
 	{
@@ -118,7 +143,7 @@ function onMidi(status, data1, data2)
 		activePage.onEncoderPress(isActive);
 	}
 	
-	if (status == statusType.ENCODER_PRESS && data2 == 127) //data2 == 0 for encoder release
+	if (status == statusType.ENCODER_PRESS && data2 == 0) //data2 == 0 for encoder release
 	{
 		encoderNum = data1;
 		encoderValue = data2;
@@ -130,29 +155,49 @@ function onMidi(status, data1, data2)
 		switch(data1)
 		{
 		case SIDE_BUTTON.LH_BOTTOM:
-            activePage.onLeftBottom(isPressed);
+            activePage.onLeftBottomPressed(isActive);
 			break;
 		case SIDE_BUTTON.LH_MIDDLE:
-			activePage.onLeftMiddle(isPressed);
+			activePage.onLeftMiddlePressed(isActive);
 			break
 		case SIDE_BUTTON.LH_TOP:
-			activePage.onLeftTop(isPressed);
+			activePage.onLeftTopPressed(isActive);
 			break;
 		case SIDE_BUTTON.RH_BOTTOM:
-            activePage.onRightBottom(isPressed);
+            activePage.onRightBottomPressed(isActive);
 			break;
 		case SIDE_BUTTON.RH_MIDDLE:
-			activePage.onRightMiddle(isPressed);
+			activePage.onRightMiddlePressed(isActive);
 			break
 		case SIDE_BUTTON.RH_TOP:
-			activePage.onRightTop(isPressed);
+			activePage.onRightTopPressed(isActive);
 			break;
 		}
 	}
-
+	
 	if (status == statusType.SIDEBUTTON_RELEASE)
 	{
-		
+		switch(data1)
+		{
+		case SIDE_BUTTON.LH_BOTTOM:
+            activePage.onLeftBottomReleased(isActive);
+			break;
+		case SIDE_BUTTON.LH_MIDDLE:
+			activePage.onLeftMiddleReleased(isActive);
+			break
+		case SIDE_BUTTON.LH_TOP:
+			activePage.onLeftTopReleased(isActive);
+			break;
+		case SIDE_BUTTON.RH_BOTTOM:
+            activePage.onRightBottomReleased(isActive);
+			break;
+		case SIDE_BUTTON.RH_MIDDLE:
+			activePage.onRightMiddleReleased(isActive);
+			break
+		case SIDE_BUTTON.RH_TOP:
+			activePage.onRightTopReleased(isActive);
+			break;
+		}
 	}
 }
 
