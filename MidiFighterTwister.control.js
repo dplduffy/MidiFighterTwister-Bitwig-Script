@@ -127,7 +127,7 @@ function getClipLoopLength (value)
 
 function onMidi(status, data1, data2)
 {
-	printMidi(status, data1, data2);
+	//printMidi(status, data1, data2);
     var isActive = (data2 > 0);
 	var isPressed = (data2 > 0);
 	

@@ -2,19 +2,22 @@ function customScrollStep()
 {
     if (playingStep > -1)
     {
-        while (playingStep>currentScrollStepEnd)
+        if(sequencerFollow)
         {
-            cursorClip.scrollStepsPageForward();
-            currentScrollStepOffset = currentScrollStepOffset + 1;
-            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
-            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;
-        }
-        while (playingStep<currentScrollStepStart)
-        {
-            cursorClip.scrollStepsPageBackwards()
-            currentScrollStepOffset = currentScrollStepOffset - 1;
-            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
-            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;             
+            while (playingStep>currentScrollStepEnd)
+            {
+                cursorClip.scrollStepsPageForward();
+                currentScrollStepOffset = currentScrollStepOffset + 1;
+                currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
+                currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;
+            }
+            while (playingStep<currentScrollStepStart)
+            {
+                cursorClip.scrollStepsPageBackwards()
+                currentScrollStepOffset = currentScrollStepOffset - 1;
+                currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
+                currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;             
+            }
         }
     }
 }

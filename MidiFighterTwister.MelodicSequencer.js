@@ -6,6 +6,9 @@ melodicSequencerPage.title = "Melodic Sequencer";
 var tempPatternPressStart = 0;
 var tempPatternPressEnd = 0;
 var tempPatternStartPressed = false;
+var tempStepPressStart = 0;
+var tempStepPressEnd = 0;
+var tempStepStartPressed = false;
 var currentBar = 0;
 var barsOnPage = 0;
 var currentSeqChunk = 0;
@@ -16,9 +19,10 @@ var a = 0;
 var b = 0;
 var min = 0;
 var max = 127;
+var stepRGB = 67;
+var seqFollowRGB = COLOR.GREEN;
 var rootRGB = 80;
 var modeRGB = 80;
-var stepRGB = 67;
 var octRGB = 40;
 var octRangeRGB = 60;
 
@@ -36,75 +40,149 @@ melodicSequencerPage.onEncoderPress = function(isActive)
     if (MELODICSEQMODE == melodicSeqMode.NOTE)
     {
         var tempStepPress = (encoderNum-encoderBankOffset.BANK4);
-        println(getFirstKey(tempStepPress, stepData));
-        if (isAnyStepTrue (tempStepPress, stepData))
+        if(tempStepStartPressed)
         {
-            for(i=0; i<128; i++)
-                {
-                prevStepData[tempStepPress][i] = false;
-                }
-        prevStepData[tempStepPress][getFirstKey(tempStepPress, stepData)] = true;
-        cursorClip.clearStep(tempStepPress, getFirstKey(tempStepPress, stepData))
-        }
-        else
-        {
-            if (isAnyStepTrue (tempStepPress, prevStepData))
+            tempStepPressEnd = tempStepPress;
+            var tempStepPressLength = (Math.abs(tempStepPressEnd - tempStepPressStart)+1);
+            if (isAnyStepTrue (tempStepPress, stepData))
             {
-            cursorClip.setStep(tempStepPress, (getFirstKey(tempStepPress, prevStepData)), VELOCITY, STEP_SIZE);
-            host.showPopupNotification(rootNoteNames[((getFirstKey(tempStepPress, prevStepData))%12)]+((Math.floor((getFirstKey(tempStepPress,prevStepData))/12))-2));
-            for(i=0; i<128; i++)
+                for(step=0; step<tempStepPressEnd; step++)
                 {
-                prevStepData[tempStepPress][i] = false;
+                    for(i=0; i<128; i++)
+                        {
+                        prevStepData[step][i] = false;
+                        }
+                    cursorClip.clearStep(tempStepPress, getFirstKey(tempStepPress, stepData))
                 }
             }
             else
             {
-            cursorClip.setStep(tempStepPress, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, STEP_SIZE);
+            cursorClip.setStep(tempStepPressStart, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, (STEP_SIZE*tempStepPressLength));
             host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
             }
+            tempStepStartPressed = false;
+        }
+        else
+        {
+            tempStepPressStart = tempStepPress;
+            tempStepStartPressed = true;
         }
     }
     
     if (MELODICSEQMODE == melodicSeqMode.PATTERN)
     {
-        var tempPatternPress = encoderNum-encoderBankOffset.BANK4;
-        
-        if (tempPatternStartPressed)
+        if(MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.PATTERN_SET)
         {
-            tempPatternPressEnd = tempPatternPress;
-            if(tempPatternPressEnd<tempPatternPressStart)
+            var tempPatternPress = encoderNum-encoderBankOffset.BANK4;
+            if (tempPatternStartPressed)
             {
-                var tempFlip = tempPatternPressEnd;
-                tempPatternPressEnd = tempPatternPressStart;
-                tempPatternPressStart = tempFlip;
+                tempPatternPressEnd = tempPatternPress;
+                if(tempPatternPressEnd<tempPatternPressStart)
+                {
+                    var tempFlip = tempPatternPressEnd;
+                    tempPatternPressEnd = tempPatternPressStart;
+                    tempPatternPressStart = tempFlip;
+                }
+                cursorClip.getLoopStart().setRaw(tempPatternPressStart*4);
+                cursorClip.getPlayStart().setRaw(tempPatternPressStart*4);
+                cursorClip.getLoopLength().setRaw(((tempPatternPressEnd*4)-(tempPatternPressStart*4))+4);
+                cursorClip.getPlayStop().setRaw(((tempPatternPressEnd*4)-(tempPatternPressStart*4))+4);
+                tempPatternPressStart = 0;
+                tempPatternPressEnd = 0;
+                tempPatternStartPressed = false;
             }
-            cursorClip.getLoopStart().setRaw(tempPatternPressStart*4);
-            cursorClip.getPlayStart().setRaw(tempPatternPressStart*4);
-            cursorClip.getLoopLength().setRaw(((tempPatternPressEnd*4)-(tempPatternPressStart*4))+4);
-            cursorClip.getPlayStop().setRaw(((tempPatternPressEnd*4)-(tempPatternPressStart*4))+4);
-            tempPatternPressStart = 0;
-            tempPatternPressEnd = 0;
-            tempPatternStartPressed = false;
+            else
+            {
+                tempPatternPressStart = tempPatternPress;
+                tempPatternStartPressed = true;
+            }
         }
-        else
+        if(MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.SECTION_SELECT)
         {
-            tempPatternPressStart = tempPatternPress;
-            tempPatternStartPressed = true;
+        }
+    }
+    
+    if (MELODICSEQMODE == melodicSeqMode.SETTINGS)
+    {
+        if (MELODICSEQSETTINGSPAGE == melodicSeqModeSettingsPage.PAGE1)
+        {
+            if((encoderNum-encoderBankOffset.BANK4) == melodicEncoderSetting.SEQ_FOLLOW)
+            {
+                sequencerFollow = !sequencerFollow
+                sequencerFollow ? seqFollowRGB = COLOR.GREEN : seqFollowRGB = COLOR.RED;
+            }
         }
     }
 }
 
 melodicSequencerPage.onEncoderRelease = function(isActive)
 {
+    if (MELODICSEQMODE == melodicSeqMode.NOTE)
+    {
+        if (MELODICSEQNOTEPAGE == melodicSeqModeNotePage.PITCH)
+        {
+            if (tempStepStartPressed)
+            {
+                if (isAnyStepTrue (tempStepPressStart, stepData))
+                {
+                    for(i=0; i<128; i++)
+                        {
+                        prevStepData[tempStepPressStart][i] = false;
+                        }
+                prevStepData[tempStepPressStart][getFirstKey(tempStepPressStart, stepData)] = true;
+                cursorClip.clearStep(tempStepPressStart, getFirstKey(tempStepPressStart, stepData))
+                }
+                else
+                {
+                    if (isAnyStepTrue (tempStepPressStart, prevStepData))
+                    {
+                    cursorClip.setStep(tempStepPressStart, (getFirstKey(tempStepPressStart, prevStepData)), VELOCITY, STEP_SIZE);
+                    host.showPopupNotification(rootNoteNames[((getFirstKey(tempStepPressStart, prevStepData))%12)]+((Math.floor((getFirstKey(tempStepPressStart,prevStepData))/12))-2));
+                    for(i=0; i<128; i++)
+                        {
+                        prevStepData[tempStepPressStart][i] = false;
+                        }
+                    }
+                    else
+                    {
+                    cursorClip.setStep(tempStepPressStart, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, STEP_SIZE);
+                    host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
+                    }
+                }
+            tempStepStartPressed = false;
+            }
+        }
+    }
     if (MELODICSEQMODE == melodicSeqMode.PATTERN)
     {
-        if (tempPatternStartPressed)
+        if (MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.PATTERN_SET)
         {
-            cursorClip.getLoopStart().setRaw(tempPatternPressStart*4);
-            cursorClip.getPlayStart().setRaw(tempPatternPressStart*4);
-            cursorClip.getLoopLength().setRaw(4);
-            cursorClip.getPlayStop().setRaw(tempPatternPressStart*4+4);
-            tempPatternStartPressed = false;
+            if (tempPatternStartPressed)
+            {
+                cursorClip.getLoopStart().setRaw(tempPatternPressStart*4);
+                cursorClip.getPlayStart().setRaw(tempPatternPressStart*4);
+                cursorClip.getLoopLength().setRaw(4);
+                cursorClip.getPlayStop().setRaw(tempPatternPressStart*4+4);
+                tempPatternStartPressed = false;
+            }
+        }
+        if (MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.SECTION_SELECT)
+        {
+            var tempPrevScrollStepOffset =  currentScrollStepOffset;
+            currentScrollStepOffset =  (encoderNum-encoderBankOffset.BANK4);
+            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
+            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;
+            
+            while (tempPrevScrollStepOffset<currentScrollStepOffset)
+            {
+                cursorClip.scrollStepsPageForward();
+                tempPrevScrollStepOffset++;
+            }
+            while (tempPrevScrollStepOffset>currentScrollStepOffset)
+            {
+                cursorClip.scrollStepsPageBackwards();
+                tempPrevScrollStepOffset--;
+            }
         }
     }
 }
@@ -226,14 +304,23 @@ melodicSequencerPage.onRightMiddlePressed = function(isActive)
 
 melodicSequencerPage.onRightMiddleReleased = function(isActive)
 {
+    
     if (MELODICSEQMODE == melodicSeqMode.PATTERN)
     {
+        if (MELODICSEQPATTERNPAGE + 1 < patternPageNameArray.length)
+        {
+            MELODICSEQPATTERNPAGE++;
+        }
+        else
+        {
+            MELODICSEQPATTERNPAGE = 0;
+        }
     }
     else
     {
     MELODICSEQMODE = melodicSeqMode.PATTERN;
-    host.showPopupNotification('Pattern Page');
     }
+    host.showPopupNotification('Pattern Page: ' + patternPageNameArray[MELODICSEQPATTERNPAGE]);
 }
 
 melodicSequencerPage.onRightBottomPressed = function(isActive)
@@ -307,30 +394,47 @@ melodicSequencerPage.updateRGBLEDs = function()
     }
     if(MELODICSEQMODE == melodicSeqMode.PATTERN)
     {
-        var tempClipStart = Math.floor(clipStart / 4);
-        var tempClipStop = Math.ceil((clipStop / 4)-1);
-        var tempClipLoopStart = Math.floor(clipLoopStart / 4);
-        var tempClipLoopLength = Math.ceil((clipLoopLength/4)-1);
-        
-        for(var i=0; i<16; i++)
+        if(MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.PATTERN_SET)
         {
-            if ((i>=tempClipStart && i<=tempClipStop) || (i>=tempClipLoopStart && i<=tempClipLoopLength))
+            var tempClipStart = Math.floor(clipStart / 4);
+            var tempClipStop = Math.ceil((clipStop / 4)-1);
+            var tempClipLoopStart = Math.floor(clipLoopStart / 4);
+            var tempClipLoopLength = Math.ceil((clipLoopLength/4)-1);
+            
+            for(var i=0; i<16; i++)
             {
-                currentBar == i ?
-                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_BLUE, STROBE.PULSE1)
-                        : setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) 
+                if ((i>=tempClipStart && i<=tempClipStop) || (i>=tempClipLoopStart && i<=tempClipLoopLength))
+                {
+                    currentBar == i ?
+                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_BLUE, STROBE.PULSE1)
+                            : setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) 
+                }
+                else
+                {
+                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF)
+                }
             }
-            else
+        }
+        if(MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.SECTION_SELECT)
+        {
+            var tempSections = ((clipLoopLength/STEP_SIZE)/16)
+            for(var i=0; i<16; i++)
             {
-                setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF)
+                if (i < tempSections)
+                {
+                currentScrollStepOffset == i ?
+                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.PULSE1) :
+                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_YELLOW, STROBE.OFF)
+                }
             }
         }
     }
     if(MELODICSEQMODE == melodicSeqMode.SETTINGS)
     {
+        setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.STEP), stepRGB, STROBE.OFF);
+        setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.SEQ_FOLLOW), seqFollowRGB, sequencerFollow ? STROBE.OFF : STROBE.PULSE1);
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.ROOT), rootRGB, STROBE.OFF);
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.MODE), modeRGB, STROBE.OFF);
-        setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.STEP), stepRGB, STROBE.OFF);
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.OCT), octRGB, STROBE.OFF);
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.OCT_RANGE), octRangeRGB, STROBE.OFF);
     }
@@ -354,10 +458,20 @@ melodicSequencerPage.update11segLEDs = function()
     }
     if(MELODICSEQMODE == melodicSeqMode.PATTERN)
     {
-        for(var i=0; i<16; i++)
-            {
-                set11segLED(i+encoderBankOffset.BANK4, 0);
-            }
+        if(MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.PATTERN_SET)
+        {
+            for(var i=0; i<16; i++)
+                {
+                    set11segLED(i+encoderBankOffset.BANK4, 0);
+                }
+        }
+        if(MELODICSEQPATTERNPAGE == melodicSeqModePatternPage.SECTION_SELECT)
+        {
+            for(var i=0; i<16; i++)
+                {
+                    set11segLED(i+encoderBankOffset.BANK4, 0);
+                }
+        }
     }
     if(MELODICSEQMODE == melodicSeqMode.SETTINGS)
     {
@@ -376,4 +490,5 @@ melodicSequencerPage.updateIndicators = function()
 melodicSequencerPage.updateSequencer = function()
 {
     customScrollStep();
+    currentBar = Math.floor(((playingStep*STEP_SIZE)/4));
 }

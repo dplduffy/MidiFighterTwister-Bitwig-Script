@@ -256,6 +256,8 @@ var octaveNoteNumbers = [ '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8
 var octaveRangeNames = ['± 6', '±12', '±18', '±24', '±30', '±36', '±42', '±48']
 var stepSizeNameArray = ['1/32', '1/16', '1/8', '1/4', '1/2', '1']
 var stepSizeArray = [0.125, 0.25, 0.5, 1, 2, 4]
+var notePageNameArray = ['Pitch', 'Length', 'Velocity', 'Modulation']
+var patternPageNameArray = ['Pattern Set', 'Section Select']
 
 var currentSeqMode =
 {
@@ -274,6 +276,15 @@ var melodicSeqModeNotePage =
 	LENGTH:1,
 	VELOCITY:2,
 	MODULATION:3,
+}
+var melodicSeqModePatternPage =
+{
+   PATTERN_SET:0,
+   SECTION_SELECT:1,
+}
+var melodicSeqModeSettingsPage =
+{
+   PAGE1 : 0,
 }
 var drumSeqMode =
 {
@@ -367,6 +378,7 @@ var rootNoteNames =
 var melodicEncoderSetting =
 {
    STEP : 8,
+   SEQ_FOLLOW : 9,
    ROOT : 12,
    MODE : 13,
    OCT: 14,
