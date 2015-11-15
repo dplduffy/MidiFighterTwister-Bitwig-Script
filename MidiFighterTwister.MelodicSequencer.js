@@ -19,6 +19,8 @@ var max = 127;
 var rootRGB = 80;
 var modeRGB = 80;
 var stepRGB = 67;
+var octRGB = 40;
+var octRangeRGB = 60;
 
 melodicSequencerPage.updateOutputState = function()
 {
@@ -34,15 +36,32 @@ melodicSequencerPage.onEncoderPress = function(isActive)
     if (MELODICSEQMODE == melodicSeqMode.NOTE)
     {
         var tempStepPress = (encoderNum-encoderBankOffset.BANK4);
-        
+        println(getFirstKey(tempStepPress, stepData));
         if (isAnyStepTrue (tempStepPress, stepData))
         {
+            for(i=0; i<128; i++)
+                {
+                prevStepData[tempStepPress][i] = false;
+                }
+        prevStepData[tempStepPress][getFirstKey(tempStepPress, stepData)] = true;
         cursorClip.clearStep(tempStepPress, getFirstKey(tempStepPress, stepData))
         }
         else
         {
-        cursorClip.setStep(tempStepPress, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, STEP_SIZE);
-        host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
+            if (isAnyStepTrue (tempStepPress, prevStepData))
+            {
+            cursorClip.setStep(tempStepPress, (getFirstKey(tempStepPress, prevStepData)), VELOCITY, STEP_SIZE);
+            host.showPopupNotification(rootNoteNames[((getFirstKey(tempStepPress, prevStepData))%12)]+((Math.floor((getFirstKey(tempStepPress,prevStepData))/12))-2));
+            for(i=0; i<128; i++)
+                {
+                prevStepData[tempStepPress][i] = false;
+                }
+            }
+            else
+            {
+            cursorClip.setStep(tempStepPress, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, STEP_SIZE);
+            host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
+            }
         }
     }
     
@@ -101,6 +120,8 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
             if (isAnyStepTrue (tempStepTurn, stepData))
             {
                 var tempKey = scaleEncoderToKey(encoderValue);
+                tempKey > 127 ? tempKey = 127 : tempKey = tempKey;
+                tempKey < 0 ? tempKey = 0 : tempKey = tempKey;
                 if (modernModes[CURRENT_MODERN_MODE].indexOf((tempKey-ROOT_NOTE) % 12) > -1)
                 {
                     for(i=0; i<128; i++)
@@ -108,13 +129,28 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
                     cursorClip.clearStep(tempStepTurn, i);
                     }
                     cursorClip.setStep(tempStepTurn, tempKey, VELOCITY, STEP_SIZE);
-                    host.showPopupNotification(rootNoteNames[(tempKey%12)]+octaveNoteNumbers[((CURRENT_OCT)+(Math.floor(tempKey/12)))]);
+                    host.showPopupNotification(rootNoteNames[(tempKey%12)]+((Math.floor(tempKey/12))-2));
                 }
             }
         }
     }
     if (MELODICSEQMODE == melodicSeqMode.SETTINGS)
     {
+        if(tempStepTurn == melodicEncoderSetting.STEP)
+        {
+            var tempPrevStep = STEP_SIZE
+            STEP_SIZE = stepSizeArray[scaleEncoderToSize(encoderValue)];
+            if (tempPrevStep < STEP_SIZE)
+            {
+                stepRGB = incrementRainbow(stepRGB);
+            }
+            if (tempPrevStep > STEP_SIZE)
+            {
+                stepRGB = decrementRainbow(stepRGB);
+            }
+            cursorClip.setStepSize(STEP_SIZE);
+            host.showPopupNotification('Step Size: '+stepSizeNameArray[stepSizeArray.indexOf(STEP_SIZE)]);
+        }   
         if (tempStepTurn == melodicEncoderSetting.ROOT)
         {
             var tempPrevRoot = ROOT_NOTE;
@@ -143,20 +179,33 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
             }
             host.showPopupNotification('Scale: '+modernModesNames[CURRENT_MODERN_MODE]);
         }
-        if(tempStepTurn == melodicEncoderSetting.STEP)
+        if(tempStepTurn == melodicEncoderSetting.OCT)
         {
-            var tempPrevStep = STEP_SIZE
-            STEP_SIZE = stepSizeArray[scaleEncoderToSize(encoderValue)];
-            if (tempPrevStep < STEP_SIZE)
+            var tempPrevOct = CURRENT_OCT
+            CURRENT_OCT = scaleEncoderToOct(encoderValue);
+            if (tempPrevOct < CURRENT_OCT)
             {
-                stepRGB = incrementRainbow(stepRGB);
+                octRGB = incrementRainbow(octRGB);
             }
-            if (tempPrevStep > STEP_SIZE)
+            if (tempPrevOct > CURRENT_OCT)
             {
-                stepRGB = decrementRainbow(stepRGB);
+                octRGB = decrementRainbow(octRGB);
             }
-            cursorClip.setStepSize(STEP_SIZE);
-            host.showPopupNotification('Step Size: '+stepSizeNameArray[stepSizeArray.indexOf(STEP_SIZE)]);
+            host.showPopupNotification('Octave: '+ octaveNoteNumbers[CURRENT_OCT]);
+        }
+        if(tempStepTurn == melodicEncoderSetting.OCT_RANGE)
+        {
+            var tempPrevOctRange = OCTAVE_RANGE
+            OCTAVE_RANGE = (scaleEncoderToOctRange(encoderValue)+1);
+            if (tempPrevOctRange < OCTAVE_RANGE)
+            {
+                octRangeRGB = incrementRainbow(octRangeRGB);
+            }
+            if (tempPrevOctRange > OCTAVE_RANGE)
+            {
+                octRangeRGB = decrementRainbow(octRangeRGB);
+            }
+            host.showPopupNotification('Octave Range: '+ octaveRangeNames[OCTAVE_RANGE-1]);
         }   
     }
 }
@@ -282,6 +331,8 @@ melodicSequencerPage.updateRGBLEDs = function()
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.ROOT), rootRGB, STROBE.OFF);
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.MODE), modeRGB, STROBE.OFF);
         setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.STEP), stepRGB, STROBE.OFF);
+        setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.OCT), octRGB, STROBE.OFF);
+        setRGBLED((encoderBankOffset.BANK4+melodicEncoderSetting.OCT_RANGE), octRangeRGB, STROBE.OFF);
     }
 }
 
@@ -310,9 +361,11 @@ melodicSequencerPage.update11segLEDs = function()
     }
     if(MELODICSEQMODE == melodicSeqMode.SETTINGS)
     {
+        set11segLED((melodicEncoderSetting.STEP+encoderBankOffset.BANK4), scaleSizeToEncoder(stepSizeArray.indexOf(STEP_SIZE)));
         set11segLED((melodicEncoderSetting.ROOT+encoderBankOffset.BANK4), scaleRootToEncoder(ROOT_NOTE));
         set11segLED((melodicEncoderSetting.MODE+encoderBankOffset.BANK4), scaleModeToEncoder(CURRENT_MODERN_MODE));
-        set11segLED((melodicEncoderSetting.STEP+encoderBankOffset.BANK4), scaleSizeToEncoder(stepSizeArray.indexOf(STEP_SIZE)));
+        set11segLED((melodicEncoderSetting.OCT+encoderBankOffset.BANK4), scaleOctToEncoder(CURRENT_OCT));
+        set11segLED((melodicEncoderSetting.OCT_RANGE+encoderBankOffset.BANK4), scaleOctRangeToEncoder(OCTAVE_RANGE));
     }
 }
 
@@ -324,90 +377,3 @@ melodicSequencerPage.updateSequencer = function()
 {
     customScrollStep();
 }
-
-function customScrollStep()
-{
-    if (playingStep > -1)
-    {
-        while (playingStep>currentScrollStepEnd)
-        {
-            cursorClip.scrollStepsPageForward();
-            currentScrollStepOffset = currentScrollStepOffset + 1;
-            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
-            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;
-        }
-        while (playingStep<currentScrollStepStart)
-        {
-            cursorClip.scrollStepsPageBackwards()
-            currentScrollStepOffset = currentScrollStepOffset - 1;
-            currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
-            currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;             
-        }
-    }
-}
-
-function scaleKeyToEncoder(key)
-{
-    var keytemp = key - (CURRENT_OCT*12);
-    keytemp = (keytemp / (OCTAVE_RANGE*12)) * 127;
-    keytemp > 127 ? keytemp = 127 : keytemp = Math.floor(keytemp);
-    return keytemp;
-}
-
-function scaleEncoderToKey(enc)
-{
-    a = (CURRENT_OCT*12);
-    b = (a+(OCTAVE_RANGE*12));
-    return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
-}
-
-function scaleRootToEncoder(root)
-{
-    return Math.floor((root/(rootNoteNames.length-1))*127);
-}
-
-function scaleEncoderToRoot(enc)
-{
-    a = 0;
-    b = rootNoteNames.length-1;
-    return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
-}
-
-function scaleModeToEncoder(mode)
-{
-    return Math.floor((mode/(modernModes.length-1))*127);
-}
-
-function scaleEncoderToMode(enc)
-{
-    a = 0;
-    b = modernModes.length-1;
-    return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
-}
-
-function scaleSizeToEncoder(size)
-{
-    return Math.floor((size/(stepSizeArray.length-1))*127);
-}
-
-function scaleEncoderToSize(enc)
-{
-    a = 0;
-    b = stepSizeArray.length-1;
-    return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
-}
-
-function incrementRainbow (varToInc)
-{
-    var tempIndex = rainbowArray.indexOf(varToInc);
-    rainbowArray[tempIndex+1] > -1 ? varToInc = rainbowArray[tempIndex+1] : varToInc = rainbowArray[0];
-    return varToInc;
-}
-
-function decrementRainbow (varToInc)
-{
-    var tempIndex = rainbowArray.indexOf(varToInc);
-    rainbowArray[tempIndex-1] > -1 ? varToInc = rainbowArray[tempIndex-1] : varToInc = rainbowArray[rainbowArray.length-1];
-    return varToInc;
-}
-    

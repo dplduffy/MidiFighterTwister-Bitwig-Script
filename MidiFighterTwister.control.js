@@ -7,6 +7,7 @@ host.addDeviceNameBasedDiscoveryPair(["Midi Fighter Twister"], ["Midi Fighter Tw
 load("MidiFighterTwister.constants.js")
 load("MidiFighterTwister.mixer.js")
 load("MidiFighterTwister.MelodicSequencer.js")
+load("MidiFighterTwister.MelodicSequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
 
 function init()
@@ -45,11 +46,12 @@ function init()
    
 	for (var i=0; i<SEQ_STEPS; i++)
 	{
+		prevStepData[i] = initArray(false, SEQ_KEYS);
 		stepData[i] = initArray(false, SEQ_KEYS);
 	}
    
    	setActivePage(mixerPage);
-   
+	
     cursorClip = host.createCursorClip(SEQ_STEPS, SEQ_KEYS);
     cursorClip.addStepDataObserver(onStepExists);
     cursorClip.addPlayingStepObserver(onStepPlaying);
@@ -125,7 +127,7 @@ function getClipLoopLength (value)
 
 function onMidi(status, data1, data2)
 {
-	//printMidi(status, data1, data2);
+	printMidi(status, data1, data2);
     var isActive = (data2 > 0);
 	var isPressed = (data2 > 0);
 	
