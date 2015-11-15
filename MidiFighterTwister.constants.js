@@ -256,7 +256,7 @@ var octaveNoteNumbers = [ '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8
 var octaveRangeNames = ['± 6', '±12', '±18', '±24', '±30', '±36', '±42', '±48']
 var stepSizeNameArray = ['1/32', '1/16', '1/8', '1/4', '1/2', '1']
 var stepSizeArray = [0.125, 0.25, 0.5, 1, 2, 4]
-var notePageNameArray = ['Pitch', 'Length', 'Velocity', 'Modulation']
+var notePageNameArray = ['Pitch', 'Velocity']
 var patternPageNameArray = ['Pattern Set', 'Section Select']
 
 var currentSeqMode =
@@ -273,9 +273,9 @@ var melodicSeqMode =
 var melodicSeqModeNotePage =
 {
 	PITCH:0,
-	LENGTH:1,
-	VELOCITY:2,
-	MODULATION:3,
+	VELOCITY:1,
+    LENGTH:2,           //not possible in current API
+	MODULATION:3,  //not possible in current API
 }
 var melodicSeqModePatternPage =
 {
