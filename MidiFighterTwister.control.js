@@ -7,7 +7,7 @@ host.addDeviceNameBasedDiscoveryPair(["Midi Fighter Twister"], ["Midi Fighter Tw
 load("MidiFighterTwister.constants.js")
 load("MidiFighterTwister.mixer.js")
 load("MidiFighterTwister.MelodicSequencer.js")
-load("MidiFighterTwister.MelodicSequencerFunctions.js")
+load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
 
 function init()
@@ -59,7 +59,9 @@ function init()
 	cursorClip.getPlayStop().addRawValueObserver(getClipStop);
 	cursorClip.getLoopStart().addRawValueObserver(getClipLoopStart);
 	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
-   
+
+	cursorTrack = host.createArrangerCursorTrack(0,0);
+	
 	changeEncoderBank(ENCODERBANK);
     trackBank.setChannelScrollStepSize(channelStepSize);
 }
@@ -295,38 +297,4 @@ function handleColor(red, green, blue)
 function changeEncoderBank(bank)
 {
 	sendMidi(147, bank, 127);
-}
-
-function onStepExists (step, key, exists)
-{
-	stepData[step][key] = exists;
-}
-
-function isAnyStepTrue (step, array)
-{
-	for (k=0; k<SEQ_KEYS; k++)
-	{
-		if (array[step][k] === true)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-function getFirstKey(step, array)
-{
-	for (k=0; k<SEQ_KEYS; k++)
-	{
-		if (array[step][k] === true)
-		{
-			return k;
-		}
-	}
-	return 0;
-}
-
-function onStepPlaying(step)
-{
-	playingStep = (step);
 }

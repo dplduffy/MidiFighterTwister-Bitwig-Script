@@ -61,6 +61,7 @@ melodicSequencerPage.onEncoderPress = function(isActive)
                 else
                 {
                 cursorClip.setStep(tempStepPressStart, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, (STEP_SIZE*tempStepPressLength));
+                //cursorTrack.playNote(ROOT_NOTE+(12*CURRENT_OCT),VELOCITY);
                 host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
                 }
                 tempStepStartPressed = false;
@@ -143,6 +144,7 @@ melodicSequencerPage.onEncoderRelease = function(isActive)
                     if (isAnyStepTrue (tempStepPressStart, prevStepData))
                     {
                     cursorClip.setStep(tempStepPressStart, (getFirstKey(tempStepPressStart, prevStepData)), VELOCITY, STEP_SIZE);
+                    //cursorTrack.playNote(getFirstKey(tempStepPressStart, prevStepData),VELOCITY);
                     host.showPopupNotification(rootNoteNames[((getFirstKey(tempStepPressStart, prevStepData))%12)]+((Math.floor((getFirstKey(tempStepPressStart,prevStepData))/12))-2));
                     for(i=0; i<128; i++)
                         {
@@ -152,6 +154,7 @@ melodicSequencerPage.onEncoderRelease = function(isActive)
                     else
                     {
                     cursorClip.setStep(tempStepPressStart, (ROOT_NOTE+(12*CURRENT_OCT)), VELOCITY, STEP_SIZE);
+                    //cursorTrack.playNote(ROOT_NOTE+(12*CURRENT_OCT),VELOCITY);
                     host.showPopupNotification(rootNoteNames[ROOT_NOTE]+octaveNoteNumbers[CURRENT_OCT]);
                     }
                 }
@@ -228,6 +231,7 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
                     cursorClip.clearStep(tempStepTurn, i);
                     }
                     cursorClip.setStep(tempStepTurn, tempKey, VELOCITY, STEP_SIZE);
+                    //cursorTrack.playNote(tempKey, VELOCITY);
                     host.showPopupNotification(rootNoteNames[(tempKey%12)]+((Math.floor(tempKey/12))-2));
                 }
             }
@@ -321,7 +325,7 @@ melodicSequencerPage.onRightTopReleased = function(isActive)
 {
     if (MELODICSEQMODE == melodicSeqMode.NOTE)
     {
-        if (MELODICSEQNOTEPAGE + 1 < notePageNameArray.length)
+        if (MELODICSEQNOTEPAGE + 1 < melodicNotePageNameArray.length)
         {
             MELODICSEQNOTEPAGE++;
         }
@@ -334,7 +338,7 @@ melodicSequencerPage.onRightTopReleased = function(isActive)
     {
     MELODICSEQMODE = melodicSeqMode.NOTE;
     }
-    host.showPopupNotification('Note Page: ' + notePageNameArray[MELODICSEQNOTEPAGE]);
+    host.showPopupNotification('Note Page: ' + melodicNotePageNameArray[MELODICSEQNOTEPAGE]);
 }
 
 melodicSequencerPage.onRightMiddlePressed = function(isActive)

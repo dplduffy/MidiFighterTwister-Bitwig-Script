@@ -1,3 +1,37 @@
+function onStepExists(step, key, exists)
+{
+	stepData[step][key] = exists;
+}
+
+function isAnyStepTrue(step, array)
+{
+	for (k=0; k<SEQ_KEYS; k++)
+	{
+		if (array[step][k] === true)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+function getFirstKey(step, array)
+{
+	for (k=0; k<SEQ_KEYS; k++)
+	{
+		if (array[step][k] === true)
+		{
+			return k;
+		}
+	}
+	return 0;
+}
+
+function onStepPlaying(step)
+{
+	playingStep = (step);
+}
+
 function customScrollStep()
 {
     if (playingStep > -1)
