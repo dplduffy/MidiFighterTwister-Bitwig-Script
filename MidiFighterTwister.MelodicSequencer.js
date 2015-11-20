@@ -113,11 +113,6 @@ melodicSequencerPage.onEncoderPress = function(isActive)
     {
         if (MELODICSEQSETTINGSPAGE == melodicSeqModeSettingsPage.PAGE1)
         {
-            if((encoderNum-encoderBankOffset.BANK4) == melodicEncoderSetting.SEQ_FOLLOW)
-            {
-                sequencerFollow = !sequencerFollow
-                sequencerFollow ? seqFollowRGB = COLOR.GREEN : seqFollowRGB = COLOR.RED;
-            }
         }
     }
 }
@@ -206,6 +201,17 @@ melodicSequencerPage.onEncoderRelease = function(isActive)
             {
                 cursorClip.scrollStepsPageBackwards();
                 tempPrevScrollStepOffset--;
+            }
+        }
+    }
+    if (MELODICSEQMODE == melodicSeqMode.SETTINGS)
+    {
+        if (MELODICSEQSETTINGSPAGE == melodicSeqModeSettingsPage.PAGE1)
+        {
+            if((encoderNum-encoderBankOffset.BANK4) == melodicEncoderSetting.SEQ_FOLLOW)
+            {
+                sequencerFollow = !sequencerFollow
+                sequencerFollow ? seqFollowRGB = COLOR.GREEN : seqFollowRGB = COLOR.RED;
             }
         }
     }
@@ -479,7 +485,7 @@ melodicSequencerPage.updateRGBLEDs = function()
                 {
                 currentScrollStepOffset == i ?
                     setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.PULSE1) :
-                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_YELLOW, STROBE.OFF)
+                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.GOLD, STROBE.OFF)
                 }
             }
         }

@@ -252,13 +252,15 @@ var MELODICSEQNOTEPAGE = 0;
 var MELODICSEQPATTERNPAGE = 0;
 var MELODICSEQSETTINGSPAGE = 0;
 var DRUMSEQMODE = 0;
-var DRUMSEQNOTEPAGE = 0;
+var DRUMSEQNOTEPAGE = 2;
+var DRUMSEQPATTERNPAGE = 0;
+var DRUMSEQSETTINGSPAGE = 0;
 var octaveNoteNumbers = [ '-2', '-1', '0', '1', '2', '3', '4', '5', '6', '7', '8']
 var octaveRangeNames = ['± 6', '±12', '±18', '±24', '±30', '±36', '±42', '±48']
 var stepSizeNameArray = ['1/32', '1/16', '1/8', '1/4', '1/2', '1']
 var stepSizeArray = [0.125, 0.25, 0.5, 1, 2, 4]
 var melodicNotePageNameArray = ['Pitch', 'Velocity']
-var drumNotePageNameArray = ['Pitch', 'Velocity', 'Drum Pads']
+var drumNotePageNameArray = ['Step Enter', 'Velocity', 'Drum Pads']
 var patternPageNameArray = ['Pattern Set', 'Section Select']
 
 var currentSeqMode =
@@ -304,6 +306,10 @@ var drumSeqModePatternPage =
 {
 	PATTERN_SET:0,
     SECTION_SELECT:1,
+}
+var drumSeqModeSettingsPage =
+{
+   PAGE1:0,
 }
 var modernModes =
 [
@@ -387,9 +393,19 @@ var melodicEncoderSetting =
    OCT: 14,
    OCT_RANGE: 15,
 }
+var drumEncoderSetting =
+{
+   STEP : 8,
+   SEQ_FOLLOW : 9,
+   DRUM_OFFSET : 12,
+}
+
 var drumMatrix = [
    12, 13, 14, 15,
    8, 9, 10, 11,
    4, 5, 6, 7,
    0, 1, 2, 3]
+
+var drumOffsets = [0, 4, 20, 36, 52, 68, 84, 100, 112]
+var drumOffsetNames = ['C-2 to D#-1', 'E-2 to G-1', 'G#-1 to B0', 'C1 to D#2', 'E2 to G3', 'G#3 to B4', 'C5 to D#6', 'E6 to G7', 'E7 to G8']
    

@@ -22,7 +22,7 @@ var min = 0;
 var max = 127;
 var stepRGB = 67;
 var seqFollowRGB = COLOR.GREEN;
-var octRGB = 40;
+var drumOffsetRGB = 40;
 
 drumSequencerPage.updateOutputState = function()
 {
@@ -40,7 +40,7 @@ drumSequencerPage.onEncoderPress = function(isActive)
     {
         var tempStepPress = (encoderNum-encoderBankOffset.BANK4);
         
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.PITCH)
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
         {
             if(tempStepStartPressed)
             {
@@ -56,14 +56,14 @@ drumSequencerPage.onEncoderPress = function(isActive)
                 else
                 {
                 cursorClip.setStep(tempStepPressStart, currentDrumKey, VELOCITY, (STEP_SIZE*tempStepPressLength));
-                host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[CURRENT_OCT]);
+                host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[Math.floor(currentDrumKey/12)]);
                 }
                 tempStepStartPressed = false;
             }
             else
             {
-            tempStepPressStart = tempStepPress;
-            tempStepStartPressed = true;
+                tempStepPressStart = tempStepPress;
+                tempStepStartPressed = true;
             }
         }
         if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
@@ -71,9 +71,10 @@ drumSequencerPage.onEncoderPress = function(isActive)
         }
         if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD)
         {
-            if(tempStepPress == drumMatrix[currentDrumKey%12])
-               {
-               }
+            if ((currentDrumKey-currentDrumOffset) == drumMatrix[tempStepPress])
+            {
+                cursorTrack.playNote(currentDrumKey,VELOCITY);
+            }
         }
     }
     if (DRUMSEQMODE == drumSeqMode.PATTERN)
@@ -112,11 +113,6 @@ drumSequencerPage.onEncoderPress = function(isActive)
     {
         if (DRUMSEQSETTINGSPAGE == drumSeqModeSettingsPage.PAGE1)
         {
-            if((encoderNum-encoderBankOffset.BANK4) == drumEncoderSetting.SEQ_FOLLOW)
-            {
-                sequencerFollow = !sequencerFollow
-                sequencerFollow ? seqFollowRGB = COLOR.GREEN : seqFollowRGB = COLOR.RED;
-            }
         }
     }
 }
@@ -125,18 +121,18 @@ drumSequencerPage.onEncoderRelease = function(isActive)
 {
     if (DRUMSEQMODE == drumSeqMode.NOTE)
     {
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.PITCH)
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
         {
             if (tempStepStartPressed)
             {
-                if (stepData[tempStepPress][currentDrumKey])
+                if (stepData[tempStepPressStart][currentDrumKey])
                 {
                 cursorClip.clearStep(tempStepPressStart, currentDrumKey)
                 }
                 else
                 {
                 cursorClip.setStep(tempStepPressStart, currentDrumKey, VELOCITY, STEP_SIZE);
-                //host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[CURRENT_OCT]);
+                host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[Math.floor(currentDrumKey/12)]);
                 }
             tempStepStartPressed = false;
             }
@@ -158,7 +154,6 @@ drumSequencerPage.onEncoderRelease = function(isActive)
         if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD)
         {
             currentDrumKey = (drumMatrix[encoderNum-encoderBankOffset.BANK4] + currentDrumOffset)
-            println(currentDrumKey);
         }
     }
     if (DRUMSEQMODE == drumSeqMode.PATTERN)
@@ -193,6 +188,17 @@ drumSequencerPage.onEncoderRelease = function(isActive)
             }
         }
     }
+    if (DRUMSEQMODE == drumSeqMode.SETTINGS)
+    {
+        if (DRUMSEQSETTINGSPAGE == drumSeqModeSettingsPage.PAGE1)
+        {
+            if((encoderNum-encoderBankOffset.BANK4) == drumEncoderSetting.SEQ_FOLLOW)
+            {
+                sequencerFollow = !sequencerFollow
+                sequencerFollow ? seqFollowRGB = COLOR.GREEN : seqFollowRGB = COLOR.RED;
+            }
+        }
+    }
 }
 
 drumSequencerPage.onEncoderTurn = function(isActive)
@@ -201,7 +207,7 @@ drumSequencerPage.onEncoderTurn = function(isActive)
     
     if (DRUMSEQMODE == drumSeqMode.NOTE)
     {
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.PITCH)
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
         {   
         }
         if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
@@ -226,28 +232,29 @@ drumSequencerPage.onEncoderTurn = function(isActive)
             cursorClip.setStepSize(STEP_SIZE);
             host.showPopupNotification('Step Size: '+stepSizeNameArray[stepSizeArray.indexOf(STEP_SIZE)]);
         } 
-        if(tempStepTurn == drumEncoderSetting.OCT)
+        if(tempStepTurn == drumEncoderSetting.DRUM_OFFSET)
         {
-            var tempPrevOct = CURRENT_OCT
-            CURRENT_OCT = scaleEncoderToOct(encoderValue);
-            if (tempPrevOct < CURRENT_OCT)
+            var tempPrevDrumOffset = currentDrumOffset
+            currentDrumOffset = drumOffsets[scaleEncoderToDrumOffset(encoderValue)];
+            currentDrumKey = currentDrumOffset;
+            if (tempPrevDrumOffset < currentDrumOffset)
             {
-                octRGB = incrementRainbow(octRGB);
+                drumOffsetRGB = incrementRainbow(drumOffsetRGB);
             }
-            if (tempPrevOct > CURRENT_OCT)
+            if (tempPrevDrumOffset > currentDrumOffset)
             {
-                octRGB = decrementRainbow(octRGB);
+                drumOffsetRGB = decrementRainbow(drumOffsetRGB);
             }
-            host.showPopupNotification('Octave: '+ octaveNoteNumbers[CURRENT_OCT]);
+            host.showPopupNotification('Drum Map: '+ drumOffsetNames[drumOffsets.indexOf(currentDrumOffset)]);
         }
     }
 }
 
-drumSequencerPage.onRightTopPressed = function(isActive) //TODO: popup
+drumSequencerPage.onRightTopPressed = function(isActive)
 {
 }
 
-drumSequencerPage.onRightTopReleased = function(isActive)
+drumSequencerPage.onRightTopReleased = function(isActive) 
 {
     if (DRUMSEQMODE == drumSeqMode.NOTE)
     {
@@ -352,13 +359,13 @@ drumSequencerPage.updateRGBLEDs = function()
 {
     if(DRUMSEQMODE == drumSeqMode.NOTE)
     {
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PITCH)
+        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
         {
             for(var i=0; i<16; i++)
                 {
                     playingStep == (i + (currentScrollStepOffset*SEQ_STEPS)) ?
                         setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) :
-                            stepData[i][currentDrumKey] ? setRGBLED(i+encoderBankOffset.BANK4, COLOR.GOLD, STROBE.OFF) :
+                            stepData[i][currentDrumKey] ? setRGBLED(i+encoderBankOffset.BANK4, COLOR.AQUA, STROBE.OFF) :
                                 setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF);
                 }
         }
@@ -376,18 +383,9 @@ drumSequencerPage.updateRGBLEDs = function()
         {
             for(var i=0; i<16; i++)
             {
-                if(i<4)
-                {
-                }
-                if(i>=4 && i <8)
-                {
-                }
-                if(i>=8 && i<12)
-                {
-                }
-                if(i>=12)
-                {
-                }
+                currentDrumKey == (drumMatrix[i] + currentDrumOffset) ?
+                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.PULSE1) :
+                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.GOLD, STROBE.OFF);
             }
         }
     }
@@ -432,7 +430,7 @@ drumSequencerPage.updateRGBLEDs = function()
     {
         setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.STEP), stepRGB, STROBE.OFF);
         setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.SEQ_FOLLOW), seqFollowRGB, sequencerFollow ? STROBE.OFF : STROBE.PULSE1);
-        setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.OCT), octRGB, STROBE.OFF);
+        setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.DRUM_OFFSET), drumOffsetRGB, STROBE.OFF);
     }
 }
 
@@ -440,13 +438,13 @@ drumSequencerPage.update11segLEDs = function()
 {
     if(DRUMSEQMODE == drumSeqMode.NOTE)
     {
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PITCH)
+        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
         { 
             for(var i=0; i<16; i++)
                 {
                     if(stepData[i][currentDrumKey])
                     {
-                    set11segLED(i+encoderBankOffset.BANK4, currentDrumKey);
+                    set11segLED(i+encoderBankOffset.BANK4, 127);
                     }
                     else
                     {
@@ -460,7 +458,7 @@ drumSequencerPage.update11segLEDs = function()
                 {
                     if(stepData[i][currentDrumKey])
                     {
-                    set11segLED(i+encoderBankOffset.BANK4, currentDrumKey);
+                    set11segLED(i+encoderBankOffset.BANK4, 127);
                     }
                     else
                     {
@@ -472,9 +470,9 @@ drumSequencerPage.update11segLEDs = function()
         {
             for(var i=0; i<16; i++)
                 {
-                    if(stepData[i][currentDrumKey])
+                    if(currentDrumKey == drumMatrix[i]+currentDrumOffset)
                     {
-                    set11segLED(i+encoderBankOffset.BANK4, currentDrumKey);
+                    set11segLED(i+encoderBankOffset.BANK4, 127);
                     }
                     else
                     {
@@ -503,8 +501,8 @@ drumSequencerPage.update11segLEDs = function()
     if(DRUMSEQMODE == drumSeqMode.SETTINGS)
     {
         set11segLED((drumEncoderSetting.STEP+encoderBankOffset.BANK4), scaleSizeToEncoder(stepSizeArray.indexOf(STEP_SIZE)));
-        set11segLED((drumEncoderSetting.ROOT+encoderBankOffset.BANK4), scaleRootToEncoder(ROOT_NOTE));
-        set11segLED((drumEncoderSetting.OCT+encoderBankOffset.BANK4), scaleOctToEncoder(CURRENT_OCT));
+        set11segLED((drumEncoderSetting.SEQ+encoderBankOffset.BANK4), scaleRootToEncoder(ROOT_NOTE));
+        set11segLED((drumEncoderSetting.DRUM_OFFSET+encoderBankOffset.BANK4), scaleDrumOffsetToEncoder(drumOffsets.indexOf(currentDrumOffset)));
     }
 }
 

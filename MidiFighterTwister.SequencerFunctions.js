@@ -132,6 +132,18 @@ function scaleEncoderToSize(enc)
     return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
 }
 
+function scaleDrumOffsetToEncoder(offset)
+{
+	return Math.floor((offset/(drumOffsets.length-1))*127);
+}
+
+function scaleEncoderToDrumOffset(enc)
+{
+	a=0
+	b=drumOffsets.length-1;
+	return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
+}
+
 function incrementRainbow (varToInc)
 {
     var tempIndex = rainbowArray.indexOf(varToInc);
