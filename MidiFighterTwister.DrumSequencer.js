@@ -338,7 +338,7 @@ drumSequencerPage.onLeftTopReleased = function(isActive)
 }
 
 drumSequencerPage.onLeftMiddlePressed = function(isActive)
-{   
+{
 }
 
 drumSequencerPage.onLeftMiddleReleased = function(isActive)
@@ -353,6 +353,9 @@ drumSequencerPage.onLeftBottomPressed = function(isActive)
 
 drumSequencerPage.onLeftBottomReleased = function(isActive)
 {
+    ENCODERBANK = 3;
+    changeEncoderBank(ENCODERBANK);
+    setActivePage(devicePage);
 }
 
 drumSequencerPage.updateRGBLEDs = function()

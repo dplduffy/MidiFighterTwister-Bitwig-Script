@@ -9,6 +9,7 @@ load("MidiFighterTwister.mixer.js")
 load("MidiFighterTwister.MelodicSequencer.js")
 load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
+load("MidiFighterTwister.device.js")
 
 function init()
 {
@@ -61,6 +62,28 @@ function init()
 	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
 
 	cursorTrack = host.createArrangerCursorTrack(0,0);
+	deviceBank1 = cursorTrack.createDeviceBank(1);
+	deviceBank2 = cursorTrack.createDeviceBank(1);
+	device1 = deviceBank1.getDevice(0);
+	device2 = deviceBank2.getDevice(0);
+
+	deviceBank1.addCanScrollUpObserver(getDeviceBank1CanScrollUp);
+	deviceBank1.addCanScrollDownObserver(getDeviceBank1CanScrollDown);
+	deviceBank1.addScrollPositionObserver(getScrollPositionObserver, 0);
+	
+	device1.addSelectedPageObserver(0, getSelectedParamPage);
+	device1.addPageNamesObserver(getDevice1ParamPageNames);
+	device1.addNameObserver(32, 'Unknown Device', getDevice1Name);
+	device1.addNextParameterPageEnabledObserver(getIsNextDevice1ParamPage);
+	device2.addNextParameterPageEnabledObserver(getIsNextDevice2ParamPage);
+	device1.addPreviousParameterPageEnabledObserver(getIsPrevDevice1ParamPage);
+	device2.addPreviousParameterPageEnabledObserver(getIsPrevDevice2ParamPage);
+	
+	for (var i=0; i<8; i++)
+	{
+		device1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device1Param));
+		device2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device2Param));
+	}
 	
 	changeEncoderBank(ENCODERBANK);
     trackBank.setChannelScrollStepSize(channelStepSize);
@@ -125,6 +148,64 @@ function getClipLoopStart (value)
 function getClipLoopLength (value)
 {
 	clipLoopLength = value;
+}
+
+function getSelectedParamPage (value)
+{
+	selectedParamPage = value;
+}
+
+function getDeviceParamValue (i, varToStore)
+{
+	return function(value)
+	{
+	varToStore[i] = value;
+	}
+}
+
+function getIsPrevDevice1ParamPage (value)
+{
+	isPrevDevice1ParamPage = value;
+}
+
+function getIsPrevDevice2ParamPage (value)
+{
+	isPrevDevice2ParamPage = value;
+}
+
+function getIsNextDevice1ParamPage (value)
+{
+	isNextDevice1ParamPage = value;
+}
+
+function getIsNextDevice2ParamPage (value)
+{
+	isNextDevice2ParamPage = value;
+}
+
+function getDeviceBank1CanScrollUp (value)
+{
+	deviceBank1CanScrollUp = value;
+}
+
+function getDeviceBank1CanScrollDown(value)
+{
+	deviceBank1CanScrollDown = value;
+}
+
+function getScrollPositionObserver(value)
+{
+	deviceBank1PositionObserver = value;
+}
+
+function getDevice1ParamPageNames()
+{
+	device1ParamPageNames = arguments;
+}
+
+function getDevice1Name(value)
+{
+	device1Name = value;
 }
 
 function onMidi(status, data1, data2)

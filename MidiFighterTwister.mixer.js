@@ -16,6 +16,10 @@ mixerPage.updateOutputState = function()
 
 mixerPage.onEncoderPress = function(isActive)
 {
+}
+
+mixerPage.onEncoderRelease = function(isActive)
+{
     if (MIXERMODE == mixerMode.VOLUME_PAN)
     {
         if(encoderNum<4)
@@ -75,10 +79,6 @@ mixerPage.onEncoderPress = function(isActive)
         trackBank.getChannel((encoderNum-12)-32).getMute().toggle();
         }
     }
-}
-
-mixerPage.onEncoderRelease = function(isActive)
-{
 }
 
 mixerPage.onEncoderTurn = function(isActive)
@@ -209,6 +209,10 @@ mixerPage.onLeftBottomPressed = function(isActive)
 
 mixerPage.onLeftBottomReleased = function(isActive)
 {
+    ENCODERBANK = 3;
+    changeEncoderBank(ENCODERBANK);
+    device2.nextParameterPage();
+    setActivePage(devicePage);
 }
 
 mixerPage.updateRGBLEDs = function()

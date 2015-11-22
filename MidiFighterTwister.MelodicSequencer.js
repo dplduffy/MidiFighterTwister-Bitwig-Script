@@ -426,6 +426,9 @@ melodicSequencerPage.onLeftBottomPressed = function(isActive)
 
 melodicSequencerPage.onLeftBottomReleased = function(isActive)
 {
+    ENCODERBANK = 3;
+    changeEncoderBank(ENCODERBANK);
+    setActivePage(devicePage);
 }
 
 melodicSequencerPage.updateRGBLEDs = function()

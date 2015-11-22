@@ -70,6 +70,18 @@ var COLOR =
     LIGHT_PURPLE2:117,
     DARK_PURPLE2:125,
 };
+var INDICATOR_COLOR =
+[
+   COLOR.RED,
+   COLOR.DARK_ORANGE,
+   COLOR.GOLD,
+   COLOR.LIGHT_GREEN,
+   COLOR.MINT,
+   COLOR.LIGHT_BLUE,
+   COLOR.LIGHT_PINK,
+   COLOR.DARK_PURPLE
+]
+   
 var STROBE =
 {
    RAINBOW:127,
@@ -245,7 +257,6 @@ var OCTAVE_RANGE = 2;   //1-10
 var ROOT_NOTE = 0;
 var CURRENT_MODERN_MODE = 0;
 var VELOCITY = 127;
-//var NOTE_LENGTH = 0.25;
 var CURRENTSEQMODE = 0;
 var MELODICSEQMODE = 0;
 var MELODICSEQNOTEPAGE = 0;
@@ -408,4 +419,32 @@ var drumMatrix = [
 
 var drumOffsets = [0, 4, 20, 36, 52, 68, 84, 100, 112]
 var drumOffsetNames = ['C-2 to D#-1', 'E-2 to G-1', 'G#-1 to B0', 'C1 to D#2', 'E2 to G3', 'G#3 to B4', 'C5 to D#6', 'E6 to G7', 'E7 to G8']
-   
+
+var scrollUp = false;
+//var POPUP_SET_TYPE = 0;
+//var popupSetType =
+//{
+//   DUAL_PARAM_SCROLL : 0,
+//   SINGLE_PARAM_SCROLL : 1,
+//}
+var popupSet = false;
+var tempDevice1Name = null;
+var device1Param = initArray (0, 8);
+var device2Param = initArray (0, 8);
+var device1ParamPageNames = null;
+var device1Name = null;
+var dualParamPageView = true;
+var deviceBank1CanScrollUp = false;
+var deviceBank1CanScrollDown = false;
+var deviceBank1PositionObserver = 0;
+var isNextDevice1ParamPage = false;
+var isNextDevice2ParamPage = false;
+var isPrevDevice1ParamPage = false;
+var isPrevDevice2ParamPage = false;
+var selectedParamPage = 0;
+var CURRENT_DEVICE_MODE = 0;
+var currentDeviceMode =
+{
+   DEVICE : 0,
+   MACRO : 1,
+}
