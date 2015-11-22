@@ -3,29 +3,6 @@ melodicSequencerPage = new page();
 
 melodicSequencerPage.title = "Melodic Sequencer";
 
-var tempPatternPressStart = 0;
-var tempPatternPressEnd = 0;
-var tempPatternStartPressed = false;
-var tempStepPressStart = 0;
-var tempStepPressEnd = 0;
-var tempStepStartPressed = false;
-var currentBar = 0;
-var barsOnPage = 0;
-var currentSeqChunk = 0;
-var currentScrollStepOffset = 0;
-var currentScrollStepStart = 0;
-var currentScrollStepEnd = 15;
-var a = 0;
-var b = 0;
-var min = 0;
-var max = 127;
-var stepRGB = 67;
-var seqFollowRGB = COLOR.GREEN;
-var rootRGB = 80;
-var modeRGB = 80;
-var octRGB = 40;
-var octRangeRGB = 60;
-
 melodicSequencerPage.updateOutputState = function()
 {
     clear();

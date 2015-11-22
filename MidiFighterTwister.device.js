@@ -3,6 +3,11 @@ devicePage = new page();
 
 devicePage.title = "Device";
 
+var devicePageRGB = 80;
+var deviceCountRGB = 80;
+var rgbPageDone = false;
+var rgbDeviceDone = false;
+
 devicePage.updateOutputState = function()
 {
     clear();
@@ -24,18 +29,78 @@ devicePage.onEncoderRelease = function(isActive)
 
 devicePage.onEncoderTurn = function(isActive)
 {
-    if ((encoderNum - encoderBankOffset.BANK4) < 8)
+    var tempEncoderTurn = encoderNum - encoderBankOffset.BANK4;
+    
+    if ((tempEncoderTurn) < 8)
     {
-    device1.getParameter(encoderNum-encoderBankOffset.BANK4).set(encoderValue,127);
+    device1.getParameter(tempEncoderTurn).set(encoderValue,127);
     }
-    if ((encoderNum - encoderBankOffset.BANK4) > 7)
+    if ((tempEncoderTurn) > 7)
     {
-    if(dualParamPageView)
-    {
-    isNextDevice1ParamPage ?
-        device2.getParameter((encoderNum-encoderBankOffset.BANK4)-8).set(encoderValue,127)
-            : null;
-    }
+        if(dualParamPageView)
+        {
+        isNextDevice1ParamPage ?
+            device2.getParameter((tempEncoderTurn)-8).set(encoderValue,127)
+                : null;
+        }
+        else
+        {
+            if(tempEncoderTurn == singleDeviceSetting.DEVICE)
+            {
+                var tempPrevDevice = deviceBank1PositionObserver;
+                var tempDevice = scaleEncoderToDeviceCount(encoderValue);
+
+                if(!rgbDeviceDone)
+                {
+                    if (tempPrevDevice < tempDevice)
+                    {
+                        deviceCountRGB = incrementRainbow(deviceCountRGB);
+                        devicePageRGB = 80;
+                        rgbDeviceDone = true;
+                    }
+                    if (tempPrevDevice > tempDevice)
+                    {
+                        deviceCountRGB = decrementRainbow(deviceCountRGB);
+                        devicePageRGB = 80;
+                        rgbDeviceDone = true
+                    }
+                }
+                if(rgbDeviceDone && (tempDevice == deviceBank1PositionObserver))
+                {
+                    rgbDeviceDone = false;
+                }
+
+                deviceBank1.scrollTo(tempDevice);
+                tempDevice1Name = device1Name;
+                popupSet = true;
+            }
+            if(tempEncoderTurn == singleDeviceSetting.PAGE)
+            {
+                var tempPrevPage = selectedParamPage;
+                var tempPage = scaleEncoderToDevicePage(encoderValue);
+                if(!rgbPageDone)
+                {
+                    if (tempPrevPage < tempPage)
+                    {
+                        devicePageRGB = incrementRainbow(devicePageRGB);
+                        device1.setParameterPage(tempPage);
+                        host.showPopupNotification(device1ParamPageNames[selectedParamPage+1])
+                        rgbPageDone = true;
+                    }
+                    if (tempPrevPage > tempPage)
+                    {
+                        devicePageRGB = decrementRainbow(devicePageRGB);
+                        device1.setParameterPage(tempPage);
+                        host.showPopupNotification(device1ParamPageNames[selectedParamPage-1])
+                        rgbPageDone = true
+                    }
+                }
+                if(rgbPageDone && (tempPage == selectedParamPage))
+                {
+                    rgbPageDone = false;
+                }
+            }
+        }
     }
 }
 
@@ -217,7 +282,18 @@ devicePage.updateRGBLEDs = function()
         }
         else
         {
+            if((i+8) == singleDeviceSetting.DEVICE)
+            {
+            setRGBLED(i+encoderBankOffset.BANK4+8, deviceCountRGB, STROBE.OFF);
+            }
+            else if((i+8) == singleDeviceSetting.PAGE)
+            {
+            setRGBLED(i+encoderBankOffset.BANK4+8, devicePageRGB, STROBE.OFF);
+            }
+            else
+            {
             setRGBLED(i+encoderBankOffset.BANK4+8, COLOR.BLACK, STROBE.OFF);
+            }
         }
     }
 }
@@ -235,7 +311,20 @@ devicePage.update11segLEDs = function()
         }
         else
         {
+            if((i+8) == singleDeviceSetting.DEVICE)
+            {
+            set11segLED(i+encoderBankOffset.BANK4+8, scaleDeviceCountToEncoder(deviceBank1PositionObserver));
+            }
+            else if((i+8) == singleDeviceSetting.PAGE)
+            {
+            device1ParamPageNames.length > 1 ?
+                set11segLED(i+encoderBankOffset.BANK4+8, scaleDevicePageToEncoder(selectedParamPage)) :
+                    set11segLED(i+encoderBankOffset.BANK4+8, 0);
+            }
+            else
+            {
             set11segLED(i+encoderBankOffset.BANK4 +8, 0);
+            }
         }
     }
 }
@@ -255,6 +344,9 @@ devicePage.deviceChangePopup = function()
     {
         if(scrollUp)
         {
+            dualParamPageView ?
+                device1.setParameterPage(device1ParamPageNames.length-1) :
+                    device1.setParameterPage(device1ParamPageNames.length);
             scrollUp = false;
         }   
         if(popupSet)
@@ -282,4 +374,28 @@ devicePage.deviceChangePopup = function()
         }
     popupSet = false;
     }
+}
+
+function scaleDevicePageToEncoder(page)
+{
+	return Math.round((page/(device1ParamPageNames.length-1))*127);
+}
+
+function scaleEncoderToDevicePage(enc)
+{
+	a=0
+	b=device1ParamPageNames.length-1;
+	return Math.round(((((b-a)*(enc-min))/(max-min)) + a));
+}
+
+function scaleDeviceCountToEncoder(count)
+{
+    return Math.round((count/(deviceBank1Count-1))*127);
+}
+
+function scaleEncoderToDeviceCount(enc)
+{
+	a=0;
+	b=deviceBank1Count-1;
+	return Math.round(((((b-a)*(enc-min))/(max-min)) + a));
 }

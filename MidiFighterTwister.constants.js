@@ -78,8 +78,8 @@ var INDICATOR_COLOR =
    COLOR.LIGHT_GREEN,
    COLOR.MINT,
    COLOR.LIGHT_BLUE,
-   COLOR.LIGHT_PINK,
-   COLOR.DARK_PURPLE
+   COLOR.LIGHT_PURPLE,
+   COLOR.DARK_PINK
 ]
    
 var STROBE =
@@ -238,6 +238,31 @@ var Bank4 =
 	ENCODER16:64,
 }
 
+var tempPatternPressStart = 0;
+var tempPatternPressEnd = 0;
+var tempPatternStartPressed = false;
+var tempStepPressStart = 0;
+var tempStepPressEnd = 0;
+var tempStepStartPressed = false;
+var currentBar = 0;
+var barsOnPage = 0;
+var currentSeqChunk = 0;
+var currentScrollStepOffset = 0;
+var currentScrollStepStart = 0;
+var currentScrollStepEnd = 15;
+var a = 0;
+var b = 0;
+var min = 0;
+var max = 127;
+var stepRGB = 67;
+var seqFollowRGB = COLOR.GREEN;
+var rootRGB = 80;
+var modeRGB = 80;
+var octRGB = 40;
+var octRangeRGB = 60;
+var currentDrumKey = 36;
+var currentDrumOffset = 36;
+var drumOffsetRGB = 40;
 var sequencerFollow = true;
 var prevStepData = [];
 var stepData = [];
@@ -421,12 +446,6 @@ var drumOffsets = [0, 4, 20, 36, 52, 68, 84, 100, 112]
 var drumOffsetNames = ['C-2 to D#-1', 'E-2 to G-1', 'G#-1 to B0', 'C1 to D#2', 'E2 to G3', 'G#3 to B4', 'C5 to D#6', 'E6 to G7', 'E7 to G8']
 
 var scrollUp = false;
-//var POPUP_SET_TYPE = 0;
-//var popupSetType =
-//{
-//   DUAL_PARAM_SCROLL : 0,
-//   SINGLE_PARAM_SCROLL : 1,
-//}
 var popupSet = false;
 var tempDevice1Name = null;
 var device1Param = initArray (0, 8);
@@ -437,6 +456,7 @@ var dualParamPageView = true;
 var deviceBank1CanScrollUp = false;
 var deviceBank1CanScrollDown = false;
 var deviceBank1PositionObserver = 0;
+var deviceBank1Count = 0;
 var isNextDevice1ParamPage = false;
 var isNextDevice2ParamPage = false;
 var isPrevDevice1ParamPage = false;
@@ -447,4 +467,9 @@ var currentDeviceMode =
 {
    DEVICE : 0,
    MACRO : 1,
+}
+var singleDeviceSetting =
+{
+   DEVICE : 12,
+   PAGE : 13,
 }

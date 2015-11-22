@@ -70,6 +70,7 @@ function init()
 	deviceBank1.addCanScrollUpObserver(getDeviceBank1CanScrollUp);
 	deviceBank1.addCanScrollDownObserver(getDeviceBank1CanScrollDown);
 	deviceBank1.addScrollPositionObserver(getScrollPositionObserver, 0);
+	deviceBank1.addDeviceCountObserver(getDeviceBank1Count);
 	
 	device1.addSelectedPageObserver(0, getSelectedParamPage);
 	device1.addPageNamesObserver(getDevice1ParamPageNames);
@@ -206,6 +207,11 @@ function getDevice1ParamPageNames()
 function getDevice1Name(value)
 {
 	device1Name = value;
+}
+
+function getDeviceBank1Count(value)
+{
+	deviceBank1Count = value;
 }
 
 function onMidi(status, data1, data2)

@@ -2,28 +2,6 @@ drumSequencerPage = new page();
 
 drumSequencerPage.title = "Drum Sequencer";
 
-var tempPatternPressStart = 0;
-var tempPatternPressEnd = 0;
-var tempPatternStartPressed = false;
-var tempStepPressStart = 0;
-var tempStepPressEnd = 0;
-var tempStepStartPressed = false;
-var currentBar = 0;
-var barsOnPage = 0;
-var currentSeqChunk = 0;
-var currentScrollStepOffset = 0;
-var currentScrollStepStart = 0;
-var currentScrollStepEnd = 15;
-var currentDrumKey = 36;
-var currentDrumOffset = 36;
-var a = 0;
-var b = 0;
-var min = 0;
-var max = 127;
-var stepRGB = 67;
-var seqFollowRGB = COLOR.GREEN;
-var drumOffsetRGB = 40;
-
 drumSequencerPage.updateOutputState = function()
 {
     clear();
