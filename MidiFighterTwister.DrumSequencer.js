@@ -491,6 +491,10 @@ drumSequencerPage.updateIndicators = function()
 {
 }
 
+drumSequencerPage.clearIndication = function()
+{
+}
+
 drumSequencerPage.updateSequencer = function()
 {
     customScrollStep();

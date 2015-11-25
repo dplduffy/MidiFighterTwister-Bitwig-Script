@@ -545,6 +545,10 @@ melodicSequencerPage.updateIndicators = function()
 {
 }
 
+melodicSequencerPage.clearIndication = function()
+{
+}
+
 melodicSequencerPage.updateSequencer = function()
 {
     customScrollStep();

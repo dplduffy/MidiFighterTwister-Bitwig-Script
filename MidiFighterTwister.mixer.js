@@ -3,8 +3,8 @@ mixerPage = new page();
 
 mixerPage.title = "Mixer";
 
-mixerPage.canScrollTracksUp = false;
-mixerPage.canScrollTracksDown = false;
+mixerPage.canScrollChannelsUp = false;
+mixerPage.canScrollChannelsDown = false;
 
 mixerPage.updateOutputState = function()
 {
@@ -61,7 +61,7 @@ mixerPage.onEncoderRelease = function(isActive)
     }
     
     if (MIXERMODE == mixerMode.Mix4)
-    {
+    {   
         if(encoderNum<(4+32))
         {
         trackBank.getChannel(encoderNum-32).selectInMixer();
@@ -181,28 +181,28 @@ mixerPage.onLeftTopPressed = function(isActive)
 
 mixerPage.onLeftTopReleased = function(isActive)
 {
-    MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
-    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
-    
-    if (MIXERMODE == mixerMode.Mix4 && channelStepSize == 8)
-    {
-    channelStepSize = 4;
-    trackBank.setChannelScrollStepSize(channelStepSize);
-    }
-    
-    switch(MIXERMODE)
-    {
-        case mixerMode.VOLUME_PAN:
-            ENCODERBANK = 0;
-            break
-        case mixerMode.SEND:
-            ENCODERBANK = 1;
-            break
-        case mixerMode.Mix4:
-            ENCODERBANK = 2;
-            break
-    }
-    changeEncoderBank(ENCODERBANK);
+    //MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
+    //host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
+    //
+    //if (MIXERMODE == mixerMode.Mix4 && channelStepSize == 8)
+    //{
+    //channelStepSize = 4;
+    //trackBank.setChannelScrollStepSize(channelStepSize);
+    //}
+    //
+    //switch(MIXERMODE)
+    //{
+    //    case mixerMode.VOLUME_PAN:
+    //        ENCODERBANK = 0;
+    //        break
+    //    case mixerMode.SEND:
+    //        ENCODERBANK = 1;
+    //        break
+    //    case mixerMode.Mix4:
+    //        ENCODERBANK = 2;
+    //        break
+    //}
+    //changeEncoderBank(ENCODERBANK);
 }
 
 mixerPage.onLeftMiddlePressed = function(isActive)
@@ -408,12 +408,26 @@ mixerPage.updateIndicators = function()
             trackBank.getChannel(i).getSend(s).setIndication(currentSend == s);
             }
         }
-        for(var i=4; i<8; i++)
+        // only necessary for Mix8
+        //for(var i=4; i<8; i++)
+        //{
+        //    for (var s=0; s<11; s++)
+        //    {
+        //    trackBank.getChannel(i).getSend(s).setIndication(false);
+        //    }
+        //}
+    }
+}
+
+mixerPage.clearIndication = function()
+{
+    for(var i=0; i<4; i++)
+    {
+        trackBank.getChannel(i).getVolume().setIndication(false);
+        trackBank.getChannel(i).getPan().setIndication(false);
+        for (var s=0; s<11; s++)
         {
-            for (var s=0; s<11; s++)
-            {
-            trackBank.getChannel(i).getSend(s).setIndication(false);
-            }
+        trackBank.getChannel(i).getSend(s).setIndication(false);
         }
     }
 }

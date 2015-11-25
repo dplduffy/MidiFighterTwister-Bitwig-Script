@@ -17,8 +17,8 @@ function init()
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
 	
-	trackBank = host.createMainTrackBank(8, 11, 8);
-    for(var t=0; t<8; t++)
+	trackBank = host.createMainTrackBank(4, 11, 8); //could be 8, 11, 8 if needed to be 8 tracks
+    for(var t=0; t<4; t++)
     {
 		var track = trackBank.getChannel(t);
 		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, volume));
@@ -37,13 +37,14 @@ function init()
     }
 	
 	trackBank.addCanScrollTracksUpObserver(function(canScroll)
-   {
-      mixerPage.canScrollTracksUp = canScroll;
-   });
-   trackBank.addCanScrollTracksDownObserver(function(canScroll)
-   {
-      mixerPage.canScrollTracksDown = canScroll;
-   });
+	{
+	mixerPage.canScrollChannelsUp = canScroll;
+	});
+	trackBank.addCanScrollTracksDownObserver(function(canScroll)
+	{
+	mixerPage.canScrollChannelsDown = canScroll;
+	});
+	
    
 	for (var i=0; i<SEQ_STEPS; i++)
 	{
@@ -82,6 +83,11 @@ function init()
 	
 	for (var i=0; i<8; i++)
 	{
+		device1Macro[i] = device1.getMacro(i).getAmount();
+	}
+	
+	for (var i=0; i<8; i++)
+	{
 		device1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device1Param));
 		device2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device2Param));
 	}
@@ -92,17 +98,17 @@ function init()
 
 function setActivePage(page) //TODO: make notification show active page within mode
 {
-   var isInit = activePage == null;
-
-   if (page != activePage)
-   {
-      activePage = page;
-      if (!isInit)
-      {
-         host.showPopupNotification(page.title);
-		 
-      }
-   }
+	
+	var isInit = activePage == null;
+	isInit ? null : activePage.clearIndication();
+	if (page != activePage)
+	{
+	   activePage = page;
+	   if (!isInit)
+	   {
+		    host.showPopupNotification(page.title);
+	   }
+	}
 }
 
 function getSendObserverFunc(t, s)

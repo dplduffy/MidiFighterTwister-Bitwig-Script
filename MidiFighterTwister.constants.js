@@ -1,12 +1,12 @@
-var volume = initArray(0, 8);
-var pan = initArray(0, 8);
-var mute = initArray(0, 8);
-var solo = initArray(0, 8);
-var arm = initArray(0, 8);
-var color = initArray(0, 8);
-var isSelected = initArray(0, 8);
+var volume = initArray(0, 4);
+var pan = initArray(0, 4);
+var mute = initArray(0, 4);
+var solo = initArray(0, 4);
+var arm = initArray(0, 4);
+var color = initArray(0, 4);
+var isSelected = initArray(0, 4);
 var activePage = null;
-var channelStepSize = 4;
+var channelStepSize = 1;
 var channelStepSizeArray = [1, 4, 8];
 var cursorTrackName;
 
@@ -120,14 +120,24 @@ var trackColors =
     [ 0.2666666805744171 , 0.7843137383460999 , 1                  , COLOR.LIGHT_BLUE]    // Blue
 ];
 
-var MIXERMODE = 0;
+var MIXERMODE = 2;
 var mixerModeArray = ["Volume / Pan", "Sends", "Mix 4"];
 var mixerMode =
 {
-    VOLUME_PAN:0,
-    SEND:1,
-    Mix4:2,
+   VOLUME_PAN:0,
+   SEND:1,
+   Mix4:2,
 };
+
+//possible for future mix 8 mode
+var Mix4 =
+{
+   BANK1 : 0,
+   BANK2 : 1,
+}
+var CURRENT_MIX4 = 0;
+var Mix4Array = [32,28];
+var Mix4ArrayRGB = [0,4];
 
 var currentSend = 0;
 var currentSend11Seg = 1;
@@ -144,7 +154,7 @@ var sendArray =
 	[0,0,0,0,0,0,0,0,0,0,0] , //track8
 ];
 
-var ENCODERBANK = 0;
+var ENCODERBANK = 2;
 var encoderNum = -1;
 var encoderValue = 0;
 var encoderBankOffset =
@@ -450,6 +460,7 @@ var popupSet = false;
 var tempDevice1Name = null;
 var device1Param = initArray (0, 8);
 var device2Param = initArray (0, 8);
+var device1Macro = initArray (0, 8);
 var device1ParamPageNames = null;
 var device1Name = null;
 var dualParamPageView = true;
