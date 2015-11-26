@@ -289,7 +289,7 @@ devicePage.onLeftBottomReleased = function(isActive)
         CURRENT_DEVICE_MODE = currentDeviceMode.DEVICE;
         host.showPopupNotification('Device Mode');
     }
-    devicePage.clearIndication();
+    this.clearIndication();
 }
 
 devicePage.updateRGBLEDs = function()

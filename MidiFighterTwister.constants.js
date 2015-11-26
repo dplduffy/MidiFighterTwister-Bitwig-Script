@@ -1,13 +1,29 @@
-var volume = initArray(0, 4);
-var pan = initArray(0, 4);
-var mute = initArray(0, 4);
-var solo = initArray(0, 4);
-var arm = initArray(0, 4);
-var color = initArray(0, 4);
-var isSelected = initArray(0, 4);
+var masterTrack;
+var mainVolume = initArray(0, 4);
+var mainPan = initArray(0, 4);
+var mainMute = initArray(0, 4);
+var mainSolo = initArray(0, 4);
+var mainArm = initArray(0, 4);
+var mainColor = initArray(0, 4);
+var mainIsSelected = initArray(0, 4);
+var effectVolume = initArray(0, 4);
+var effectPan = initArray(0, 4);
+var effectMute = initArray(0, 4);
+var effectSolo = initArray(0, 4);
+var effectArm = initArray(0, 4);
+var effectColor = initArray(0, 4);
+var effectIsSelected = initArray(0, 4);
+var masterVolume = initArray(0, 0);
+var masterPan = initArray(0, 0);
+var masterMute = initArray(0, 0);
+var masterSolo = initArray(0, 0);
+var masterArm = initArray(0, 0);
+var masterColor = initArray(0, 0);
+var masterIsSelected = initArray(0, 0);
+
 var activePage = null;
 var channelStepSize = 1;
-var channelStepSizeArray = [1, 4, 8];
+var channelStepSizeArray = [1, 4];
 var cursorTrackName;
 
 var statusType =
@@ -92,41 +108,42 @@ var STROBE =
 }
 var trackColors =
 [
-    [ 0.3294117748737335 , 0.3294117748737335 , 0.3294117748737335 , COLOR.GREY],    // Dark Gray
-    [ 0.47843137383461   , 0.47843137383461   , 0.47843137383461   , COLOR.GREY],    // Gray
-    [ 0.7882353067398071 , 0.7882353067398071 , 0.7882353067398071 , COLOR.GREY],    // Light Gray
-    [ 0.5254902243614197 , 0.5372549295425415 , 0.6745098233222961 , COLOR.SILVER],   // Silver
-    [ 0.6392157077789307 , 0.4745098054409027 , 0.26274511218070984, COLOR.BROWN],   // Dark Brown
-    [ 0.7764706015586853 , 0.6235294342041016 , 0.43921568989753723, COLOR.LIGHT_BROWN],   // Brown
-    [ 0.34117648005485535, 0.3803921639919281 , 0.7764706015586853 , COLOR.DARK_PURPLE],   // Dark Blue
-    [ 0.5176470875740051 , 0.5411764979362488 , 0.8784313797950745 , COLOR.LIGHT_PURPLE],   // Light Blue
-    [ 0.5843137502670288 , 0.2862745225429535 , 0.7960784435272217 , COLOR.DARK_PURPLE],   // Purple
-    [ 0.8509804010391235 , 0.21960784494876862, 0.4431372582912445 , COLOR.DARK_PINK],   // Pink
-    [ 0.8509804010391235 , 0.18039216101169586, 0.1411764770746231 , COLOR.RED],    // Red
-    [ 1                  , 0.34117648005485535, 0.0235294122248888 , COLOR.DARK_ORANGE],   // Orange
-    [ 0.8509804010391235 , 0.615686297416687  , 0.062745101749897  , COLOR.GOLD],   // Gold
-    [ 0.45098039507865906, 0.5960784554481506 , 0.0784313753247261 , COLOR.FOREST_GREEN],   // Forest Green
-    [ 0                  , 0.615686297416687  , 0.27843138575553894, COLOR.GREEN],   // Green
-    [ 0                  , 0.6509804129600525 , 0.5803921818733215 , COLOR.TURQUOISE],   // Turquiose
-    [ 0                  , 0.6000000238418579 , 0.8509804010391235 , COLOR.AQUA],   // Aqua
-    [ 0.7372549176216125 , 0.4627451002597809 , 0.9411764740943909 , COLOR.LIGHT_PURPLE],   // Light Purple
+    [ 0.5                , 0.5                , 0.5                , COLOR.GREY],         // No Color?
+    [ 0.3294117748737335 , 0.3294117748737335 , 0.3294117748737335 , COLOR.GREY],         // Dark Gray
+    [ 0.47843137383461   , 0.47843137383461   , 0.47843137383461   , COLOR.GREY],         // Gray
+    [ 0.7882353067398071 , 0.7882353067398071 , 0.7882353067398071 , COLOR.GREY],         // Light Gray
+    [ 0.5254902243614197 , 0.5372549295425415 , 0.6745098233222961 , COLOR.SILVER],       // Silver
+    [ 0.6392157077789307 , 0.4745098054409027 , 0.26274511218070984, COLOR.BROWN],        // Dark Brown
+    [ 0.7764706015586853 , 0.6235294342041016 , 0.43921568989753723, COLOR.LIGHT_BROWN],  // Brown
+    [ 0.34117648005485535, 0.3803921639919281 , 0.7764706015586853 , COLOR.DARK_PURPLE],  // Dark Blue
+    [ 0.5176470875740051 , 0.5411764979362488 , 0.8784313797950745 , COLOR.LIGHT_PURPLE], // Light Blue
+    [ 0.5843137502670288 , 0.2862745225429535 , 0.7960784435272217 , COLOR.DARK_PURPLE],  // Purple
+    [ 0.8509804010391235 , 0.21960784494876862, 0.4431372582912445 , COLOR.DARK_PINK],    // Pink
+    [ 0.8509804010391235 , 0.18039216101169586, 0.1411764770746231 , COLOR.RED],          // Red
+    [ 1                  , 0.34117648005485535, 0.0235294122248888 , COLOR.DARK_ORANGE],  // Orange
+    [ 0.8509804010391235 , 0.615686297416687  , 0.062745101749897  , COLOR.GOLD],         // Gold
+    [ 0.45098039507865906, 0.5960784554481506 , 0.0784313753247261 , COLOR.FOREST_GREEN], // Forest Green
+    [ 0                  , 0.615686297416687  , 0.27843138575553894, COLOR.GREEN],        // Green
+    [ 0                  , 0.6509804129600525 , 0.5803921818733215 , COLOR.TURQUOISE],    // Turquiose
+    [ 0                  , 0.6000000238418579 , 0.8509804010391235 , COLOR.AQUA],         // Aqua
+    [ 0.7372549176216125 , 0.4627451002597809 , 0.9411764740943909 , COLOR.LIGHT_PURPLE], // Light Purple
     [ 0.8823529481887817 , 0.4000000059604645 , 0.5686274766921997 , COLOR.LIGHT_PINK],   // Light Pink
-    [ 0.9254902005195618 , 0.3803921639919281 , 0.34117648005485535, COLOR.LIGHT_PINK],    // Skin
-    [ 1                  , 0.5137255191802979 , 0.24313725531101227, COLOR.LIGHT_ORANGE],   // Light Orange
-    [ 0.8941176533699036 , 0.7176470756530762 , 0.30588236451148987, COLOR.LIGHT_YELLOW],   // Light Yellow
+    [ 0.9254902005195618 , 0.3803921639919281 , 0.34117648005485535, COLOR.LIGHT_PINK],   // Skin
+    [ 1                  , 0.5137255191802979 , 0.24313725531101227, COLOR.LIGHT_ORANGE], // Light Orange
+    [ 0.8941176533699036 , 0.7176470756530762 , 0.30588236451148987, COLOR.LIGHT_YELLOW], // Light Yellow
     [ 0.6274510025978088 , 0.7529411911964417 , 0.2980392277240753 , COLOR.PUKE_GREEN],   // Puke Green
-    [ 0.24313725531101227, 0.7333333492279053 , 0.3843137323856354 , COLOR.LIGHT_GREEN],   // Light Green
-    [ 0.26274511218070984, 0.8235294222831726 , 0.7254902124404907 , COLOR.MINT],   // Mint
+    [ 0.24313725531101227, 0.7333333492279053 , 0.3843137323856354 , COLOR.LIGHT_GREEN],  // Light Green
+    [ 0.26274511218070984, 0.8235294222831726 , 0.7254902124404907 , COLOR.MINT],         // Mint
     [ 0.2666666805744171 , 0.7843137383460999 , 1                  , COLOR.LIGHT_BLUE]    // Blue
 ];
 
-var MIXERMODE = 2;
-var mixerModeArray = ["Volume / Pan", "Sends", "Mix 4"];
+var MIXERMODE = 0;
+var mixerModeArray = ["Main", "Effect", "Master"];
 var mixerMode =
 {
-   VOLUME_PAN:0,
-   SEND:1,
-   Mix4:2,
+   MAIN:0,
+   EFFECT:1,
+   MASTER:2,
 };
 
 //possible for future mix 8 mode
@@ -146,12 +163,11 @@ var sendArray =
     [0,0,0,0,0,0,0,0,0,0,0] , //track1
     [0,0,0,0,0,0,0,0,0,0,0] , //track2
 	[0,0,0,0,0,0,0,0,0,0,0] , //track3
+	[0,0,0,0,0,0,0,0,0,0,0] , //track4
+    [0,0,0,0,0,0,0,0,0,0,0] , //track1
+    [0,0,0,0,0,0,0,0,0,0,0] , //track2
 	[0,0,0,0,0,0,0,0,0,0,0] , //track3
 	[0,0,0,0,0,0,0,0,0,0,0] , //track4
-	[0,0,0,0,0,0,0,0,0,0,0] , //track5
-	[0,0,0,0,0,0,0,0,0,0,0] , //track6
-	[0,0,0,0,0,0,0,0,0,0,0] , //track7
-	[0,0,0,0,0,0,0,0,0,0,0] , //track8
 ];
 
 var ENCODERBANK = 2;

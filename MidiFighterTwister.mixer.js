@@ -3,8 +3,10 @@ mixerPage = new page();
 
 mixerPage.title = "Mixer";
 
-mixerPage.canScrollChannelsUp = false;
-mixerPage.canScrollChannelsDown = false;
+mixerPage.canScrollMainChannelsUp = false;
+mixerPage.canScrollMainChannelsDown = false;
+mixerPage.canScrollEffectChannelsUp = false;
+mixerPage.canScrollEffectChannelsDown = false;
 
 mixerPage.updateOutputState = function()
 {
@@ -19,127 +21,107 @@ mixerPage.onEncoderPress = function(isActive)
 }
 
 mixerPage.onEncoderRelease = function(isActive)
-{
-    if (MIXERMODE == mixerMode.VOLUME_PAN)
+{ 
+    if (MIXERMODE == mixerMode.MAIN)
     {
-        if(encoderNum<4)
+        if(encoderNum<(4+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum).selectInMixer();
+        mainTrackBank.getChannel(encoderNum-encoderBankOffset.BANK3).selectInMixer();
         }
-        if(encoderNum>=4 && encoderNum<8)
+        if(encoderNum>=(4+encoderBankOffset.BANK3) && encoderNum<(8+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-4).getArm().toggle();
+        mainTrackBank.getChannel((encoderNum-4)-encoderBankOffset.BANK3).getArm().toggle();
         }
-        if(encoderNum>=8 && encoderNum<12)
+        if(encoderNum>=(8+encoderBankOffset.BANK3) && encoderNum<(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-4).selectInMixer();
+        mainTrackBank.getChannel((encoderNum-8)-encoderBankOffset.BANK3).getSolo().toggle();
         }
-        if(encoderNum>=12)
+        if(encoderNum>=(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-8).getArm().toggle();
+        mainTrackBank.getChannel((encoderNum-12)-encoderBankOffset.BANK3).getMute().toggle();
         }
     }
-    
-    if (MIXERMODE == mixerMode.SEND)
+    if (MIXERMODE == mixerMode.EFFECT)
     {
-        if(encoderNum<(4+16))
+        if(encoderNum<(4+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-16).getSolo().toggle();
+        effectTrackBank.getChannel(encoderNum-encoderBankOffset.BANK3).selectInMixer();
         }
-        if(encoderNum>=(4+16) && encoderNum<(8+16))
+        if(encoderNum>=(4+encoderBankOffset.BANK3) && encoderNum<(8+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-4)-16).getMute().toggle();
+        effectTrackBank.getChannel((encoderNum-4)-encoderBankOffset.BANK3).getArm().toggle();
         }
-        if(encoderNum>=(8+16) && encoderNum<(12+16))
+        if(encoderNum>=(8+encoderBankOffset.BANK3) && encoderNum<(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-4)-16).getSolo().toggle();
+        effectTrackBank.getChannel((encoderNum-8)-encoderBankOffset.BANK3).getSolo().toggle();
         }
-        if(encoderNum>=(12+16))
+        if(encoderNum>=(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-8)-16).getMute().toggle();
+        effectTrackBank.getChannel((encoderNum-12)-encoderBankOffset.BANK3).getMute().toggle();
         }
     }
-    
-    if (MIXERMODE == mixerMode.Mix4)
-    {   
-        if(encoderNum<(4+32))
+    if (MIXERMODE == mixerMode.MASTER)
+    {
+        if(encoderNum<(4+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-32).selectInMixer();
+        masterTrack.selectInMixer();
         }
-        if(encoderNum>=(4+32) && encoderNum<(8+32))
+        if(encoderNum>=(4+encoderBankOffset.BANK3) && encoderNum<(8+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-4)-32).getArm().toggle();
+        masterTrack.getArm().toggle();
         }
-        if(encoderNum>=(8+32) && encoderNum<(12+32))
+        if(encoderNum>=(8+encoderBankOffset.BANK3) && encoderNum<(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-8)-32).getSolo().toggle();
+        masterTrack.getSolo().toggle();
         }
-        if(encoderNum>=(12+32))
+        if(encoderNum>=(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-12)-32).getMute().toggle();
+        masterTrack.getMute().toggle();
         }
     }
 }
 
 mixerPage.onEncoderTurn = function(isActive)
 {   
-    if (MIXERMODE == mixerMode.VOLUME_PAN)
+    if (MIXERMODE == mixerMode.MAIN)
     {
-        if(encoderNum<4)
+        if(encoderNum<(4+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum).getVolume().set(encoderValue,127);
+        mainTrackBank.getChannel(encoderNum-encoderBankOffset.BANK3).getVolume().set(encoderValue,127);
         }
-        if(encoderNum>=4 && encoderNum<8)
+        if(encoderNum>=(4+encoderBankOffset.BANK3) && encoderNum<(8+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-4).getPan().set(encoderValue,127);
+        mainTrackBank.getChannel((encoderNum-4)-encoderBankOffset.BANK3).getPan().set(encoderValue,127);
         }
-        if(encoderNum>=8 && encoderNum<12)
+        if(encoderNum>=(8+encoderBankOffset.BANK3) && encoderNum<(12+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-4).getVolume().set(encoderValue,127);
+        mainTrackBank.getChannel((encoderNum-8)-encoderBankOffset.BANK3).getSend(currentSend).set(encoderValue,127);
         }
-        if(encoderNum>=12)
-        {
-        trackBank.getChannel(encoderNum-8).getPan().set(encoderValue,127);
-        }
-    }
-    
-    if (MIXERMODE == mixerMode.SEND)
-    {
-        if(encoderNum<(4+16))
-        {
-        trackBank.getChannel(encoderNum-16).getSend(currentSend).set(encoderValue,127);
-        }
-        if(encoderNum>=(4+16) && encoderNum<(8+16))
-        {
-        setSendNumber(encoderValue);
-        }
-        if(encoderNum>=(8+16) && encoderNum<(12+16))
-        {
-        trackBank.getChannel((encoderNum-4)-16).getSend(currentSend).set(encoderValue,127);
-        }
-        if(encoderNum>=(12+16))
+        if(encoderNum>=(12+encoderBankOffset.BANK3))
         {
         setSendNumber(encoderValue);
         }
     }
-    
-    if (MIXERMODE == mixerMode.Mix4)
+    if (MIXERMODE == mixerMode.EFFECT)
     {
-        if(encoderNum<(4+32))
+        if(encoderNum<(4+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel(encoderNum-32).getVolume().set(encoderValue,127);
+        effectTrackBank.getChannel(encoderNum-encoderBankOffset.BANK3).getVolume().set(encoderValue,127);
         }
-        if(encoderNum>=(4+32) && encoderNum<(8+32))
+        if(encoderNum>=(4+encoderBankOffset.BANK3) && encoderNum<(8+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-4)-32).getPan().set(encoderValue,127);
+        effectTrackBank.getChannel((encoderNum-4)-encoderBankOffset.BANK3).getPan().set(encoderValue,127);
         }
-        if(encoderNum>=(8+32) && encoderNum<(12+32))
+    }
+    if (MIXERMODE == mixerMode.MASTER)
+    {
+        if(encoderNum<(4+encoderBankOffset.BANK3))
         {
-        trackBank.getChannel((encoderNum-8)-32).getSend(currentSend).set(encoderValue,127);
+        masterTrack.getVolume().set(encoderValue,127);
         }
-        if(encoderNum>=(12+32))
+        if(encoderNum>=(4+encoderBankOffset.BANK3) && encoderNum<(8+encoderBankOffset.BANK3))
         {
-        setSendNumber(encoderValue);
+        masterTrack.getPan().set(encoderValue,127);
         }
     }
 }
@@ -150,7 +132,14 @@ mixerPage.onRightTopPressed = function(isActive)
 
 mixerPage.onRightTopReleased = function(isActive)
 {
-    trackBank.scrollChannelsUp();
+    if(MIXERMODE == mixerMode.MAIN)
+    {
+    mainTrackBank.scrollChannelsUp();
+    }
+    if(MIXERMODE == mixerMode.EFFECT)
+    {
+    effectTrackBank.scrollChannelsUp();
+    }     
 }
 
 mixerPage.onRightMiddlePressed = function(isActive)
@@ -160,10 +149,11 @@ mixerPage.onRightMiddlePressed = function(isActive)
 mixerPage.onRightMiddleReleased = function(isActive)
 {
     var index = channelStepSizeArray.indexOf(channelStepSize);
-    MIXERMODE == mixerMode.Mix4 ? index == (channelStepSizeArray.length - 2) ? index = 0 : index++ : index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
+    index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
     channelStepSize = channelStepSizeArray[index];
     host.showPopupNotification("Channel Step Size: "+channelStepSize);
-    trackBank.setChannelScrollStepSize(channelStepSize);
+    mainTrackBank.setChannelScrollStepSize(channelStepSize);
+    effectTrackBank.setChannelScrollStepSize(channelStepSize);
 }
 
 mixerPage.onRightBottomPressed = function(isActive)
@@ -172,7 +162,14 @@ mixerPage.onRightBottomPressed = function(isActive)
 
 mixerPage.onRightBottomReleased = function(isActive)
 {
-    trackBank.scrollChannelsDown();
+    if(MIXERMODE == mixerMode.MAIN)
+    {
+    mainTrackBank.scrollChannelsDown();
+    }
+    if(MIXERMODE == mixerMode.EFFECT)
+    {
+    effectTrackBank.scrollChannelsDown();
+    }      
 }
 
 mixerPage.onLeftTopPressed = function(isActive)
@@ -181,28 +178,9 @@ mixerPage.onLeftTopPressed = function(isActive)
 
 mixerPage.onLeftTopReleased = function(isActive)
 {
-    //MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
-    //host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
-    //
-    //if (MIXERMODE == mixerMode.Mix4 && channelStepSize == 8)
-    //{
-    //channelStepSize = 4;
-    //trackBank.setChannelScrollStepSize(channelStepSize);
-    //}
-    //
-    //switch(MIXERMODE)
-    //{
-    //    case mixerMode.VOLUME_PAN:
-    //        ENCODERBANK = 0;
-    //        break
-    //    case mixerMode.SEND:
-    //        ENCODERBANK = 1;
-    //        break
-    //    case mixerMode.Mix4:
-    //        ENCODERBANK = 2;
-    //        break
-    //}
-    //changeEncoderBank(ENCODERBANK);
+    MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
+    this.clearIndication();
+    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
 }
 
 mixerPage.onLeftMiddlePressed = function(isActive)
@@ -239,71 +217,97 @@ mixerPage.onLeftBottomReleased = function(isActive)
 
 mixerPage.updateRGBLEDs = function()
 {
-    if (MIXERMODE == mixerMode.VOLUME_PAN) 
+    if (MIXERMODE == mixerMode.MAIN) 
     {
         for(var i=0; i<16; i++)
         {
             if(i<4)
             {
-            isSelected[i] ? setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) : setRGBLED(i, color[i], STROBE.OFF);
+            mainIsSelected[i] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.GREEN, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, mainColor[i], STROBE.OFF);
             }
             if(i>=4 && i <8)
             {
-            arm[i-4] ? setRGBLED(i, COLOR.RED, STROBE.PULSE1) : setRGBLED(i, color[i-4], STROBE.OFF);
+            mainArm[i-4] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.RED, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, mainColor[i-4], STROBE.OFF);
             }
             if(i>=8 && i<12)
             {
-            isSelected[i-4] ? setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) : setRGBLED(i, color[i-4], STROBE.OFF);
+            mainSolo[i-8] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.DARK_BLUE, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, mainColor[i-8], STROBE.OFF);
             }
             if(i>=12)
             {
-            arm[i-8] ? setRGBLED(i, COLOR.RED, STROBE.PULSE1) : setRGBLED(i, color[i-8], STROBE.OFF);
+            mainMute[i-12] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.BROWN, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, mainColor[i-12], STROBE.OFF);
             }
         }
     }
-    
-    if (MIXERMODE == mixerMode.SEND) 
+    if (MIXERMODE == mixerMode.EFFECT) 
     {
         for(var i=0; i<16; i++)
         {
             if(i<4)
             {
-            solo[i] ? setRGBLED(i+16, COLOR.DARK_BLUE, STROBE.PULSE1) : setRGBLED(i+16, color[i], STROBE.OFF);
+            effectIsSelected[i] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.GREEN, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, effectColor[i], STROBE.OFF);
             }
             if(i>=4 && i <8)
             {
-            mute[i-4] ? setRGBLED(i+16, COLOR.BROWN, STROBE.PULSE1) : setRGBLED(i+16, color[i-4], STROBE.OFF);
+            effectArm[i-4] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.RED, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, effectColor[i-4], STROBE.OFF);
             }
             if(i>=8 && i<12)
             {
-            solo[i-4] ? setRGBLED(i+16, COLOR.DARK_BLUE, STROBE.PULSE1) : setRGBLED(i+16, color[i-4], STROBE.OFF);
+            effectSolo[i-8] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.DARK_BLUE, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, effectColor[i-8], STROBE.OFF);
             }
             if(i>=12)
             {
-            mute[i-8] ? setRGBLED(i+16, COLOR.BROWN, STROBE.PULSE1) : setRGBLED(i+16, color[i-8], STROBE.OFF);
+            effectMute[i-12] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.BROWN, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, effectColor[i-12], STROBE.OFF);
             }
         }
     }
-
-    if (MIXERMODE == mixerMode.Mix4) 
+    if (MIXERMODE == mixerMode.MASTER) 
     {
         for(var i=0; i<16; i++)
         {
-            if(i<4)
+            if(i==0)
             {
-            isSelected[i] ? setRGBLED(i+32, COLOR.GREEN, STROBE.PULSE1) : setRGBLED(i+32, color[i], STROBE.OFF);
+            masterIsSelected[i] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.GREEN, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, masterColor[0], STROBE.OFF);
             }
-            if(i>=4 && i <8)
+            if(i==4)
             {
-            arm[i-4] ? setRGBLED(i+32, COLOR.RED, STROBE.PULSE1) : setRGBLED(i+32, color[i-4], STROBE.OFF);
+            masterArm[i-4] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.RED, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, masterColor[0], STROBE.OFF);
             }
-            if(i>=8 && i<12)
+            if(i==8)
             {
-            solo[i-8] ? setRGBLED(i+32, COLOR.DARK_BLUE, STROBE.PULSE1) : setRGBLED(i+32, color[i-8], STROBE.OFF);
+            masterSolo[i-8] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.DARK_BLUE, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, effectColor[0], STROBE.OFF);
             }
-            if(i>=12)
+            if(i==12)
             {
-            mute[i-12] ? setRGBLED(i+32, COLOR.BROWN, STROBE.PULSE1) : setRGBLED(i+32, color[i-12], STROBE.OFF);
+            masterMute[i-12] ?
+                setRGBLED(i+encoderBankOffset.BANK3, COLOR.BROWN, STROBE.PULSE1) :
+                    setRGBLED(i+encoderBankOffset.BANK3, masterColor[0], STROBE.OFF);
+            }
+            else
+            {
+            setRGBLED(i+encoderBankOffset.BANK3, COLOR.BLACK, STROBE.OFF);
             }
         }
     }
@@ -311,111 +315,96 @@ mixerPage.updateRGBLEDs = function()
 
 mixerPage.update11segLEDs = function()
 {
-    //TODO: only set PAN leds if track exists
-    if (MIXERMODE == mixerMode.VOLUME_PAN)
+    if (MIXERMODE == mixerMode.MAIN)
     {
         for(var i=0; i<16; i++)
         {
             if(i<4)
             {
-            set11segLED(i, volume[i]);
+            set11segLED(i+encoderBankOffset.BANK3, mainVolume[i]);
             }
             if(i>=4 && i <8)
             {
-            set11segLED(i, pan[i-4]);
+            set11segLED(i+encoderBankOffset.BANK3, mainPan[i-4]);
             }
             if(i>=8 && i<12)
             {
-            set11segLED(i, volume[i-4]);
+            set11segLED(i+encoderBankOffset.BANK3, sendArray[i-8][currentSend]);
             }
             if(i>=12)
             {
-            set11segLED(i, pan[i-8]);
+            set11segLED(i+encoderBankOffset.BANK3, currentSend11Seg);
             }
         }
     }
-    
-    if (MIXERMODE == mixerMode.SEND)
+    if (MIXERMODE == mixerMode.EFFECT)
     {
         for(var i=0; i<16; i++)
-        { 
+        {
             if(i<4)
             {
-            set11segLED(i+16, sendArray[i][currentSend]);
+            set11segLED(i+encoderBankOffset.BANK3, effectVolume[i]);
             }
             if(i>=4 && i <8)
             {
-            set11segLED(i+16, currentSend11Seg);
+            set11segLED(i+encoderBankOffset.BANK3, effectPan[i-4]);
             }
             if(i>=8 && i<12)
             {
-            set11segLED(i+16, sendArray[i-4][currentSend]);
+            set11segLED(i+encoderBankOffset.BANK3, 0);
             }
             if(i>=12)
             {
-            set11segLED(i+16, currentSend11Seg);
+            set11segLED(i+encoderBankOffset.BANK3, 0);
             }
         }
     }
-    
-    if (MIXERMODE == mixerMode.Mix4)
+    if (MIXERMODE == mixerMode.MASTER)
     {
         for(var i=0; i<16; i++)
-        { 
-            if(i<4)
+        {
+            if(i==0)
             {
-            set11segLED(i+32, volume[i]);
+            set11segLED(i+encoderBankOffset.BANK3, masterVolume[0]);
             }
-            if(i>=4 && i <8)
+            else if(i==4)
             {
-            set11segLED(i+32, pan[i-4]);
+            set11segLED(i+encoderBankOffset.BANK3, masterPan[0]);
             }
-            if(i>=8 && i<12)
+            else
             {
-            set11segLED(i+32, sendArray[i-4][currentSend]);
-            }
-            if(i>=12)
-            {
-            set11segLED(i+32, currentSend11Seg);
+            set11segLED(i+encoderBankOffset.BANK3, 0);
             }
         }
     }
 }
 
 mixerPage.updateIndicators = function()
-{
-    if (MIXERMODE == mixerMode.VOLUME_PAN || MIXERMODE == mixerMode.SEND)
-    {
-        for(var i=0; i<8; i++)
-        {
-            trackBank.getChannel(i).getVolume().setIndication(MIXERMODE == mixerMode.VOLUME_PAN);
-            trackBank.getChannel(i).getPan().setIndication(MIXERMODE == mixerMode.VOLUME_PAN);
-            for (var s=0; s<11; s++)
-            {
-            trackBank.getChannel(i).getSend(s).setIndication(MIXERMODE == mixerMode.SEND && currentSend == s);
-            }
-        }
-    }
-    
-    if (MIXERMODE == mixerMode.Mix4)
+{   
+    if (MIXERMODE == mixerMode.MAIN)
     {
         for(var i=0; i<4; i++)
         {
-            trackBank.getChannel(i).getVolume().setIndication(true);
-            trackBank.getChannel(i).getPan().setIndication(true);
+            mainTrackBank.getChannel(i).getVolume().setIndication(true);
+            mainTrackBank.getChannel(i).getPan().setIndication(true);
             for (var s=0; s<11; s++)
             {
-            trackBank.getChannel(i).getSend(s).setIndication(currentSend == s);
+            mainTrackBank.getChannel(i).getSend(s).setIndication(currentSend == s);
             }
         }
-        // only necessary for Mix8
-        //for(var i=4; i<8; i++)
-        //{
-        //    for (var s=0; s<11; s++)
-        //    {
-        //    trackBank.getChannel(i).getSend(s).setIndication(false);
-        //    }
-        //}
+    }
+    if (MIXERMODE == mixerMode.EFFECT)
+    {
+        for(var i=0; i<4; i++)
+        {
+            effectTrackBank.getChannel(i).getVolume().setIndication(true);
+            effectTrackBank.getChannel(i).getPan().setIndication(true);
+        }
+    }
+    if (MIXERMODE == mixerMode.MASTER)
+    {
+        masterTrack.getVolume().setIndication(true);
+        masterTrack.getPan().setIndication(true);
     }
 }
 
@@ -423,13 +412,17 @@ mixerPage.clearIndication = function()
 {
     for(var i=0; i<4; i++)
     {
-        trackBank.getChannel(i).getVolume().setIndication(false);
-        trackBank.getChannel(i).getPan().setIndication(false);
+        mainTrackBank.getChannel(i).getVolume().setIndication(false);
+        mainTrackBank.getChannel(i).getPan().setIndication(false);
         for (var s=0; s<11; s++)
         {
-        trackBank.getChannel(i).getSend(s).setIndication(false);
+        mainTrackBank.getChannel(i).getSend(s).setIndication(false);
         }
+        effectTrackBank.getChannel(i).getVolume().setIndication(false);
+        effectTrackBank.getChannel(i).getPan().setIndication(false);
     }
+    masterTrack.getVolume().setIndication(false);
+    masterTrack.getPan().setIndication(false);
 }
 
 function setSendNumber(value)

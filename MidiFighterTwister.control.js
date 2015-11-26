@@ -17,35 +17,65 @@ function init()
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
 	
-	trackBank = host.createMainTrackBank(4, 11, 8); //could be 8, 11, 8 if needed to be 8 tracks
+	mainTrackBank = host.createMainTrackBank(4, 11, 8);
     for(var t=0; t<4; t++)
     {
-		var track = trackBank.getChannel(t);
-		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, volume));
-		track.getPan().addValueObserver(126, getTrackObserverFunc(t, pan));
+		var track = mainTrackBank.getChannel(t);
+		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, mainVolume));
+		track.getPan().addValueObserver(126, getTrackObserverFunc(t, mainPan));
 		
 		for(var s=0; s<11; s++)
 			{
 			track.getSend(s).addValueObserver(126, getSendObserverFunc(t, s));
 			}
 			
-		track.getMute().addValueObserver(getTrackObserverFunc(t, mute));
-		track.getSolo().addValueObserver(getTrackObserverFunc(t, solo));
-		track.addIsSelectedInMixerObserver(getTrackObserverFunc(t, isSelected));
-		track.addColorObserver(getTrackObserverFunc(t, color));
-		track.getArm().addValueObserver(getTrackObserverFunc(t, arm));
+		track.getMute().addValueObserver(getTrackObserverFunc(t, mainMute));
+		track.getSolo().addValueObserver(getTrackObserverFunc(t, mainSolo));
+		track.addIsSelectedInMixerObserver(getTrackObserverFunc(t, mainIsSelected));
+		track.addColorObserver(getTrackObserverFunc(t, mainColor));
+		track.getArm().addValueObserver(getTrackObserverFunc(t, mainArm));
     }
 	
-	trackBank.addCanScrollTracksUpObserver(function(canScroll)
+	mainTrackBank.addCanScrollTracksUpObserver(function(canScroll)
 	{
-	mixerPage.canScrollChannelsUp = canScroll;
+	mixerPage.canScrollMainChannelsUp = canScroll;
 	});
-	trackBank.addCanScrollTracksDownObserver(function(canScroll)
+	mainTrackBank.addCanScrollTracksDownObserver(function(canScroll)
 	{
-	mixerPage.canScrollChannelsDown = canScroll;
+	mixerPage.canScrollMainChannelsDown = canScroll;
 	});
 	
-   
+	effectTrackBank = host.createEffectTrackBank(4, 8)
+	for(var t=0; t<4; t++)
+    {
+		var effectTrack = effectTrackBank.getChannel(t);
+		effectTrack.getVolume().addValueObserver(126, getTrackObserverFunc(t, effectVolume));
+		effectTrack.getPan().addValueObserver(126, getTrackObserverFunc(t, effectPan));
+		effectTrack.getMute().addValueObserver(getTrackObserverFunc(t, effectMute));
+		effectTrack.getSolo().addValueObserver(getTrackObserverFunc(t, effectSolo));
+		effectTrack.addIsSelectedInMixerObserver(getTrackObserverFunc(t, effectIsSelected));
+		effectTrack.addColorObserver(getTrackObserverFunc(t, effectColor));
+		effectTrack.getArm().addValueObserver(getTrackObserverFunc(t, effectArm));
+    }
+	
+	effectTrackBank.addCanScrollTracksUpObserver(function(canScroll)
+	{
+	mixerPage.canScrollEffectChannelsUp = canScroll;
+	});
+	effectTrackBank.addCanScrollTracksDownObserver(function(canScroll)
+	{
+	mixerPage.canScrollEffectChannelsDown = canScroll;
+	});
+	
+	masterTrack = host.createMasterTrack(8);
+	masterTrack.getVolume().addValueObserver(126, getTrackObserverFunc(0, masterVolume));
+	masterTrack.getPan().addValueObserver(126, getTrackObserverFunc(0, masterPan));
+	masterTrack.getMute().addValueObserver(getTrackObserverFunc(0, masterMute));
+	masterTrack.getSolo().addValueObserver(getTrackObserverFunc(0, masterSolo));
+	masterTrack.addIsSelectedInMixerObserver(getTrackObserverFunc(0, masterIsSelected));
+	masterTrack.addColorObserver(getTrackObserverFunc(0, masterColor));
+	masterTrack.getArm().addValueObserver(getTrackObserverFunc(0, masterArm));
+	
 	for (var i=0; i<SEQ_STEPS; i++)
 	{
 		prevStepData[i] = initArray(false, SEQ_KEYS);
@@ -93,7 +123,8 @@ function init()
 	}
 	
 	changeEncoderBank(ENCODERBANK);
-    trackBank.setChannelScrollStepSize(channelStepSize);
+    mainTrackBank.setChannelScrollStepSize(channelStepSize);
+	effectTrackBank.setChannelScrollStepSize(channelStepSize);
 }
 
 function setActivePage(page) //TODO: make notification show active page within mode
@@ -120,8 +151,9 @@ function getSendObserverFunc(t, s)
 }
 
 function getTrackObserverFunc(track, varToStore)
-{	
-	if (varToStore == color)
+{
+
+	if (varToStore == mainColor || varToStore == effectColor)
 	{
 		return function(r, g, b)
 		{
