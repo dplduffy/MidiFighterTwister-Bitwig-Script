@@ -228,73 +228,36 @@ melodicSequencerPage.onEncoderTurn = function(isActive)
     {
         if(tempStepTurn == melodicEncoderSetting.STEP)
         {
-            var tempPrevStep = STEP_SIZE
             STEP_SIZE = stepSizeArray[scaleEncoderToSize(encoderValue)];
-            if (tempPrevStep < STEP_SIZE)
-            {
-                stepRGB = incrementRainbow(stepRGB);
-            }
-            if (tempPrevStep > STEP_SIZE)
-            {
-                stepRGB = decrementRainbow(stepRGB);
-            }
+            stepRGB = rainbowArray[stepSizeArray.indexOf(STEP_SIZE)%(rainbowArray.length-1)];
             cursorClip.setStepSize(STEP_SIZE);
             host.showPopupNotification('Step Size: '+stepSizeNameArray[stepSizeArray.indexOf(STEP_SIZE)]);
         }   
         if (tempStepTurn == melodicEncoderSetting.ROOT)
         {
-            var tempPrevRoot = ROOT_NOTE;
             ROOT_NOTE = scaleEncoderToRoot(encoderValue);
-            if(tempPrevRoot < ROOT_NOTE)
-            {
-                rootRGB = incrementRainbow(rootRGB);
-            }
-            if(tempPrevRoot > ROOT_NOTE)
-            {
-                rootRGB = decrementRainbow(rootRGB);
-            }
+            rootRGB = rainbowArray[ROOT_NOTE%(rainbowArray.length-1)];
             host.showPopupNotification('Root Note: '+rootNoteNames[ROOT_NOTE]);
         }
         if (tempStepTurn == melodicEncoderSetting.MODE)
         {
             var tempPrevMode = CURRENT_MODERN_MODE
             CURRENT_MODERN_MODE =  scaleEncoderToMode(encoderValue);
-            if (tempPrevMode < CURRENT_MODERN_MODE)
-            {
-                modeRGB = incrementRainbow(modeRGB);
-            }
-            if (tempPrevMode > CURRENT_MODERN_MODE)
-            {
-                modeRGB = decrementRainbow(modeRGB);
-            }
+            modeRGB = rainbowArray[CURRENT_MODERN_MODE%(rainbowArray.length-1)];
             host.showPopupNotification('Scale: '+modernModesNames[CURRENT_MODERN_MODE]);
         }
         if(tempStepTurn == melodicEncoderSetting.OCT)
         {
             var tempPrevOct = CURRENT_OCT
             CURRENT_OCT = scaleEncoderToOct(encoderValue);
-            if (tempPrevOct < CURRENT_OCT)
-            {
-                octRGB = incrementRainbow(octRGB);
-            }
-            if (tempPrevOct > CURRENT_OCT)
-            {
-                octRGB = decrementRainbow(octRGB);
-            }
+            octRGB = rainbowArray[CURRENT_OCT%(rainbowArray.length-1)];
             host.showPopupNotification('Octave: '+ octaveNoteNumbers[CURRENT_OCT]);
         }
         if(tempStepTurn == melodicEncoderSetting.OCT_RANGE)
         {
             var tempPrevOctRange = OCTAVE_RANGE
             OCTAVE_RANGE = (scaleEncoderToOctRange(encoderValue)+1);
-            if (tempPrevOctRange < OCTAVE_RANGE)
-            {
-                octRangeRGB = incrementRainbow(octRangeRGB);
-            }
-            if (tempPrevOctRange > OCTAVE_RANGE)
-            {
-                octRangeRGB = decrementRainbow(octRangeRGB);
-            }
+            octRangeRGB = rainbowArray[OCTAVE_RANGE%(rainbowArray.length-1)];
             host.showPopupNotification('Octave Range: '+ octaveRangeNames[OCTAVE_RANGE-1]);
         }   
     }

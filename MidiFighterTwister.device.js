@@ -3,10 +3,9 @@ devicePage = new page();
 
 devicePage.title = "Device";
 
-var devicePageRGB = 80;
-var deviceCountRGB = 80;
 var rgbPageDone = false;
 var rgbDeviceDone = false;
+var tempRainbow = 80;
 
 devicePage.updateOutputState = function()
 {
@@ -51,27 +50,6 @@ devicePage.onEncoderTurn = function(isActive)
                 {
                     var tempPrevDevice = deviceBank1PositionObserver;
                     var tempDevice = scaleEncoderToDeviceCount(encoderValue);
-    
-                    if(!rgbDeviceDone)
-                    {
-                        if (tempPrevDevice < tempDevice)
-                        {
-                            deviceCountRGB = incrementRainbow(deviceCountRGB);
-                            devicePageRGB = 80;
-                            rgbDeviceDone = true;
-                        }
-                        if (tempPrevDevice > tempDevice)
-                        {
-                            deviceCountRGB = decrementRainbow(deviceCountRGB);
-                            devicePageRGB = 80;
-                            rgbDeviceDone = true
-                        }
-                    }
-                    if(rgbDeviceDone && (tempDevice == deviceBank1PositionObserver))
-                    {
-                        rgbDeviceDone = false;
-                    }
-    
                     deviceBank1.scrollTo(tempDevice);
                     tempDevice1Name = device1Name;
                     popupSet = true;
@@ -84,22 +62,14 @@ devicePage.onEncoderTurn = function(isActive)
                     {
                         if (tempPrevPage < tempPage)
                         {
-                            devicePageRGB = incrementRainbow(devicePageRGB);
                             device1.setParameterPage(tempPage);
                             host.showPopupNotification(device1ParamPageNames[selectedParamPage+1])
-                            rgbPageDone = true;
                         }
                         if (tempPrevPage > tempPage)
                         {
-                            devicePageRGB = decrementRainbow(devicePageRGB);
                             device1.setParameterPage(tempPage);
                             host.showPopupNotification(device1ParamPageNames[selectedParamPage-1])
-                            rgbPageDone = true
                         }
-                    }
-                    if(rgbPageDone && (tempPage == selectedParamPage))
-                    {
-                        rgbPageDone = false;
                     }
                 }
             }
@@ -235,19 +205,7 @@ devicePage.onLeftTopPressed = function(isActive)
 
 devicePage.onLeftTopReleased = function(isActive)
 {
-    switch(MIXERMODE)
-    {
-        case mixerMode.VOLUME_PAN:
-            ENCODERBANK = 0;
-            break
-        case mixerMode.SEND:
-            ENCODERBANK = 1;
-            break
-        case mixerMode.Mix4:
-            ENCODERBANK = 2;
-            break
-    }
-    
+    ENCODERBANK = 2;
     changeEncoderBank(ENCODERBANK);
 	setActivePage(mixerPage);
 }
@@ -310,11 +268,19 @@ devicePage.updateRGBLEDs = function()
             {
                 if((i+8) == singleDeviceSetting.DEVICE)
                 {
-                setRGBLED(i+encoderBankOffset.BANK4+8, deviceCountRGB, STROBE.OFF);
+                setRGBLED(i+encoderBankOffset.BANK4+8, rainbowArray[(deviceBank1PositionObserver%deviceBank1Count)%(rainbowArray.length-1)], STROBE.OFF);
                 }
                 else if((i+8) == singleDeviceSetting.PAGE)
                 {
-                setRGBLED(i+encoderBankOffset.BANK4+8, devicePageRGB, STROBE.OFF);
+                    if(device1ParamPageNames.length>1)
+                    {
+                    tempRainbow = rainbowArray[(selectedParamPage%(device1ParamPageNames.length-1))%(rainbowArray.length-1)]
+                    }
+                    else
+                    {
+                    tempRainbow = rainbowArray[0];
+                    }
+                    setRGBLED(i+encoderBankOffset.BANK4+8, tempRainbow, STROBE.OFF);
                 }
                 else
                 {
@@ -451,12 +417,12 @@ function scaleEncoderToDevicePage(enc)
 
 function scaleDeviceCountToEncoder(count)
 {
-    return Math.round((count/(deviceBank1Count-1))*127);
+    return Math.round((count/(deviceBank1Count))*127);
 }
 
 function scaleEncoderToDeviceCount(enc)
 {
 	a=0;
-	b=deviceBank1Count-1;
+	b=deviceBank1Count;
 	return Math.round(((((b-a)*(enc-min))/(max-min)) + a));
 }

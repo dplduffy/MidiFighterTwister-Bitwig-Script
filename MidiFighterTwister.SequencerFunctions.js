@@ -144,16 +144,16 @@ function scaleEncoderToDrumOffset(enc)
 	return Math.floor(((((b-a)*(enc-min))/(max-min)) + a));
 }
 
-function incrementRainbow (varToInc)
-{
-    var tempIndex = rainbowArray.indexOf(varToInc);
-    rainbowArray[tempIndex+1] > -1 ? varToInc = rainbowArray[tempIndex+1] : varToInc = rainbowArray[0];
-    return varToInc;
-}
-
-function decrementRainbow (varToInc)
-{
-    var tempIndex = rainbowArray.indexOf(varToInc);
-    rainbowArray[tempIndex-1] > -1 ? varToInc = rainbowArray[tempIndex-1] : varToInc = rainbowArray[rainbowArray.length-1];
-    return varToInc;
-} 
+//function incrementRainbow (varToInc)
+//{
+//    var tempIndex = rainbowArray.indexOf(varToInc);
+//    rainbowArray[tempIndex+1] > -1 ? varToInc = rainbowArray[tempIndex+1] : varToInc = rainbowArray[0];
+//    return varToInc;
+//}
+//
+//function decrementRainbow (varToInc)
+//{
+//    var tempIndex = rainbowArray.indexOf(varToInc);
+//    rainbowArray[tempIndex-1] > -1 ? varToInc = rainbowArray[tempIndex-1] : varToInc = rainbowArray[rainbowArray.length-1];
+//    return varToInc;
+//} 
