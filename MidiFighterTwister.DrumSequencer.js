@@ -298,19 +298,7 @@ drumSequencerPage.onLeftTopPressed = function(isActive)
 
 drumSequencerPage.onLeftTopReleased = function(isActive)
 {
-    switch(MIXERMODE)
-    {
-        case mixerMode.VOLUME_PAN:
-            ENCODERBANK = 0;
-            break
-        case mixerMode.SEND:
-            ENCODERBANK = 1;
-            break
-        case mixerMode.Mix4:
-            ENCODERBANK = 2;
-            break
-    }
-    
+    ENCODERBANK = 2;
     changeEncoderBank(ENCODERBANK);
 	setActivePage(mixerPage);
 }

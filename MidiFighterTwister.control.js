@@ -120,6 +120,7 @@ function init()
 	{
 		device1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device1Param));
 		device2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device2Param));
+		device1.getMacro(i).getAmount().addValueObserver(127, getDeviceMacroValue(i, device1MacroValue));
 	}
 	
 	changeEncoderBank(ENCODERBANK);
@@ -195,6 +196,14 @@ function getSelectedParamPage (value)
 }
 
 function getDeviceParamValue (i, varToStore)
+{
+	return function(value)
+	{
+	varToStore[i] = value;
+	}
+}
+
+function getDeviceMacroValue (i, varToStore)
 {
 	return function(value)
 	{

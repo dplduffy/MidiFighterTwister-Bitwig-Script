@@ -75,6 +75,24 @@ devicePage.onEncoderTurn = function(isActive)
             }
         }
     }
+    if(CURRENT_DEVICE_MODE == currentDeviceMode.MACRO)
+    {
+        if(tempEncoderTurn < 8)
+        {
+        device1.getMacro(tempEncoderTurn).getAmount().set(encoderValue,127);
+        }
+        if(tempEncoderTurn > 7)
+        {
+            if(tempEncoderTurn == singleDeviceSetting.DEVICE)
+            {
+                var tempPrevDevice = deviceBank1PositionObserver;
+                var tempDevice = scaleEncoderToDeviceCount(encoderValue);
+                deviceBank1.scrollTo(tempDevice);
+                tempDevice1Name = device1Name;
+                popupSet = true;
+            }
+        }
+    }
 }
 
 devicePage.onRightTopPressed = function(isActive)
@@ -122,6 +140,16 @@ devicePage.onRightTopReleased = function(isActive)
             }
         }
     }
+    if(CURRENT_DEVICE_MODE == currentDeviceMode.MACRO)
+    {
+        if(deviceBank1CanScrollUp)
+        {
+        tempDevice1Name = device1Name;
+        deviceBank1.scrollUp();
+        popupSet = true;
+        scrollUp = true;
+        }
+    }
 }
 
 devicePage.onRightMiddlePressed = function(isActive)
@@ -135,6 +163,10 @@ devicePage.onRightMiddleReleased = function(isActive)
         dualParamPageView = !dualParamPageView;
         dualParamPageView ? 
             host.showPopupNotification('Dual Page View') : host.showPopupNotification('Single Page View');
+    }
+    if(CURRENT_DEVICE_MODE == currentDeviceMode.MACRO)
+    {
+        device1.isMacroSectionVisible().toggle();
     }
 }
 
@@ -195,6 +227,15 @@ devicePage.onRightBottomReleased = function(isActive)
                 popupSet = true;
                 }
             }
+        }
+    }
+    if(CURRENT_DEVICE_MODE == currentDeviceMode.MACRO)
+    {
+        if(deviceBank1CanScrollDown)
+        {
+        tempDevice1Name = device1Name;
+        deviceBank1.scrollDown();
+        popupSet = true;
         }
     }
 }
@@ -294,7 +335,15 @@ devicePage.updateRGBLEDs = function()
         for (var i=0; i<8; i++)
         {
             setRGBLED(i+encoderBankOffset.BANK4, INDICATOR_COLOR[i], STROBE.OFF);
+            
+            if((i+8) == singleDeviceSetting.DEVICE)
+            {
+            setRGBLED(i+encoderBankOffset.BANK4+8, rainbowArray[(deviceBank1PositionObserver%deviceBank1Count)%(rainbowArray.length-1)], STROBE.OFF);
+            }
+            else
+            {
             setRGBLED(i+encoderBankOffset.BANK4+8, COLOR.BLACK, STROBE.OFF);
+            }
         }
     }
 }
@@ -328,6 +377,22 @@ devicePage.update11segLEDs = function()
                 {
                 set11segLED(i+encoderBankOffset.BANK4 +8, 0);
                 }
+            }
+        }
+    }
+    if(CURRENT_DEVICE_MODE == currentDeviceMode.MACRO)
+    {
+        for(var i=0; i<8; i++)
+        {
+            set11segLED(i+encoderBankOffset.BANK4, device1MacroValue[i]);
+
+            if((i+8) == singleDeviceSetting.DEVICE)
+            {
+            set11segLED(i+encoderBankOffset.BANK4+8, scaleDeviceCountToEncoder(deviceBank1PositionObserver));
+            }
+            else
+            {
+            set11segLED(i+encoderBankOffset.BANK4 +8, 0);
             }
         }
     }
@@ -387,6 +452,22 @@ devicePage.deviceChangePopup = function()
                 {
                 host.showPopupNotification((device1Name) + ': ' + device1ParamPageNames[selectedParamPage]);
                 }
+            }
+        popupSet = false;
+        }
+    }
+    if(CURRENT_DEVICE_MODE == currentDeviceMode.MACRO)
+    {
+        if(tempDevice1Name != device1Name)
+        {
+            if(scrollUp)
+            {
+                device1.setParameterPage(device1ParamPageNames.length);
+                scrollUp = false;
+            }   
+            if(popupSet)
+            {
+                host.showPopupNotification(device1Name);
             }
         popupSet = false;
         }
