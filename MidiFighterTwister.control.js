@@ -1,15 +1,16 @@
 
-loadAPI(1);
+loadAPI(11);
 host.defineController("DJ Tech Tools", "Midi Fighter Twister", "1.0", "d6b9adc4-81d0-11e5-8bcf-feff819cdc9f");
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(["Midi Fighter Twister"], ["Midi Fighter Twister"]);
 
 load("MidiFighterTwister.constants.js")
 load("MidiFighterTwister.mixer.js")
+load("MidiFighterTwister.device.js")
 load("MidiFighterTwister.MelodicSequencer.js")
 load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
-load("MidiFighterTwister.device.js")
+
 
 function init()
 {
@@ -113,14 +114,8 @@ function init()
 	
 	for (var i=0; i<8; i++)
 	{
-		device1Macro[i] = device1.getMacro(i).getAmount();
-	}
-	
-	for (var i=0; i<8; i++)
-	{
 		device1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device1Param));
 		device2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device2Param));
-		device1.getMacro(i).getAmount().addValueObserver(127, getDeviceMacroValue(i, device1MacroValue));
 	}
 	
 	changeEncoderBank(ENCODERBANK);
@@ -263,7 +258,7 @@ function getDeviceBank1Count(value)
 
 function onMidi(status, data1, data2)
 {
-	//printMidi(status, data1, data2);
+	printMidi(status, data1, data2);
     var isActive = (data2 > 0);
 	var isPressed = (data2 > 0);
 	
