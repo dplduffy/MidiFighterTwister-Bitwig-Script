@@ -18,14 +18,15 @@ function init()
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
 	
-	mainTrackBank = host.createMainTrackBank(4, 11, 8);
+	mainTrackBank = host.createMainTrackBank(4, 12, 8);
+
     for(var t=0; t<4; t++)
     {
 		var track = mainTrackBank.getChannel(t);
 		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, mainVolume));
 		track.getPan().addValueObserver(126, getTrackObserverFunc(t, mainPan));
 		
-		for(var s=0; s<11; s++)
+		for(var s=0; s<12; s++)
 			{
 			track.getSend(s).addValueObserver(126, getSendObserverFunc(t, s));
 			}
@@ -37,11 +38,11 @@ function init()
 		track.getArm().addValueObserver(getTrackObserverFunc(t, mainArm));
     }
 	
-	mainTrackBank.addCanScrollTracksUpObserver(function(canScroll)
+	mainTrackBank.canScrollChannelsUp().addValueObserver(function(canScroll) 
 	{
 	mixerPage.canScrollMainChannelsUp = canScroll;
 	});
-	mainTrackBank.addCanScrollTracksDownObserver(function(canScroll)
+	mainTrackBank.canScrollChannelsDown().addValueObserver(function(canScroll)
 	{
 	mixerPage.canScrollMainChannelsDown = canScroll;
 	});
@@ -59,11 +60,11 @@ function init()
 		effectTrack.getArm().addValueObserver(getTrackObserverFunc(t, effectArm));
     }
 	
-	effectTrackBank.addCanScrollTracksUpObserver(function(canScroll)
+	effectTrackBank.canScrollChannelsUp().addValueObserver(function(canScroll)
 	{
 	mixerPage.canScrollEffectChannelsUp = canScroll;
 	});
-	effectTrackBank.addCanScrollTracksDownObserver(function(canScroll)
+	effectTrackBank.canScrollChannelsDown().addValueObserver(function(canScroll)
 	{
 	mixerPage.canScrollEffectChannelsDown = canScroll;
 	});
@@ -93,29 +94,23 @@ function init()
 	cursorClip.getLoopStart().addRawValueObserver(getClipLoopStart);
 	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
 
-	cursorTrack = host.createArrangerCursorTrack(0,0);
-	deviceBank1 = cursorTrack.createDeviceBank(1);
-	deviceBank2 = cursorTrack.createDeviceBank(1);
-	device1 = deviceBank1.getDevice(0);
-	device2 = deviceBank2.getDevice(0);
-
-	deviceBank1.addCanScrollUpObserver(getDeviceBank1CanScrollUp);
-	deviceBank1.addCanScrollDownObserver(getDeviceBank1CanScrollDown);
-	deviceBank1.addScrollPositionObserver(getScrollPositionObserver, 0);
+	cursorTrack = host.createCursorTrack("ct", "ct", 2, 0, true)
+	cursorDevice =  cursorTrack.createCursorDevice("cd","cd",2,CursorDeviceFollowMode.FOLLOW_SELECTION);
+	cursorDevice.name().addValueObserver(getCursorDeviceName);
+	cursorDevice.position().addValueObserver(getDevicePositionObserver);
+	deviceBank1 = cursorTrack.createDeviceBank(32);
+	deviceBank1.canScrollBackwards().addValueObserver(getDeviceBank1CanScrollBackwards);
+	deviceBank1.canScrollForwards().addValueObserver(getDeviceBank1CanScrollForwards);
 	deviceBank1.addDeviceCountObserver(getDeviceBank1Count);
-	
-	device1.addSelectedPageObserver(0, getSelectedParamPage);
-	device1.addPageNamesObserver(getDevice1ParamPageNames);
-	device1.addNameObserver(32, 'Unknown Device', getDevice1Name);
-	device1.addNextParameterPageEnabledObserver(getIsNextDevice1ParamPage);
-	device2.addNextParameterPageEnabledObserver(getIsNextDevice2ParamPage);
-	device1.addPreviousParameterPageEnabledObserver(getIsPrevDevice1ParamPage);
-	device2.addPreviousParameterPageEnabledObserver(getIsPrevDevice2ParamPage);
+
+	cursorDRCP = cursorDevice.createCursorRemoteControlsPage(8);
+	cursorDRCP.getName().addValueObserver(getCursorDRCPName);
+	cursorDRCP.pageCount().addValueObserver(getCursorDRCPCount);
+	cursorDRCP.selectedPageIndex().addValueObserver(getCursorDRCPIndex);
 	
 	for (var i=0; i<8; i++)
 	{
-		device1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device1Param));
-		device2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, device2Param));
+		cursorDRCP.getParameter(i).addValueObserver(127, getDeviceParamValue(i, cursorDeviceParam));
 	}
 	
 	changeEncoderBank(ENCODERBANK);
@@ -185,9 +180,19 @@ function getClipLoopLength (value)
 	clipLoopLength = value;
 }
 
-function getSelectedParamPage (value)
+function getCursorDRCPName (value)
 {
-	selectedParamPage = value;
+	cursorDRCPName = value;
+}
+
+function getCursorDRCPCount (value)
+{
+	cursorDRCPCount = value;
+}
+
+function getCursorDRCPIndex (value)
+{
+	cursorDRCPIndex = value;
 }
 
 function getDeviceParamValue (i, varToStore)
@@ -198,57 +203,24 @@ function getDeviceParamValue (i, varToStore)
 	}
 }
 
-function getDeviceMacroValue (i, varToStore)
+function getDeviceBank1CanScrollBackwards (value)
 {
-	return function(value)
-	{
-	varToStore[i] = value;
-	}
+	deviceBank1CanScrollBackwards = value;
 }
 
-function getIsPrevDevice1ParamPage (value)
+function getDeviceBank1CanScrollForwards(value)
 {
-	isPrevDevice1ParamPage = value;
+	deviceBank1CanScrollForwards = value;
 }
 
-function getIsPrevDevice2ParamPage (value)
+function getDevicePositionObserver(value)
 {
-	isPrevDevice2ParamPage = value;
+	devicePositionObserver = value;
 }
 
-function getIsNextDevice1ParamPage (value)
+function getCursorDeviceName(value)
 {
-	isNextDevice1ParamPage = value;
-}
-
-function getIsNextDevice2ParamPage (value)
-{
-	isNextDevice2ParamPage = value;
-}
-
-function getDeviceBank1CanScrollUp (value)
-{
-	deviceBank1CanScrollUp = value;
-}
-
-function getDeviceBank1CanScrollDown(value)
-{
-	deviceBank1CanScrollDown = value;
-}
-
-function getScrollPositionObserver(value)
-{
-	deviceBank1PositionObserver = value;
-}
-
-function getDevice1ParamPageNames()
-{
-	device1ParamPageNames = arguments;
-}
-
-function getDevice1Name(value)
-{
-	device1Name = value;
+	cursorDeviceName = value;
 }
 
 function getDeviceBank1Count(value)
@@ -336,13 +308,7 @@ function onMidi(status, data1, data2)
 
 function page()
 {
-	this.canScrollLeft = false;
-	this.canScrollRight = false;
 }
-
-page.prototype.updateOutputState = function()
-{
-};
 
 function clear()
 {

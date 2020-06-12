@@ -211,7 +211,7 @@ mixerPage.onLeftBottomReleased = function(isActive)
 {
     ENCODERBANK = 3;
     changeEncoderBank(ENCODERBANK);
-    device2.nextParameterPage();
+    //device2.nextParameterPage();
     setActivePage(devicePage);
 }
 

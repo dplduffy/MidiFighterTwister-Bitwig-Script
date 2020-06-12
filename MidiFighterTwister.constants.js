@@ -340,7 +340,7 @@ var melodicSeqModeNotePage =
 {
 	PITCH:0,
 	VELOCITY:1,
-    LENGTH:2,           //not possible in current API
+   LENGTH:2,      //not possible in current API
 	MODULATION:3,  //not possible in current API
 }
 var melodicSeqModePatternPage =
@@ -474,30 +474,16 @@ var drumOffsetNames = ['C-2 to D#-1', 'E-2 to G-1', 'G#-1 to B0', 'C1 to D#2', '
 var scrollUp = false;
 var popupSet = false;
 var tempDevice1Name = null;
-var device1Param = initArray (0, 8);
-var device2Param = initArray (0, 8);
-var device1Macro = initArray (0, 8);
-var device1MacroValue = initArray (0, 8);
-var device1ParamPageNames = null;
-var device1Name = null;
-var dualParamPageView = false;
+var cursorDeviceParam = initArray (0, 8);
+var cursorDeviceName = null;
 var deviceBank1CanScrollUp = false;
 var deviceBank1CanScrollDown = false;
 var deviceBank1PositionObserver = 0;
 var deviceBank1Count = 0;
-var isNextDevice1ParamPage = false;
-var isNextDevice2ParamPage = false;
-var isPrevDevice1ParamPage = false;
-var isPrevDevice2ParamPage = false;
 var selectedParamPage = 0;
-var CURRENT_DEVICE_MODE = 0;
-var currentDeviceMode =
-{
-   DEVICE : 0,
-   MACRO : 1,
-}
+
 var singleDeviceSetting =
 {
-   DEVICE : 12,
-   PAGE : 13,
+   DEVICE : 8,
+   PAGE : 9,
 }
