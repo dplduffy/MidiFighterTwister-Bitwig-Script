@@ -20,6 +20,7 @@ var masterSolo = initArray(0, 0);
 var masterArm = initArray(0, 0);
 var masterColor = initArray(0, 0);
 var masterIsSelected = initArray(0, 0);
+var cursorTrackColor = initArray(0, 0);
 
 var activePage = null;
 var channelStepSize = 1;
@@ -187,81 +188,13 @@ var encoderBank =
    BANK3:14,
    BANK4:15,
 }
-var Bank1 =
+
+var ENC = 
 {
-	ENCODER1:1,
-	ENCODER2:2,
-	ENCODER3:3,
-	ENCODER4:4,
-	ENCODER5:5,
-	ENCODER6:6,
-	ENCODER7:7,
-	ENCODER8:8,
-	ENCODER9:9,
-	ENCODER10:10,
-	ENCODER11:11,
-	ENCODER12:12,
-	ENCODER13:13,
-	ENCODER14:14,
-	ENCODER15:15,
-	ENCODER16:16,
-}
-var Bank2 =
-{
-	ENCODER1:17,
-	ENCODER2:18,
-	ENCODER3:19,
-	ENCODER4:20,
-	ENCODER5:21,
-	ENCODER6:22,
-	ENCODER7:23,
-	ENCODER8:24,
-	ENCODER9:25,
-	ENCODER10:26,
-	ENCODER11:27,
-	ENCODER12:28,
-	ENCODER13:29,
-	ENCODER14:30,
-	ENCODER15:31,
-	ENCODER16:32,
-}
-var Bank3 =
-{
-	ENCODER1:33,
-	ENCODER2:34,
-	ENCODER3:35,
-	ENCODER4:36,
-	ENCODER5:37,
-	ENCODER6:38,
-	ENCODER7:39,
-	ENCODER8:40,
-	ENCODER9:41,
-	ENCODER10:42,
-	ENCODER11:43,
-	ENCODER12:44,
-	ENCODER13:45,
-	ENCODER14:46,
-	ENCODER15:47,
-	ENCODER16:48,
-}
-var Bank4 =
-{
-	ENCODER1:49,
-	ENCODER2:50,
-	ENCODER3:51,
-	ENCODER4:52,
-	ENCODER5:53,
-	ENCODER6:54,
-	ENCODER7:55,
-	ENCODER8:56,
-	ENCODER9:57,
-	ENCODER10:58,
-	ENCODER11:59,
-	ENCODER12:60,
-	ENCODER13:61,
-	ENCODER14:62,
-	ENCODER15:63,
-	ENCODER16:64,
+   DEVICE: 8,
+   PAGE: 9,
+   PAN: 11,
+   VOLUME: 15,
 }
 
 var tempPatternPressStart = 0;
@@ -481,9 +414,3 @@ var deviceBank1CanScrollDown = false;
 var deviceBank1PositionObserver = 0;
 var deviceBank1Count = 0;
 var selectedParamPage = 0;
-
-var singleDeviceSetting =
-{
-   DEVICE : 8,
-   PAGE : 9,
-}
