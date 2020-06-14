@@ -10,6 +10,7 @@ load("MidiFighterTwister.device.js")
 load("MidiFighterTwister.MelodicSequencer.js")
 load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
+load("MidiFighterTwister.User.js")
 
 
 function init() {
@@ -70,8 +71,6 @@ function init() {
 		prevStepData[i] = initArray(false, SEQ_KEYS);
 		stepData[i] = initArray(false, SEQ_KEYS);
 	}
-   
-   	setActivePage(mixerPage);
 	
     cursorClip = host.createCursorClip(SEQ_STEPS, SEQ_KEYS);
     cursorClip.addStepDataObserver(onStepExists);
@@ -81,11 +80,23 @@ function init() {
 	cursorClip.getLoopStart().addRawValueObserver(getClipLoopStart);
 	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
 
+	deviceTrackBank = host.createTrackBank(11, 11, 8);
+	deviceTrackBank.addTrackScrollPositionObserver(getDeviceTrackBankScrollPosition, 0);
+
 	cursorTrack = host.createCursorTrack("ct", "ct", 2, 0, true)
 	cursorTrack.color().addValueObserver(getTrackObserverFunc(0, cursorTrackColor));
-	cursorDevice =  cursorTrack.createCursorDevice("cd","cd",2,CursorDeviceFollowMode.FOLLOW_SELECTION);
+	cursorTrack.volume().addValueObserver(127, getCursorTrackVar(0, cursorTrackVolume));
+	cursorTrack.pan().addValueObserver(127, getCursorTrackVar(0, cursorTrackPan));
+	cursorTrack.position().addValueObserver(getCursorTrackPositionObserver);
+
+	//deviceTrackBank.followCursorTrack(cursorTrack);
+	deviceTrackBank.channelCount().markInterested();
+	deviceTrackBank.channelScrollPosition().markInterested();
+
+	cursorDevice =  cursorTrack.createCursorDevice("cd", "cd", 2, CursorDeviceFollowMode.FOLLOW_SELECTION);
 	cursorDevice.name().addValueObserver(getCursorDeviceName);
 	cursorDevice.position().addValueObserver(getDevicePositionObserver);
+
 	deviceBank1 = cursorTrack.createDeviceBank(32);
 	deviceBank1.canScrollBackwards().addValueObserver(getDeviceBank1CanScrollBackwards);
 	deviceBank1.canScrollForwards().addValueObserver(getDeviceBank1CanScrollForwards);
@@ -99,21 +110,46 @@ function init() {
 	for (var i=0; i<8; i++){
 		cursorDRCP.getParameter(i).addValueObserver(127, getDeviceParamValue(i, cursorDeviceParam));
 	}
-	
-	changeEncoderBank(ENCODERBANK);
+
     mainTrackBank.setChannelScrollStepSize(channelStepSize);
 	effectTrackBank.setChannelScrollStepSize(channelStepSize);
+
+	activePage = devicePage;
+	setActivePage(devicePage);
+	changeEncoderBank(12);
+}
+
+function cyclePage(){
+	ENCODERBANK < 3 ? ENCODERBANK ++ : ENCODERBANK = 1;
+    switch(ENCODERBANK){
+		case 1:
+			setActivePage(userPage);
+			break;
+		case 2: 
+			setActivePage(mixerPage);
+            break;
+        case 3:
+			setActivePage(devicePage);
+            break;
+		case 4: 
+			if (CURRENTSEQMODE == currentSeqMode.DRUM){
+				setActivePage(drumSequencerPage);
+			}else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
+				setActivePage(melodicSequencerPage);
+			}
+			break;
+    }
 }
 
 function setActivePage(page){
-	var isInit = activePage == null;
-	isInit ? null : activePage.clearIndication();
-	if (page != activePage){
-	   activePage = page;
-	   if (!isInit){
-		    host.showPopupNotification(page.title);
-	   }
+	for (var i=0; i<16; i++){
+        set11segLED(i, 0);
+		setRGBLED(i, COLOR.BLACK, STROBE.OFF);
+		println("i = " + i);
 	}
+	activePage.clearIndication();
+	activePage = page;
+	host.showPopupNotification(page.title);
 }
 
 function getSendObserverFunc(t, s){
@@ -161,6 +197,12 @@ function getCursorDRCPCount (value) {
 	cursorDRCPCount = value;
 }
 
+function getCursorTrackVar (i, varToStore) {
+	return function(value){
+		varToStore[i] = value;
+	}
+}
+
 function getCursorDRCPIndex (value) {
 	cursorDRCPIndex = value;
 }
@@ -169,6 +211,9 @@ function getDeviceParamValue (i, varToStore) {
 	return function(value) {
 		varToStore[i] = value;
 	}
+}
+function getDeviceTrackBankScrollPosition (value){
+	deviceTrackBankScrollPosition = value;
 }
 
 function getDeviceBank1CanScrollBackwards (value){
@@ -183,6 +228,10 @@ function getDevicePositionObserver(value){
 	devicePositionObserver = value;
 }
 
+function getCursorTrackPositionObserver(value){
+	cursorTrackPositionObserver = value;
+}
+
 function getCursorDeviceName(value){
 	cursorDeviceName = value;
 }
@@ -194,19 +243,18 @@ function getDeviceBank1Count(value){
 function onMidi(status, data1, data2){
 	printMidi(status, data1, data2);
     var isActive = (data2 > 0);
-	var isPressed = (data2 > 0);
 	
 	if (status == statusType.ENCODER_TURN){
-		encoderNum = data1;
-		encoderValue = data2;
+		enc = data1;
+		val = data2;
 		activePage.onEncoderTurn(isActive);
 	}else if (status == statusType.ENCODER_PRESS && data2 == 127){ //data2 == 127 for encoder press
-		encoderNum = data1;
-		encoderValue = data2;
+		enc = data1;
+		val = data2;
 		activePage.onEncoderPress(isActive);
 	}else if (status == statusType.ENCODER_PRESS && data2 == 0){ //data2 == 0 for encoder release
-		encoderNum = data1;
-		encoderValue = data2;
+		enc = data1;
+		val = data2;
 		activePage.onEncoderRelease(isActive);
 	}
 	
@@ -314,4 +362,5 @@ function handleColor(red, green, blue){
 
 function changeEncoderBank(bank){
 	sendMidi(147, bank, 127);
+	println('here');
 }

@@ -26,13 +26,17 @@ var activePage = null;
 var channelStepSize = 1;
 var channelStepSizeArray = [1, 4];
 var cursorTrackName;
+var cursorTrackVolume = initArray(0, 0);
+var cursorTrackPan = initArray(0, 0);
+var cursorTrackPosition = initArray(0, 0);
+var cursorTrackPositionObserver = 0;
 
 var statusType =
 {
-   SIDEBUTTON_RELEASE:131,
-   SIDEBUTTON_PRESS:147,
    ENCODER_PRESS:177,
    ENCODER_TURN:176,
+   SIDEBUTTON_RELEASE:131,
+   SIDEBUTTON_PRESS:147,
 }
 var SIDE_BUTTON =
 {
@@ -171,29 +175,32 @@ var sendArray =
 	[0,0,0,0,0,0,0,0,0,0,0] , //track4
 ];
 
-var ENCODERBANK = 2;
-var encoderNum = -1;
-var encoderValue = 0;
-var encoderBankOffset =
+var enc = -1;
+var val = 0;
+var ENCODERBANK = 1;
+/*var encoderBankOffset =
 {
    BANK1:0,
    BANK2:16,
    BANK3:32,
    BANK4:48,
 }
+
 var encoderBank =
 {
    BANK1:12,
    BANK2:13,
    BANK3:14,
    BANK4:15,
-}
+}*/
 
 var ENC = 
 {
    DEVICE: 8,
    PAGE: 9,
+   TRACK_SEL: 10,
    PAN: 11,
+   SEND_SEL: 14,
    VOLUME: 15,
 }
 

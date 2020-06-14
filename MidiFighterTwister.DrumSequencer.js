@@ -11,60 +11,39 @@ drumSequencerPage.updateOutputState = function()
     this.updateIndicators();
 }
 
-drumSequencerPage.onEncoderPress = function(isActive)
-{
-
-    if (DRUMSEQMODE == drumSeqMode.NOTE)
-    {
-        var tempStepPress = (encoderNum-encoderBankOffset.BANK4);
+drumSequencerPage.onEncoderPress = function(isActive){
+    if (DRUMSEQMODE == drumSeqMode.NOTE){
+        var tempStepPress = (enc);
         
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
-        {
-            if(tempStepStartPressed)
-            {
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE){
+            if(tempStepStartPressed){
                 tempStepPressEnd = tempStepPress;
                 var tempStepPressLength = (Math.abs(tempStepPressEnd - tempStepPressStart)+1);
-                if (stepData[tempStepPress][currentDrumKey])
-                {
-                    for(step=0; step<tempStepPressEnd; step++)
-                    {
+                if (stepData[tempStepPress][currentDrumKey]){
+                    for(step=0; step<tempStepPressEnd; step++){
                         cursorClip.clearStep(step, currentDrumKey)
                     }
-                }
-                else
-                {
-                cursorClip.setStep(tempStepPressStart, currentDrumKey, VELOCITY, (STEP_SIZE*tempStepPressLength));
-                host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[Math.floor(currentDrumKey/12)]);
+                }else{
+                    cursorClip.setStep(tempStepPressStart, currentDrumKey, VELOCITY, (STEP_SIZE*tempStepPressLength));
+                    host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[Math.floor(currentDrumKey/12)]);
                 }
                 tempStepStartPressed = false;
-            }
-            else
-            {
+            }else{
                 tempStepPressStart = tempStepPress;
                 tempStepStartPressed = true;
             }
-        }
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
-        {
-        }
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD)
-        {
-            if ((currentDrumKey-currentDrumOffset) == drumMatrix[tempStepPress])
-            {
+        }else if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY){
+        }else if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD){
+            if ((currentDrumKey-currentDrumOffset) == drumMatrix[tempStepPress]){
                 cursorTrack.playNote(currentDrumKey,VELOCITY);
             }
         }
-    }
-    if (DRUMSEQMODE == drumSeqMode.PATTERN)
-    {
-        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET)
-        {
-            var tempPatternPress = encoderNum-encoderBankOffset.BANK4;
-            if (tempPatternStartPressed)
-            {
+    }else if (DRUMSEQMODE == drumSeqMode.PATTERN){
+        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET){
+            var tempPatternPress = enc;
+            if (tempPatternStartPressed){
                 tempPatternPressEnd = tempPatternPress;
-                if(tempPatternPressEnd<tempPatternPressStart)
-                {
+                if(tempPatternPressEnd<tempPatternPressStart){
                     var tempFlip = tempPatternPressEnd;
                     tempPatternPressEnd = tempPatternPressStart;
                     tempPatternPressStart = tempFlip;
@@ -76,102 +55,69 @@ drumSequencerPage.onEncoderPress = function(isActive)
                 tempPatternPressStart = 0;
                 tempPatternPressEnd = 0;
                 tempPatternStartPressed = false;
-            }
-            else
-            {
+            }else{
                 tempPatternPressStart = tempPatternPress;
                 tempPatternStartPressed = true;
             }
+        }else if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT){
         }
-        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT)
-        {
-        }
-    }
-    if (DRUMSEQMODE == drumSeqMode.SETTINGS)
-    {
-        if (DRUMSEQSETTINGSPAGE == drumSeqModeSettingsPage.PAGE1)
-        {
+    }else if (DRUMSEQMODE == drumSeqMode.SETTINGS){
+        if (DRUMSEQSETTINGSPAGE == drumSeqModeSettingsPage.PAGE1){
         }
     }
 }
 
-drumSequencerPage.onEncoderRelease = function(isActive)
-{
-    if (DRUMSEQMODE == drumSeqMode.NOTE)
-    {
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
-        {
-            if (tempStepStartPressed)
-            {
-                if (stepData[tempStepPressStart][currentDrumKey])
-                {
-                cursorClip.clearStep(tempStepPressStart, currentDrumKey)
-                }
-                else
-                {
-                cursorClip.setStep(tempStepPressStart, currentDrumKey, VELOCITY, STEP_SIZE);
-                host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[Math.floor(currentDrumKey/12)]);
+drumSequencerPage.onEncoderRelease = function(isActive){
+    if (DRUMSEQMODE == drumSeqMode.NOTE){
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE){
+            if (tempStepStartPressed){
+                if (stepData[tempStepPressStart][currentDrumKey]){
+                    cursorClip.clearStep(tempStepPressStart, currentDrumKey)
+                }else{
+                    cursorClip.setStep(tempStepPressStart, currentDrumKey, VELOCITY, STEP_SIZE);
+                    host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[Math.floor(currentDrumKey/12)]);
                 }
             tempStepStartPressed = false;
             }
-        }
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
-        {
-            var tempStepPress = (encoderNum-encoderBankOffset.BANK4);
-            if (stepData[tempStepPress][currentDrumKey])
-            {
-            cursorClip.setStep(tempStepPress, currentDrumKey,VELOCITY,STEP_SIZE)
-            host.showPopupNotification('Velocity: '+VELOCITY);
+        }else if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY){
+            var tempStepPress = (enc);
+            if (stepData[tempStepPress][currentDrumKey]){
+                cursorClip.setStep(tempStepPress, currentDrumKey,VELOCITY,STEP_SIZE)
+                host.showPopupNotification('Velocity: '+VELOCITY);
+            }else{
+                cursorClip.setStep(tempStepPress, currentDrumKey, VELOCITY, STEP_SIZE);
+                host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[CURRENT_OCT]);
             }
-            else
-            {
-            cursorClip.setStep(tempStepPress, currentDrumKey, VELOCITY, STEP_SIZE);
-            host.showPopupNotification(rootNoteNames[currentDrumKey%12]+octaveNoteNumbers[CURRENT_OCT]);
-            }
+        }else if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD){
+            currentDrumKey = (drumMatrix[enc] + currentDrumOffset)
         }
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD)
-        {
-            currentDrumKey = (drumMatrix[encoderNum-encoderBankOffset.BANK4] + currentDrumOffset)
-        }
-    }
-    if (DRUMSEQMODE == drumSeqMode.PATTERN)
-    {
-        if (DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET)
-        {
-            if (tempPatternStartPressed)
-            {
+    }else if (DRUMSEQMODE == drumSeqMode.PATTERN){
+        if (DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET){
+            if (tempPatternStartPressed){
                 cursorClip.getLoopStart().setRaw(tempPatternPressStart*4);
                 cursorClip.getPlayStart().setRaw(tempPatternPressStart*4);
                 cursorClip.getLoopLength().setRaw(4);
                 cursorClip.getPlayStop().setRaw(tempPatternPressStart*4+4);
                 tempPatternStartPressed = false;
             }
-        }
-        if (DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT)
-        {
+        }else if (DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT){
             var tempPrevScrollStepOffset =  currentScrollStepOffset;
-            currentScrollStepOffset =  (encoderNum-encoderBankOffset.BANK4);
+            currentScrollStepOffset =  (enc);
             currentScrollStepStart = (currentScrollStepOffset*SEQ_STEPS);
             currentScrollStepEnd = (((currentScrollStepOffset*SEQ_STEPS)+SEQ_STEPS) - 1) ;
             
-            while (tempPrevScrollStepOffset<currentScrollStepOffset)
-            {
+            while (tempPrevScrollStepOffset<currentScrollStepOffset){
                 cursorClip.scrollStepsPageForward();
                 tempPrevScrollStepOffset++;
             }
-            while (tempPrevScrollStepOffset>currentScrollStepOffset)
-            {
+            while (tempPrevScrollStepOffset>currentScrollStepOffset){
                 cursorClip.scrollStepsPageBackwards();
                 tempPrevScrollStepOffset--;
             }
         }
-    }
-    if (DRUMSEQMODE == drumSeqMode.SETTINGS)
-    {
-        if (DRUMSEQSETTINGSPAGE == drumSeqModeSettingsPage.PAGE1)
-        {
-            if((encoderNum-encoderBankOffset.BANK4) == drumEncoderSetting.SEQ_FOLLOW)
-            {
+    }else if (DRUMSEQMODE == drumSeqMode.SETTINGS){
+        if (DRUMSEQSETTINGSPAGE == drumSeqModeSettingsPage.PAGE1){
+            if((enc) == drumEncoderSetting.SEQ_FOLLOW){
                 sequencerFollow = !sequencerFollow
                 sequencerFollow ? seqFollowRGB = COLOR.GREEN : seqFollowRGB = COLOR.RED;
             }
@@ -179,48 +125,31 @@ drumSequencerPage.onEncoderRelease = function(isActive)
     }
 }
 
-drumSequencerPage.onEncoderTurn = function(isActive)
-{
-    var tempStepTurn = (encoderNum-encoderBankOffset.BANK4);
-    
-    if (DRUMSEQMODE == drumSeqMode.NOTE)
-    {
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
-        {   
+drumSequencerPage.onEncoderTurn = function(isActive){
+    if (DRUMSEQMODE == drumSeqMode.NOTE){
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE){   
         }
-        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
-        {
-            cursorClip.setStep(tempStepTurn, currentDrumKey, encoderValue, STEP_SIZE);
+        if (DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY){
+            cursorClip.setStep(enc, currentDrumKey, val, STEP_SIZE);
         }
-    }
-    if (DRUMSEQMODE == drumSeqMode.SETTINGS)
-    {
-        if(tempStepTurn == drumEncoderSetting.STEP)
-        {
+    }else if (DRUMSEQMODE == drumSeqMode.SETTINGS){
+        if(enc == drumEncoderSetting.STEP){
             var tempPrevStep = STEP_SIZE
-            STEP_SIZE = stepSizeArray[scaleEncoderToSize(encoderValue)];
-            if (tempPrevStep < STEP_SIZE)
-            {
+            STEP_SIZE = stepSizeArray[scaleEncoderToSize(val)];
+            if (tempPrevStep < STEP_SIZE){
                 stepRGB = incrementRainbow(stepRGB);
-            }
-            if (tempPrevStep > STEP_SIZE)
-            {
+            }else if (tempPrevStep > STEP_SIZE){
                 stepRGB = decrementRainbow(stepRGB);
             }
             cursorClip.setStepSize(STEP_SIZE);
             host.showPopupNotification('Step Size: '+stepSizeNameArray[stepSizeArray.indexOf(STEP_SIZE)]);
-        } 
-        if(tempStepTurn == drumEncoderSetting.DRUM_OFFSET)
-        {
+        }else if(enc == drumEncoderSetting.DRUM_OFFSET){
             var tempPrevDrumOffset = currentDrumOffset
-            currentDrumOffset = drumOffsets[scaleEncoderToDrumOffset(encoderValue)];
+            currentDrumOffset = drumOffsets[scaleEncoderToDrumOffset(val)];
             currentDrumKey = currentDrumOffset;
-            if (tempPrevDrumOffset < currentDrumOffset)
-            {
+            if (tempPrevDrumOffset < currentDrumOffset){
                 drumOffsetRGB = incrementRainbow(drumOffsetRGB);
-            }
-            if (tempPrevDrumOffset > currentDrumOffset)
-            {
+            }else if (tempPrevDrumOffset > currentDrumOffset){
                 drumOffsetRGB = decrementRainbow(drumOffsetRGB);
             }
             host.showPopupNotification('Drum Map: '+ drumOffsetNames[drumOffsets.indexOf(currentDrumOffset)]);
@@ -228,250 +157,167 @@ drumSequencerPage.onEncoderTurn = function(isActive)
     }
 }
 
-drumSequencerPage.onRightTopPressed = function(isActive)
-{
+drumSequencerPage.onRightTopPressed = function(isActive){
 }
 
-drumSequencerPage.onRightTopReleased = function(isActive) 
-{
-    if (DRUMSEQMODE == drumSeqMode.NOTE)
-    {
-        if (DRUMSEQNOTEPAGE + 1 < drumNotePageNameArray.length)
-        {
+drumSequencerPage.onRightTopReleased = function(isActive){
+    if (DRUMSEQMODE == drumSeqMode.NOTE){
+        if (DRUMSEQNOTEPAGE + 1 < drumNotePageNameArray.length){
             DRUMSEQNOTEPAGE++;
-        }
-        else
-        {
+        }else{
             DRUMSEQNOTEPAGE = 0;
         }
-    }
-    else
-    {
-    DRUMSEQMODE = drumSeqMode.NOTE;
+    }else{
+        DRUMSEQMODE = drumSeqMode.NOTE;
     }
     host.showPopupNotification('Note Page: ' + drumNotePageNameArray[DRUMSEQNOTEPAGE]);
 }
 
-drumSequencerPage.onRightMiddlePressed = function(isActive)
-{
+drumSequencerPage.onRightMiddlePressed = function(isActive){
 }
 
-drumSequencerPage.onRightMiddleReleased = function(isActive)
-{
-    if (DRUMSEQMODE == drumSeqMode.PATTERN)
-    {
-        if (DRUMSEQPATTERNPAGE + 1 < patternPageNameArray.length)
-        {
+drumSequencerPage.onRightMiddleReleased = function(isActive){
+    if (DRUMSEQMODE == drumSeqMode.PATTERN){
+        if (DRUMSEQPATTERNPAGE + 1 < patternPageNameArray.length){
             DRUMSEQPATTERNPAGE++;
-        }
-        else
-        {
+        }else{
             DRUMSEQPATTERNPAGE = 0;
         }
-    }
-    else
-    {
-    DRUMSEQMODE = drumSeqMode.PATTERN;
+    }else{
+        DRUMSEQMODE = drumSeqMode.PATTERN;
     }
     host.showPopupNotification('Pattern Page: ' + patternPageNameArray[DRUMSEQPATTERNPAGE]);
 }
 
-drumSequencerPage.onRightBottomPressed = function(isActive)
-{
+drumSequencerPage.onRightBottomPressed = function(isActive){
 }
 
-drumSequencerPage.onRightBottomReleased = function(isActive)
-{
-    if (DRUMSEQMODE == drumSeqMode.SETTINGS)
-    {
-    }
-    else
-    {
-    DRUMSEQMODE = drumSeqMode.SETTINGS;
-    host.showPopupNotification('Settings Page 1');
+drumSequencerPage.onRightBottomReleased = function(isActive){
+    if (DRUMSEQMODE == drumSeqMode.SETTINGS){
+    }else{
+        DRUMSEQMODE = drumSeqMode.SETTINGS;
+        host.showPopupNotification('Settings Page 1');
     }
 }
 
-drumSequencerPage.onLeftTopPressed = function(isActive)
-{
+drumSequencerPage.onLeftTopPressed = function(isActive){
 }
 
-drumSequencerPage.onLeftTopReleased = function(isActive)
-{
-    ENCODERBANK = 2;
-    changeEncoderBank(ENCODERBANK);
-	setActivePage(mixerPage);
+drumSequencerPage.onLeftTopReleased = function(isActive){
+    cyclePage();
 }
 
-drumSequencerPage.onLeftMiddlePressed = function(isActive)
-{
+drumSequencerPage.onLeftMiddlePressed = function(isActive){
 }
 
-drumSequencerPage.onLeftMiddleReleased = function(isActive)
-{
+drumSequencerPage.onLeftMiddleReleased = function(isActive){
     CURRENTSEQMODE = 1;
     setActivePage(melodicSequencerPage);
 }
 
-drumSequencerPage.onLeftBottomPressed = function(isActive)
-{
+drumSequencerPage.onLeftBottomPressed = function(isActive){
 }
 
-drumSequencerPage.onLeftBottomReleased = function(isActive)
-{
-    ENCODERBANK = 3;
-    changeEncoderBank(ENCODERBANK);
-    setActivePage(devicePage);
+drumSequencerPage.onLeftBottomReleased = function(isActive){
 }
 
-drumSequencerPage.updateRGBLEDs = function()
-{
-    if(DRUMSEQMODE == drumSeqMode.NOTE)
-    {
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
-        {
-            for(var i=0; i<16; i++)
-                {
-                    playingStep == (i + (currentScrollStepOffset*SEQ_STEPS)) ?
-                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) :
-                            stepData[i][currentDrumKey] ? setRGBLED(i+encoderBankOffset.BANK4, COLOR.AQUA, STROBE.OFF) :
-                                setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF);
-                }
-        }
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
-        {
-            for(var i=0; i<16; i++)
-                {
-                    playingStep == (i + (currentScrollStepOffset*SEQ_STEPS)) ?
-                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) :
-                            stepData[i][currentDrumKey] ? setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_PINK, STROBE.OFF) :
-                                setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF);
-                }
-        }
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD)
-        {
-            for(var i=0; i<16; i++)
-            {
+drumSequencerPage.updateRGBLEDs = function(){
+    if(DRUMSEQMODE == drumSeqMode.NOTE){
+        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE){
+            for(var i=0; i<16; i++){
+                playingStep == (i + (currentScrollStepOffset*SEQ_STEPS)) ?
+                    setRGBLED(i, COLOR.GREEN, STROBE.OFF) :
+                        stepData[i][currentDrumKey] ? setRGBLED(i, COLOR.AQUA, STROBE.OFF) :
+                            setRGBLED(i, COLOR.BLACK, STROBE.OFF);
+            }
+        }else if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY){
+            for(var i=0; i<16; i++){
+                playingStep == (i + (currentScrollStepOffset*SEQ_STEPS)) ?
+                    setRGBLED(i, COLOR.GREEN, STROBE.OFF) :
+                        stepData[i][currentDrumKey] ? setRGBLED(i, COLOR.LIGHT_PINK, STROBE.OFF) :
+                            setRGBLED(i, COLOR.BLACK, STROBE.OFF);
+            }
+        }else if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD){
+            for(var i=0; i<16; i++){
                 currentDrumKey == (drumMatrix[i] + currentDrumOffset) ?
-                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.PULSE1) :
-                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.GOLD, STROBE.OFF);
+                    setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) :
+                        setRGBLED(i, COLOR.GOLD, STROBE.OFF);
             }
         }
-    }
-    if(DRUMSEQMODE == drumSeqMode.PATTERN)
-    {
-        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET)
-        {
+    }else if(DRUMSEQMODE == drumSeqMode.PATTERN){
+        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET){
             var tempClipStart = Math.floor(clipStart / 4);
             var tempClipStop = Math.ceil((clipStop / 4)-1);
             var tempClipLoopStart = Math.floor(clipLoopStart / 4);
             var tempClipLoopLength = Math.ceil((clipLoopLength/4)-1);
             
-            for(var i=0; i<16; i++)
-            {
-                if ((i>=tempClipStart && i<=tempClipStop) || (i>=tempClipLoopStart && i<=tempClipLoopLength))
-                {
+            for(var i=0; i<16; i++){
+                if ((i>=tempClipStart && i<=tempClipStop) || (i>=tempClipLoopStart && i<=tempClipLoopLength)){
                     currentBar == i ?
-                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_BLUE, STROBE.PULSE1)
-                            : setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.OFF) 
-                }
-                else
-                {
-                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.BLACK, STROBE.OFF)
+                        setRGBLED(i, COLOR.LIGHT_BLUE, STROBE.PULSE1)
+                            : setRGBLED(i, COLOR.GREEN, STROBE.OFF) 
+                }else{
+                    setRGBLED(i, COLOR.BLACK, STROBE.OFF)
                 }
             }
-        }
-        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT)
-        {
+        }else if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT){
             var tempSections = ((clipLoopLength/STEP_SIZE)/16)
-            for(var i=0; i<16; i++)
-            {
-                if (i < tempSections)
-                {
-                currentScrollStepOffset == i ?
-                    setRGBLED(i+encoderBankOffset.BANK4, COLOR.GREEN, STROBE.PULSE1) :
-                        setRGBLED(i+encoderBankOffset.BANK4, COLOR.LIGHT_YELLOW, STROBE.OFF)
+            for(var i=0; i<16; i++){
+                if (i < tempSections){
+                    currentScrollStepOffset == i ?
+                        setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) :
+                            setRGBLED(i, COLOR.LIGHT_YELLOW, STROBE.OFF)
                 }
             }
         }
-    }
-    if(DRUMSEQMODE == drumSeqMode.SETTINGS)
-    {
-        setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.STEP), stepRGB, STROBE.OFF);
-        setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.SEQ_FOLLOW), seqFollowRGB, sequencerFollow ? STROBE.OFF : STROBE.PULSE1);
-        setRGBLED((encoderBankOffset.BANK4+drumEncoderSetting.DRUM_OFFSET), drumOffsetRGB, STROBE.OFF);
+    }else if(DRUMSEQMODE == drumSeqMode.SETTINGS){
+        setRGBLED((drumEncoderSetting.STEP), stepRGB, STROBE.OFF);
+        setRGBLED((drumEncoderSetting.SEQ_FOLLOW), seqFollowRGB, sequencerFollow ? STROBE.OFF : STROBE.PULSE1);
+        setRGBLED((drumEncoderSetting.DRUM_OFFSET), drumOffsetRGB, STROBE.OFF);
     }
 }
 
-drumSequencerPage.update11segLEDs = function()
-{
-    if(DRUMSEQMODE == drumSeqMode.NOTE)
-    {
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE)
-        { 
-            for(var i=0; i<16; i++)
-                {
-                    if(stepData[i][currentDrumKey])
-                    {
-                    set11segLED(i+encoderBankOffset.BANK4, 127);
-                    }
-                    else
-                    {
-                    set11segLED(i+encoderBankOffset.BANK4, 0);
-                    }
+drumSequencerPage.update11segLEDs = function(){
+    if(DRUMSEQMODE == drumSeqMode.NOTE){
+        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.NOTE){ 
+            for(var i=0; i<16; i++){
+                if(stepData[i][currentDrumKey]){
+                    set11segLED(i, 127);
+                }else{
+                    set11segLED(i, 0);
                 }
-        }
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY)
-        {
-            for(var i=0; i<16; i++)
-                {
-                    if(stepData[i][currentDrumKey])
-                    {
-                    set11segLED(i+encoderBankOffset.BANK4, 127);
-                    }
-                    else
-                    {
-                    set11segLED(i+encoderBankOffset.BANK4, 0);
-                    }
+            }
+        }else if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.VELOCITY){
+            for(var i=0; i<16; i++){
+                if(stepData[i][currentDrumKey]){
+                    set11segLED(i, 127);
+                }else{
+                    set11segLED(i, 0);
                 }
-        }
-        if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD)
-        {
-            for(var i=0; i<16; i++)
-                {
-                    if(currentDrumKey == drumMatrix[i]+currentDrumOffset)
-                    {
-                    set11segLED(i+encoderBankOffset.BANK4, 127);
-                    }
-                    else
-                    {
-                    set11segLED(i+encoderBankOffset.BANK4, 0);
-                    }
+            }
+        }else if(DRUMSEQNOTEPAGE == drumSeqModeNotePage.PAD){
+            for(var i=0; i<16; i++){
+                if(currentDrumKey == drumMatrix[i]+currentDrumOffset){
+                    set11segLED(i, 127);
+                }else{
+                    set11segLED(i, 0);
                 }
+            }
         }
-    }
-    if(DRUMSEQMODE == drumSeqMode.PATTERN)
-    {
-        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET)
-        {
-            for(var i=0; i<16; i++)
-                {
-                    set11segLED(i+encoderBankOffset.BANK4, 0);
-                }
+    }else if(DRUMSEQMODE == drumSeqMode.PATTERN){
+        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.PATTERN_SET){
+            for(var i=0; i<16; i++){
+                set11segLED(i, 0);
+            }
+        }else if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT){
+            for(var i=0; i<16; i++){
+                set11segLED(i, 0);
+            }
         }
-        if(DRUMSEQPATTERNPAGE == drumSeqModePatternPage.SECTION_SELECT)
-        {
-            for(var i=0; i<16; i++)
-                {
-                    set11segLED(i+encoderBankOffset.BANK4, 0);
-                }
-        }
-    }
-    if(DRUMSEQMODE == drumSeqMode.SETTINGS)
-    {
-        set11segLED((drumEncoderSetting.STEP+encoderBankOffset.BANK4), scaleSizeToEncoder(stepSizeArray.indexOf(STEP_SIZE)));
-        set11segLED((drumEncoderSetting.SEQ+encoderBankOffset.BANK4), scaleRootToEncoder(ROOT_NOTE));
-        set11segLED((drumEncoderSetting.DRUM_OFFSET+encoderBankOffset.BANK4), scaleDrumOffsetToEncoder(drumOffsets.indexOf(currentDrumOffset)));
+    }else if(DRUMSEQMODE == drumSeqMode.SETTINGS){
+        set11segLED((drumEncoderSetting.STEP), scaleSizeToEncoder(stepSizeArray.indexOf(STEP_SIZE)));
+        set11segLED((drumEncoderSetting.SEQ), scaleRootToEncoder(ROOT_NOTE));
+        set11segLED((drumEncoderSetting.DRUM_OFFSET), scaleDrumOffsetToEncoder(drumOffsets.indexOf(currentDrumOffset)));
     }
 }
 

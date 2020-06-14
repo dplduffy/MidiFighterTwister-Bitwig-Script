@@ -21,21 +21,29 @@ devicePage.onEncoderRelease = function(isActive){
 }
 
 devicePage.onEncoderTurn = function(isActive){
-    var tempEncoderTurn = encoderNum - encoderBankOffset.BANK4;
-    
-    if(tempEncoderTurn < 8){
-    cursorDRCP.getParameter(tempEncoderTurn).set(encoderValue,127);
-    } else if(tempEncoderTurn == ENC.DEVICE) {
-        var tempIndex = scaleValue(encoderValue, 127, (deviceBank1Count-1));
+    if(enc < 8){
+        cursorDRCP.getParameter(enc).set(val,127);
+    }else if(enc == ENC.DEVICE) {
+        var tempIndex = scaleValue(val, 127, 0, (deviceBank1Count-1));
         var tempDevice = deviceBank1.getDevice(tempIndex);
-
         deviceBank1.scrollIntoView(tempIndex);
         cursorDevice.selectDevice(tempDevice);
-
         host.showPopupNotification(cursorDeviceName)
-    } else if(tempEncoderTurn == ENC.PAGE){
-        cursorDRCP.selectedPageIndex().set(scaleValue(encoderValue, 127, (cursorDRCPCount-1)));
+    }else if(enc == ENC.PAGE){
+        cursorDRCP.selectedPageIndex().set(scaleValue(val, 127, 0, (cursorDRCPCount-1)));
         host.showPopupNotification(cursorDRCPName)
+    }else if(enc == ENC.PAN){
+        cursorTrack.getPan().set(val,127);
+    }else if(enc == ENC.VOLUME){
+        cursorTrack.getVolume().set(val,127);
+    }else if(enc == ENC.TRACK_SEL){
+        var tempIndex = scaleValue(val, 127, 0, 10);
+        var tempChannel = deviceTrackBank.getChannel(tempIndex);
+        deviceTrackBank.scrollToChannel(scaleValue(val, 127, 0, 10));
+        cursorTrack.selectChannel(tempChannel);
+        //println('scroll = ' + scaleValue(val, 127, 0, 10));
+        //println('channelCount = ' + deviceTrackBank.channelCount().get())
+        //println('scrollPos = ' + deviceTrackBank.channelScrollPosition().get())
     }
 }
 
@@ -61,68 +69,50 @@ devicePage.onLeftTopPressed = function(isActive){
 }
 
 devicePage.onLeftTopReleased = function(isActive){
-    ENCODERBANK = 2;
-    changeEncoderBank(ENCODERBANK);
-	setActivePage(mixerPage);
+    cyclePage();
 }
 
 devicePage.onLeftMiddlePressed = function(isActive){
 }
 
-devicePage.onLeftMiddleReleased = function(isActive){
-    ENCODERBANK = 3;
-    changeEncoderBank(ENCODERBANK);
-	
-    if (CURRENTSEQMODE == currentSeqMode.DRUM){
-		setActivePage(drumSequencerPage);
-	} else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
-        setActivePage(melodicSequencerPage);
-    }
+devicePage.onLeftMiddleReleased = function(isActive){    
 }
 
 devicePage.onLeftBottomPressed = function(isActive){
 }
 
 devicePage.onLeftBottomReleased = function(isActive){
-    host.showPopupNotification('Device: ' + cursorDeviceName + ', ' + cursorDRCPName);
-    this.clearIndication();
 }
 
 devicePage.updateRGBLEDs = function(){
-    for(var i=0; i<16; i++){
-        if(i < 8) {
-            setRGBLED(i+encoderBankOffset.BANK4, INDICATOR_COLOR[i], STROBE.OFF);
-        } else if(i == ENC.DEVICE){
-            setRGBLED(i+encoderBankOffset.BANK4, rainbowArray[(devicePositionObserver%deviceBank1Count)%(rainbowArray.length-1)], STROBE.OFF);
-        } else if(i == ENC.PAGE){
-            setRGBLED(i+encoderBankOffset.BANK4, rainbowArray[(cursorDRCPIndex%(cursorDRCPCount-1))%(rainbowArray.length-1)], STROBE.OFF);
-        } else if(i == ENC.PAN){
-            println("cursorTrackColor : " + cursorTrackColor[0])
-            setRGBLED(i+encoderBankOffset.BANK4, cursorTrackColor[0], STROBE.OFF);
-        }
+    for(var i=0; i<8; i++){
+        setRGBLED(i, INDICATOR_COLOR[i], STROBE.OFF);
     }
+    setRGBLED(ENC.DEVICE, rainbowArray[(devicePositionObserver%deviceBank1Count)%(rainbowArray.length-1)], STROBE.OFF);
+    setRGBLED(ENC.PAGE, rainbowArray[(cursorDRCPIndex%cursorDRCPCount)%(rainbowArray.length-1)], STROBE.OFF);
+    setRGBLED(ENC.TRACK_SEL, cursorTrackColor[0], STROBE.OFF);
+    setRGBLED(ENC.PAN, cursorTrackColor[0], STROBE.OFF);
+    setRGBLED(ENC.VOLUME, cursorTrackColor[0], STROBE.OFF);
 }
 
 devicePage.update11segLEDs = function(){
-    for(var i=0; i<16; i++){
-        if (i<8){
-            set11segLED(i+encoderBankOffset.BANK4, cursorDeviceParam[i]);
-        } else if(i == ENC.DEVICE){
-            set11segLED(i+encoderBankOffset.BANK4+8, scaleValue(devicePositionObserver, (deviceBank1Count-1), 127));
-        } else if(i == ENC.PAGE){
-            cursorDRCPCount > 1 ?
-                set11segLED(i+encoderBankOffset.BANK4+8,scaleValue(cursorDRCPIndex, (cursorDRCPCount-1), 127)) :
-                    set11segLED(i+encoderBankOffset.BANK4+8, 0);
-        } else{
-            set11segLED(i+encoderBankOffset.BANK4 +8, 0);
-        }
+    for(var i=0; i<8; i++){
+        set11segLED(i, cursorDeviceParam[i]);
     }
+    set11segLED(ENC.DEVICE, scaleValue(devicePositionObserver, (deviceBank1Count-1), 0, 127));
+    set11segLED(ENC.PAGE, scaleValue(cursorDRCPIndex, (cursorDRCPCount-1), 1, 127));
+    //set11segLED(ENC.TRACK_SEL, scaleValue(cursorTrackPositionObserver, 11, 1, 127));
+    //println('pos = ' + deviceTrackBankScrollPosition);
+    set11segLED(ENC.PAN, cursorTrackPan[0]);
+    set11segLED(ENC.VOLUME, cursorTrackVolume[0]);
 }
 
 devicePage.updateIndicators = function(){
     for (var i=0; i<8; i++){
         cursorDRCP.getParameter(i).setIndication(true);
     }
+    cursorTrack.getVolume().setIndication(true);
+    cursorTrack.getPan().setIndication(true);
 }
 
 devicePage.deviceChangePopup = function(){
@@ -133,8 +123,16 @@ devicePage.clearIndication = function(){
     for (var i=0; i<8; i++){
         cursorDRCP.getParameter(i).setIndication(false);
     }
+    cursorTrack.getVolume().setIndication(false);
+    cursorTrack.getPan().setIndication(false);
 }
 
-function scaleValue(value, scaleIn, scaleOut){
-    return Math.round(((value/scaleIn) * scaleOut))
+function scaleValue(value, scaleIn, outMin, outMax){
+    var temp = Math.round((value/scaleIn) * (outMax-outMin));
+    if (temp < 0){
+        temp = 0
+    }else if (temp > 127){
+        temp = 127
+    }
+    return temp;
 }
