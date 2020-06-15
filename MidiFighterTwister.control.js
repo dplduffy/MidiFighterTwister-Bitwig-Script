@@ -6,7 +6,7 @@ host.addDeviceNameBasedDiscoveryPair(["Midi Fighter Twister"], ["Midi Fighter Tw
 
 load("MidiFighterTwister.constants.js")
 load("MidiFighterTwister.mixer.js")
-load("MidiFighterTwister.device.js")
+load("MidiFighterTwister.overview.js")
 load("MidiFighterTwister.MelodicSequencer.js")
 load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
@@ -114,42 +114,16 @@ function init() {
     mainTrackBank.setChannelScrollStepSize(channelStepSize);
 	effectTrackBank.setChannelScrollStepSize(channelStepSize);
 
-	activePage = devicePage;
-	setActivePage(devicePage);
-	changeEncoderBank(12);
-}
+	hardwareSurface = host.createHardwareSurface();
 
-function cyclePage(){
-	ENCODERBANK < 3 ? ENCODERBANK ++ : ENCODERBANK = 1;
-    switch(ENCODERBANK){
-		case 1:
-			setActivePage(userPage);
-			break;
-		case 2: 
-			setActivePage(mixerPage);
-            break;
-        case 3:
-			setActivePage(devicePage);
-            break;
-		case 4: 
-			if (CURRENTSEQMODE == currentSeqMode.DRUM){
-				setActivePage(drumSequencerPage);
-			}else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
-				setActivePage(melodicSequencerPage);
-			}
-			break;
-    }
-}
+	//for (var i=0; i<16; i++){
+	knob = hardwareSurface.createAbsoluteHardwareKnob('temp');
+	knob.targetName().markInterested();
+	//}
 
-function setActivePage(page){
-	for (var i=0; i<16; i++){
-        set11segLED(i, 0);
-		setRGBLED(i, COLOR.BLACK, STROBE.OFF);
-		println("i = " + i);
-	}
-	activePage.clearIndication();
-	activePage = page;
-	host.showPopupNotification(page.title);
+	pageIndex = 0;
+	activePage = overviewPage;
+	setActivePage(overviewPage);
 }
 
 function getSendObserverFunc(t, s){
@@ -242,52 +216,37 @@ function getDeviceBank1Count(value){
 
 function onMidi(status, data1, data2){
 	printMidi(status, data1, data2);
-    var isActive = (data2 > 0);
+	var isActive = (data2 > 0);
 	
+	enc = data1 + activePage.bankEncOffset;
+	val = data2;
+
 	if (status == statusType.ENCODER_TURN){
-		enc = data1;
-		val = data2;
 		activePage.onEncoderTurn(isActive);
-	}else if (status == statusType.ENCODER_PRESS && data2 == 127){ //data2 == 127 for encoder press
-		enc = data1;
-		val = data2;
+	}else if (status == statusType.ENCODER_PRESS && data2 == 127){
 		activePage.onEncoderPress(isActive);
-	}else if (status == statusType.ENCODER_PRESS && data2 == 0){ //data2 == 0 for encoder release
-		enc = data1;
-		val = data2;
+	}else if (status == statusType.ENCODER_PRESS && data2 == 0){
 		activePage.onEncoderRelease(isActive);
-	}
-	
-	if (status == statusType.SIDEBUTTON_PRESS){
+	}else if(status == statusType.SIDEBUTTON){
+		data1 = data1 - activePage.bankSBOffset;
 		switch(data1){
-			case SIDE_BUTTON.LH_BOTTOM: activePage.onLeftBottomPressed(isActive);
+			case (SIDE_BUTTON.LH_BOTTOM): 
+				data2 == 127 ? activePage.onLeftBottomPressed(isActive) : activePage.onLeftBottomReleased(isActive);
 				break;
-			case SIDE_BUTTON.LH_MIDDLE: activePage.onLeftMiddlePressed(isActive);
+			case SIDE_BUTTON.LH_MIDDLE: 
+				data2 == 127 ? activePage.onLeftMiddlePressed(isActive) : activePage.onLeftMiddleReleased(isActive);
 				break
-			case SIDE_BUTTON.LH_TOP: activePage.onLeftTopPressed(isActive);
+			case SIDE_BUTTON.LH_TOP: 
+				data2 == 127 ? activePage.onLeftTopPressed(isActive) : activePage.onLeftTopReleased(isActive);
 				break;
-			case SIDE_BUTTON.RH_BOTTOM: activePage.onRightBottomPressed(isActive);
+			case SIDE_BUTTON.RH_BOTTOM: 
+				data2 == 127 ? activePage.onRightBottomPressed(isActive) : activePage.onRightBottomReleased(isActive);
 				break;
-			case SIDE_BUTTON.RH_MIDDLE: activePage.onRightMiddlePressed(isActive);
+			case SIDE_BUTTON.RH_MIDDLE: 
+				data2 == 127 ? activePage.onRightMiddlePressed(isActive) : activePage.onRightMiddleReleased(isActive);
 				break
-			case SIDE_BUTTON.RH_TOP: activePage.onRightTopPressed(isActive);
-				break;
-		}
-	}
-	
-	if (status == statusType.SIDEBUTTON_RELEASE){
-		switch(data1){
-			case SIDE_BUTTON.LH_BOTTOM: activePage.onLeftBottomReleased(isActive);
-				break;
-			case SIDE_BUTTON.LH_MIDDLE: activePage.onLeftMiddleReleased(isActive);
-				break
-			case SIDE_BUTTON.LH_TOP: activePage.onLeftTopReleased(isActive);
-				break;
-			case SIDE_BUTTON.RH_BOTTOM: activePage.onRightBottomReleased(isActive);
-				break;
-			case SIDE_BUTTON.RH_MIDDLE: activePage.onRightMiddleReleased(isActive);
-				break
-			case SIDE_BUTTON.RH_TOP: activePage.onRightTopReleased(isActive);
+			case SIDE_BUTTON.RH_TOP: 
+				data2 == 127 ? activePage.onRightTopPressed(isActive) : activePage.onRightTopReleased(isActive);
 				break;
 		}
 	}
@@ -307,14 +266,17 @@ function clear(){
 function flush(){
 	activePage.updateOutputState();
 	flushLEDs();
+	println('knob binding = ' + knob.targetName().get())
 }
 
 function setRGBLED(loc, color, strobe){
+	loc = loc + activePage.bankEncOffset;
 	pendingRGBLEDs[loc] = color;
 	pendingRGBSTROBEs[loc] = strobe;
 }
 
 function set11segLED(loc, value){
+	loc = loc + activePage.bankEncOffset;
 	pending11segLEDs[loc] = value;
 }
 
@@ -350,6 +312,64 @@ function flushLEDs(){
 	}
 }
 
+clearIndicators = function(){
+
+    for (var i=0; i<8; i++){
+        cursorDRCP.getParameter(i).setIndication(false);
+    }
+    cursorTrack.getVolume().setIndication(false);
+	cursorTrack.getPan().setIndication(false);
+
+	for(var i=0; i<4; i++){
+        mainTrackBank.getChannel(i).getVolume().setIndication(false);
+        mainTrackBank.getChannel(i).getPan().setIndication(false);
+        for (var s=0; s<11; s++){
+            mainTrackBank.getChannel(i).getSend(s).setIndication(false);
+        }
+        effectTrackBank.getChannel(i).getVolume().setIndication(false);
+        effectTrackBank.getChannel(i).getPan().setIndication(false);
+    }
+    masterTrack.getVolume().setIndication(false);
+    masterTrack.getPan().setIndication(false);
+	
+}
+
+function cyclePage(){
+	pageIndex < 3 ? pageIndex ++ : pageIndex = 0;
+	
+    switch(pageIndex){
+		case 0:
+			setActivePage(overviewPage);
+            break;
+		case 1: 
+			setActivePage(mixerPage);
+            break;
+        case 2:
+			setActivePage(userPage);
+			break;
+		case 3: 
+			if (CURRENTSEQMODE == currentSeqMode.DRUM){
+				setActivePage(drumSequencerPage);
+			}else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
+				setActivePage(melodicSequencerPage);
+			}
+			break;
+	}
+	
+	
+}
+
+function setActivePage(page){
+	for (var i=0; i<16; i++){
+        set11segLED(i, 0);
+		setRGBLED(i, COLOR.BLACK, STROBE.OFF);
+	}
+	clearIndicators();
+	activePage = page;
+	changeEncoderBank(activePage.bank);
+	host.showPopupNotification(page.title);
+}
+
 function handleColor(red, green, blue){
     for (var i = 0; i < trackColors.length; i++){
         var currentColor = trackColors[i];
@@ -361,6 +381,5 @@ function handleColor(red, green, blue){
 };
 
 function changeEncoderBank(bank){
-	sendMidi(147, bank, 127);
-	println('here');
+	sendMidi(179, bank, 127);
 }

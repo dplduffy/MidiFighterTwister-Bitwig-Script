@@ -2,6 +2,9 @@
 userPage = new page();
 
 userPage.title = "User";
+userPage.bank = BANK[1];
+userPage.bankEncOffset = BANK_ENC_OFFSET[1];
+userPage.bankSBOffset = BANK_SB_OFFSET[1];
 
 var rgbDeviceDone = false;
 var tempRainbow = 80;
@@ -60,6 +63,9 @@ userPage.onLeftBottomReleased = function(isActive){
 }
 
 userPage.updateRGBLEDs = function(){
+    for(var i=0; i<16; i++){
+        setRGBLED(i, INDICATOR_COLOR[i%8], STROBE.OFF);
+    }
 }
 
 userPage.update11segLEDs = function(){

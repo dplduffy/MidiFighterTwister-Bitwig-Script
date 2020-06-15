@@ -1,6 +1,9 @@
 drumSequencerPage = new page();
 
 drumSequencerPage.title = "Drum Sequencer";
+drumSequencerPage.bank = BANK[0];
+drumSequencerPage.bankEncOffset = BANK_ENC_OFFSET[0];
+drumSequencerPage.bankSBOffset = BANK_SB_OFFSET[0];
 
 drumSequencerPage.updateOutputState = function()
 {

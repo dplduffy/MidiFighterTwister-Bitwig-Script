@@ -31,28 +31,21 @@ var cursorTrackPan = initArray(0, 0);
 var cursorTrackPosition = initArray(0, 0);
 var cursorTrackPositionObserver = 0;
 
-var statusType =
-{
+var pageIndex = 0;
+
+var statusType = {
    ENCODER_PRESS:177,
    ENCODER_TURN:176,
-   SIDEBUTTON_RELEASE:131,
-   SIDEBUTTON_PRESS:147,
+   SIDEBUTTON:179,
 }
-var SIDE_BUTTON =
-{
+var SIDE_BUTTON = {
    LH_TOP:8,
    LH_MIDDLE:9,
    LH_BOTTOM:10,
    RH_TOP:11,
    RH_MIDDLE:12,
    RH_BOTTOM:13,
-};
-var LEFT_BUTTON =
-{
-    TOP:8,
-    MIDDLE:9,
-    BOTTOM:10,
-};
+}
 
 var pendingRGBLEDs = new Array(64);
 var activeRGBLEDs = new Array(64);
@@ -60,9 +53,8 @@ var pendingRGBSTROBEs = new Array(64);
 var activeRGBSTROBEs = new Array(64);
 var pending11segLEDs = new Array(64);
 var active11segLEDs = new Array(64);
-var rainbowArray = [80, 67, 60, 40, 18, 100, 117];
-var COLOR =
-{
+
+var COLOR = {
     SILVER:0,
     WHITE:0,
     GREY:0,
@@ -90,9 +82,20 @@ var COLOR =
     DARK_PURPLE:112,
     LIGHT_PURPLE2:117,
     DARK_PURPLE2:125,
-};
-var INDICATOR_COLOR =
-[
+}
+
+var RAINBOW_ARRAY = [
+   COLOR.RED,
+   COLOR.DARK_ORANGE,
+   COLOR.GOLD,
+   COLOR.LIGHT_GREEN,
+   COLOR.LIGHT_BLUE,
+   COLOR.DARK_PINK,
+   COLOR.MINT,
+   COLOR.LIGHT_PURPLE,
+];
+
+var INDICATOR_COLOR = [
    COLOR.RED,
    COLOR.DARK_ORANGE,
    COLOR.GOLD,
@@ -102,17 +105,14 @@ var INDICATOR_COLOR =
    COLOR.LIGHT_PURPLE,
    COLOR.DARK_PINK
 ]
-   
-var STROBE =
-{
+var STROBE = {
    RAINBOW:127,
    PULSE1:12,
    PULSE2:13,
    ON:1,
    OFF:0,
 }
-var trackColors =
-[
+var trackColors = [
     [ 0.5                , 0.5                , 0.5                , COLOR.GREY],         // No Color?
     [ 0.3294117748737335 , 0.3294117748737335 , 0.3294117748737335 , COLOR.GREY],         // Dark Gray
     [ 0.47843137383461   , 0.47843137383461   , 0.47843137383461   , COLOR.GREY],         // Gray
@@ -140,68 +140,62 @@ var trackColors =
     [ 0.24313725531101227, 0.7333333492279053 , 0.3843137323856354 , COLOR.LIGHT_GREEN],  // Light Green
     [ 0.26274511218070984, 0.8235294222831726 , 0.7254902124404907 , COLOR.MINT],         // Mint
     [ 0.2666666805744171 , 0.7843137383460999 , 1                  , COLOR.LIGHT_BLUE]    // Blue
-];
+]
 
 var MIXERMODE = 0;
 var mixerModeArray = ["Main", "Effect", "Master"];
-var mixerMode =
-{
+var mixerMode = {
    MAIN:0,
    EFFECT:1,
    MASTER:2,
-};
+}
 
-//possible for future mix 8 mode
-var Mix4 =
-{
+var Mix4 = {
    BANK1 : 0,
    BANK2 : 1,
 }
+
 var CURRENT_MIX4 = 0;
 var Mix4Array = [32,28];
 var Mix4ArrayRGB = [0,4];
 
 var currentSend = 0;
 var currentSend11Seg = 1;
-var sendArray =
-[
-    [0,0,0,0,0,0,0,0,0,0,0] , //track1
-    [0,0,0,0,0,0,0,0,0,0,0] , //track2
+var sendArray = [
+   [0,0,0,0,0,0,0,0,0,0,0] , //track1
+   [0,0,0,0,0,0,0,0,0,0,0] , //track2
 	[0,0,0,0,0,0,0,0,0,0,0] , //track3
 	[0,0,0,0,0,0,0,0,0,0,0] , //track4
-    [0,0,0,0,0,0,0,0,0,0,0] , //track1
-    [0,0,0,0,0,0,0,0,0,0,0] , //track2
+   [0,0,0,0,0,0,0,0,0,0,0] , //track1
+   [0,0,0,0,0,0,0,0,0,0,0] , //track2
 	[0,0,0,0,0,0,0,0,0,0,0] , //track3
 	[0,0,0,0,0,0,0,0,0,0,0] , //track4
 ];
 
 var enc = -1;
 var val = 0;
-var ENCODERBANK = 1;
-/*var encoderBankOffset =
-{
-   BANK1:0,
-   BANK2:16,
-   BANK3:32,
-   BANK4:48,
-}
 
-var encoderBank =
-{
-   BANK1:12,
-   BANK2:13,
-   BANK3:14,
-   BANK4:15,
-}*/
-
-var ENC = 
-{
+var OVERVIEW = {
    DEVICE: 8,
    PAGE: 9,
    TRACK_SEL: 10,
    PAN: 11,
    SEND_SEL: 14,
    VOLUME: 15,
+}
+
+var currentSideButtonOffset = 0;
+
+var BANK = [0,1,2,3];
+var BANK_ENC_OFFSET = [0,16,32,64];
+var BANK_SB_OFFSET = [0,6,12,18];
+
+var ENC = 
+{
+   OVERVIEW,
+   BANK,
+   BANK_ENC_OFFSET,
+   BANK_SB_OFFSET,
 }
 
 var tempPatternPressStart = 0;
@@ -243,7 +237,7 @@ var SEQ_STEPS = 16;
 var SEQ_KEYS = 128;
 var KEYS_OCT_LO = 0;
 var KEYS_OCT_HI = 48;
-var CURRENT_OCT = 3;   //0-10
+var CURRENT_OCT = 3;    //0-10
 var OCTAVE_RANGE = 2;   //1-10
 var ROOT_NOTE = 0;
 var CURRENT_MODERN_MODE = 0;

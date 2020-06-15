@@ -2,6 +2,9 @@
 melodicSequencerPage = new page();
 
 melodicSequencerPage.title = "Melodic Sequencer";
+melodicSequencerPage.bank = BANK[0];
+melodicSequencerPage.bankEncOffset = BANK_ENC_OFFSET[0];
+melodicSequencerPage.bankSBOffset = BANK_SB_OFFSET[0];
 
 melodicSequencerPage.updateOutputState = function()
 {

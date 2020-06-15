@@ -2,6 +2,9 @@
 mixerPage = new page();
 
 mixerPage.title = "Mixer";
+mixerPage.bank = BANK[0];
+mixerPage.bankEncOffset = BANK_ENC_OFFSET[0];
+mixerPage.bankSBOffset = BANK_SB_OFFSET[0];
 
 mixerPage.canScrollMainChannelsUp = false;
 mixerPage.canScrollMainChannelsDown = false;
@@ -56,7 +59,6 @@ mixerPage.onEncoderRelease = function(isActive){
 
 mixerPage.onEncoderTurn = function(isActive){   
     if (MIXERMODE == mixerMode.MAIN){
-        println('enc = ' + enc);
         if(enc<4){
             mainTrackBank.getChannel(enc).getVolume().set(val,127);
         }else if(enc>=4 && enc<8){
@@ -265,20 +267,6 @@ mixerPage.updateIndicators = function(){
         masterTrack.getVolume().setIndication(true);
         masterTrack.getPan().setIndication(true);
     }
-}
-
-mixerPage.clearIndication = function(){
-    for(var i=0; i<4; i++){
-        mainTrackBank.getChannel(i).getVolume().setIndication(false);
-        mainTrackBank.getChannel(i).getPan().setIndication(false);
-        for (var s=0; s<11; s++){
-            mainTrackBank.getChannel(i).getSend(s).setIndication(false);
-        }
-        effectTrackBank.getChannel(i).getVolume().setIndication(false);
-        effectTrackBank.getChannel(i).getPan().setIndication(false);
-    }
-    masterTrack.getVolume().setIndication(false);
-    masterTrack.getPan().setIndication(false);
 }
 
 function setSendNumber(value){
