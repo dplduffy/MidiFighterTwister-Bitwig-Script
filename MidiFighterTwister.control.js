@@ -79,6 +79,9 @@ function init() {
 	cursorClip.getPlayStop().addRawValueObserver(getClipStop);
 	cursorClip.getLoopStart().addRawValueObserver(getClipLoopStart);
 	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
+	cursorClip.clipLauncherSlot().isPlaying().addValueObserver(getCursorClipIsPlaying);
+	cursorClip.clipLauncherSlot().isRecording().addValueObserver(getCursorClipIsRecording);
+	//cursorTrack.clipLauncherSlot().isStopped().addValueObserver(getCursorClipIsStopped);
 
 	deviceTrackBank = host.createTrackBank(11, 11, 8);
 	deviceTrackBank.addTrackScrollPositionObserver(getDeviceTrackBankScrollPosition, 0);
@@ -87,7 +90,7 @@ function init() {
 	cursorTrack.color().addValueObserver(getTrackObserverFunc(0, cursorTrackColor));
 	cursorTrack.volume().addValueObserver(127, getCursorTrackVar(0, cursorTrackVolume));
 	cursorTrack.pan().addValueObserver(127, getCursorTrackVar(0, cursorTrackPan));
-	cursorTrack.position().addValueObserver(getCursorTrackPositionObserver);
+	//cursorTrack.position().addValueObserver(getCursorTrackPositionObserver);
 
 	//deviceTrackBank.followCursorTrack(cursorTrack);
 	deviceTrackBank.channelCount().markInterested();
@@ -117,10 +120,11 @@ function init() {
 	hardwareSurface = host.createHardwareSurface();
 
 	//for (var i=0; i<16; i++){
-	knob = hardwareSurface.createAbsoluteHardwareKnob('temp');
-	knob.targetName().markInterested();
+	//knob = hardwareSurface.createAbsoluteHardwareKnob('temp');
+	//knob.targetName().markInterested();
 	//}
 
+	MIXERMODE = mixerMode.MAIN;
 	pageIndex = 0;
 	activePage = overviewPage;
 	setActivePage(overviewPage);
@@ -202,9 +206,10 @@ function getDevicePositionObserver(value){
 	devicePositionObserver = value;
 }
 
-function getCursorTrackPositionObserver(value){
-	cursorTrackPositionObserver = value;
-}
+//the api doesn't work properly for this function
+//function getCursorTrackPositionObserver(value){
+//	cursorTrackPositionObserver = value;
+//}
 
 function getCursorDeviceName(value){
 	cursorDeviceName = value;
@@ -214,11 +219,24 @@ function getDeviceBank1Count(value){
 	deviceBank1Count = value;
 }
 
+function getCursorClipIsPlaying(value){
+	cursorClipIsPlaying = value;
+}
+
+function getCursorClipIsRecording(value){
+	cursorClipIsRecording = value;
+}
+
+function getCursorClipIsStopped(value){
+	cursorClipIsStopped = value;
+}
+
 function onMidi(status, data1, data2){
 	printMidi(status, data1, data2);
 	var isActive = (data2 > 0);
 	
-	enc = data1 + activePage.bankEncOffset;
+	enc = data1 - activePage.bankEncOffset;
+	println(enc)
 	val = data2;
 
 	if (status == statusType.ENCODER_TURN){
@@ -266,7 +284,7 @@ function clear(){
 function flush(){
 	activePage.updateOutputState();
 	flushLEDs();
-	println('knob binding = ' + knob.targetName().get())
+	//println('knob binding = ' + knob.targetName().get())
 }
 
 function setRGBLED(loc, color, strobe){
@@ -335,17 +353,19 @@ clearIndicators = function(){
 }
 
 function cyclePage(){
-	pageIndex < 3 ? pageIndex ++ : pageIndex = 0;
 	
     switch(pageIndex){
 		case 0:
 			setActivePage(overviewPage);
+			pageIndex ++ 
             break;
 		case 1: 
 			setActivePage(mixerPage);
+			pageIndex ++ 
             break;
         case 2:
 			setActivePage(userPage);
+			pageIndex ++ 
 			break;
 		case 3: 
 			if (CURRENTSEQMODE == currentSeqMode.DRUM){
@@ -353,6 +373,7 @@ function cyclePage(){
 			}else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
 				setActivePage(melodicSequencerPage);
 			}
+			pageIndex = 0;
 			break;
 	}
 	

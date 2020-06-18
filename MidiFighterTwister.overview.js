@@ -18,6 +18,13 @@ overviewPage.updateOutputState = function(){
 }
 
 overviewPage.onEncoderPress = function(isActive){
+    if (enc = ENC.OVERVIEW.CLIP){
+        if(cursorClipIsPlaying){
+            cursorTrack.stop();
+        }else if(cursorClipIsRecording){
+            cursorClip.launch();
+        }//else if(cursorClipIsStopped)
+    }
 }
 
 overviewPage.onEncoderRelease = function(isActive){
@@ -27,26 +34,51 @@ overviewPage.onEncoderTurn = function(isActive){
     if(enc < 8){
         cursorDRCP.getParameter(enc).set(val,127);
     }else if(enc == ENC.OVERVIEW.DEVICE) {
-        var tempIndex = scaleValue(val, 127, 0, (deviceBank1Count-1));
+        (val > 64) ? (tempCursorDI ++) : (tempCursorDI --);
+        if (tempCursorDI > 5){
+            tempCursorDI = 0;
+            cursorDevice.selectNext();
+        }else if(tempCursorDI < -5){
+            tempCursorDI = 0;
+            cursorDevice.selectPrevious();
+        }
+        /*var tempIndex = scaleValue(val, 127, 0, (deviceBank1Count-1));
         var tempDevice = deviceBank1.getDevice(tempIndex);
         deviceBank1.scrollIntoView(tempIndex);
-        cursorDevice.selectDevice(tempDevice);
+        cursorDevice.selectDevice(tempDevice);*/
         host.showPopupNotification(cursorDeviceName)
     }else if(enc == ENC.OVERVIEW.PAGE){
-        cursorDRCP.selectedPageIndex().set(scaleValue(val, 127, 0, (cursorDRCPCount-1)));
+        (val > 64) ? (tempCursorDRCPI ++) : (tempCursorDRCPI --);
+        if (tempCursorDRCPI > 5){
+            tempCursorDRCPI = 0;
+            cursorDRCP.selectNext();
+        }else if(tempCursorDRCPI < -5){
+            tempCursorDRCPI = 0;
+            cursorDRCP.selectPrevious();
+        }
+        //cursorDRCP.selectedPageIndex().set(scaleValue(val, 127, 0, (cursorDRCPCount-1)));
         host.showPopupNotification(cursorDRCPName)
     }else if(enc == ENC.OVERVIEW.PAN){
         cursorTrack.getPan().set(val,127);
     }else if(enc == ENC.OVERVIEW.VOLUME){
         cursorTrack.getVolume().set(val,127);
     }else if(enc == ENC.OVERVIEW.TRACK_SEL){
-        var tempIndex = scaleValue(val, 127, 0, 10);
+        (val > 64) ? (cursorTrackPosition ++) : (cursorTrackPosition --);
+        if (cursorTrackPosition > 5){
+            cursorTrackPosition = 0;
+            cursorTrack.selectNext();
+        }else if(cursorTrackPosition < -5){
+            cursorTrackPosition = 0;
+            cursorTrack.selectPrevious();
+        }
+
+        /*var tempIndex = scaleValue(val, 127, 0, 10);
         var tempChannel = deviceTrackBank.getChannel(tempIndex);
         deviceTrackBank.scrollToChannel(scaleValue(val, 127, 0, 10));
         cursorTrack.selectChannel(tempChannel);
-        //println('scroll = ' + scaleValue(val, 127, 0, 10));
-        //println('channelCount = ' + deviceTrackBank.channelCount().get())
-        //println('scrollPos = ' + deviceTrackBank.channelScrollPosition().get())
+        println('scroll = ' + scaleValue(val, 127, 0, 10));
+        println('channelCount = ' + deviceTrackBank.channelCount().get())
+        println('scrollPos = ' + deviceTrackBank.channelScrollPosition().get())*/
     }
 }
 
@@ -60,6 +92,7 @@ overviewPage.onRightMiddlePressed = function(isActive){
 }
 
 overviewPage.onRightMiddleReleased = function(isActive){
+    setActivePage(mixerPage);
 }
 
 overviewPage.onRightBottomPressed = function(isActive){
@@ -72,7 +105,6 @@ overviewPage.onLeftTopPressed = function(isActive){
 }
 
 overviewPage.onLeftTopReleased = function(isActive){
-    cyclePage();
 }
 
 overviewPage.onLeftMiddlePressed = function(isActive){
@@ -104,8 +136,7 @@ overviewPage.update11segLEDs = function(){
     }
     set11segLED(ENC.OVERVIEW.DEVICE, scaleValue(devicePositionObserver, (deviceBank1Count-1), 0, 127));
     set11segLED(ENC.OVERVIEW.PAGE, scaleValue(cursorDRCPIndex, (cursorDRCPCount-1), 1, 127));
-    //set11segLED(ENC.OVERVIEW.TRACK_SEL, scaleValue(cursorTrackPositionObserver, 11, 1, 127));
-    //println('pos = ' + deviceTrackBankScrollPosition);
+    set11segLED(ENC.OVERVIEW.TRACK_SEL, 0);//scaleValue(cursorTrackPositionObserver, 11, 1, 127));
     set11segLED(ENC.OVERVIEW.PAN, cursorTrackPan[0]);
     set11segLED(ENC.OVERVIEW.VOLUME, cursorTrackVolume[0]);
 }
@@ -119,7 +150,7 @@ overviewPage.updateIndicators = function(){
 }
 
 overviewPage.deviceChangePopup = function(){
-    host.showPopupNotification('Device: ' + cursorDeviceName + ', ' + cursorDRCPName);
+    //host.showPopupNotification('Device: ' + cursorDeviceName + ', ' + cursorDRCPName);
 }
 
 function scaleValue(value, scaleIn, outMin, outMax){

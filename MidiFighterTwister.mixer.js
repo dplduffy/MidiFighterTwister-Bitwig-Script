@@ -2,9 +2,9 @@
 mixerPage = new page();
 
 mixerPage.title = "Mixer";
-mixerPage.bank = BANK[0];
-mixerPage.bankEncOffset = BANK_ENC_OFFSET[0];
-mixerPage.bankSBOffset = BANK_SB_OFFSET[0];
+mixerPage.bank = BANK[1];
+mixerPage.bankEncOffset = BANK_ENC_OFFSET[1];
+mixerPage.bankSBOffset = BANK_SB_OFFSET[1];
 
 mixerPage.canScrollMainChannelsUp = false;
 mixerPage.canScrollMainChannelsDown = false;
@@ -89,50 +89,51 @@ mixerPage.onRightTopPressed = function(isActive){
 }
 
 mixerPage.onRightTopReleased = function(isActive){
-    if(MIXERMODE == mixerMode.MAIN){
+    /*if(MIXERMODE == mixerMode.MAIN){
         mainTrackBank.scrollChannelsUp();
     }else if(MIXERMODE == mixerMode.EFFECT){
         effectTrackBank.scrollChannelsUp();
-    }     
+    }*/
+    setActivePage(overviewPage);
 }
 
 mixerPage.onRightMiddlePressed = function(isActive){
 }
 
 mixerPage.onRightMiddleReleased = function(isActive){
-    var index = channelStepSizeArray.indexOf(channelStepSize);
+    /*var index = channelStepSizeArray.indexOf(channelStepSize);
     index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
     channelStepSize = channelStepSizeArray[index];
     host.showPopupNotification("Channel Step Size: "+channelStepSize);
     mainTrackBank.setChannelScrollStepSize(channelStepSize);
-    effectTrackBank.setChannelScrollStepSize(channelStepSize);
+    effectTrackBank.setChannelScrollStepSize(channelStepSize);*/
 }
 
 mixerPage.onRightBottomPressed = function(isActive){
 }
 
 mixerPage.onRightBottomReleased = function(isActive){
-    if(MIXERMODE == mixerMode.MAIN){
+    /*if(MIXERMODE == mixerMode.MAIN){
         mainTrackBank.scrollChannelsDown();
     }else if(MIXERMODE == mixerMode.EFFECT){
         effectTrackBank.scrollChannelsDown();
-    }      
+    }*/
+    setActivePage(userPage);
 }
 
 mixerPage.onLeftTopPressed = function(isActive){
 }
 
 mixerPage.onLeftTopReleased = function(isActive){
-    cyclePage();
 }
 
 mixerPage.onLeftMiddlePressed = function(isActive){
 }
 
 mixerPage.onLeftMiddleReleased = function(isActive){
-    MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
+    /*(MIXERMODE < 2 ? MIXERMODE++ : MIXERMODE = 0;
     this.clearIndication();
-    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
+    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);*/
 }
 
 mixerPage.onLeftBottomPressed = function(isActive){
