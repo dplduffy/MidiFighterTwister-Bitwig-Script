@@ -81,6 +81,8 @@ function init() {
 	cursorClip.getLoopLength().addRawValueObserver(getClipLoopLength);
 	cursorClip.clipLauncherSlot().isPlaying().addValueObserver(getCursorClipIsPlaying);
 	cursorClip.clipLauncherSlot().isRecording().addValueObserver(getCursorClipIsRecording);
+	cursorClip.clipLauncherSlot().hasContent().addValueObserver(getCusrorClipHasContent);
+	cursorClip.clipLauncherSlot().color().addValueObserver(getCursorClipColor(0, cursorClipColor));
 	//cursorTrack.clipLauncherSlot().isStopped().addValueObserver(getCursorClipIsStopped);
 
 	deviceTrackBank = host.createTrackBank(11, 11, 8);
@@ -88,6 +90,7 @@ function init() {
 
 	cursorTrack = host.createCursorTrack("ct", "ct", 2, 0, true)
 	cursorTrack.color().addValueObserver(getTrackObserverFunc(0, cursorTrackColor));
+	cursorTrack.color().markInterested();
 	cursorTrack.volume().addValueObserver(127, getCursorTrackVar(0, cursorTrackVolume));
 	cursorTrack.pan().addValueObserver(127, getCursorTrackVar(0, cursorTrackPan));
 	//cursorTrack.position().addValueObserver(getCursorTrackPositionObserver);
@@ -231,12 +234,21 @@ function getCursorClipIsStopped(value){
 	cursorClipIsStopped = value;
 }
 
+function getCusrorClipHasContent(value){
+	cursorClipHasContent = value;
+}
+
+function getCursorClipColor(t, value){
+	return function(r, g, b) {
+		value[t] = handleColor(r,g,b);
+	}
+}
+
 function onMidi(status, data1, data2){
 	printMidi(status, data1, data2);
 	var isActive = (data2 > 0);
 	
 	enc = data1 - activePage.bankEncOffset;
-	println(enc)
 	val = data2;
 
 	if (status == statusType.ENCODER_TURN){

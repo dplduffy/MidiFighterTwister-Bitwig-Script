@@ -20,10 +20,11 @@ overviewPage.updateOutputState = function(){
 overviewPage.onEncoderPress = function(isActive){
     if (enc = ENC.OVERVIEW.CLIP){
         if(cursorClipIsPlaying){
-            cursorTrack.stop();
-        }else if(cursorClipIsRecording){
+            cursorClip.getTrack().stop();
+            println('here')
+        }else if(cursorClipIsRecording || cursorClipHasContent){
             cursorClip.launch();
-        }//else if(cursorClipIsStopped)
+        }
     }
 }
 
@@ -60,8 +61,6 @@ overviewPage.onEncoderTurn = function(isActive){
         host.showPopupNotification(cursorDRCPName)
     }else if(enc == ENC.OVERVIEW.PAN){
         cursorTrack.getPan().set(val,127);
-    }else if(enc == ENC.OVERVIEW.VOLUME){
-        cursorTrack.getVolume().set(val,127);
     }else if(enc == ENC.OVERVIEW.TRACK_SEL){
         (val > 64) ? (cursorTrackPosition ++) : (cursorTrackPosition --);
         if (cursorTrackPosition > 5){
@@ -71,7 +70,17 @@ overviewPage.onEncoderTurn = function(isActive){
             cursorTrackPosition = 0;
             cursorTrack.selectPrevious();
         }
-
+    }else if(enc == ENC.OVERVIEW.CLIP){
+        /*(val > 64) ? (cursorClipPosition ++) : (cursorClipPosition --);
+        if (cursorClipPosition > 5){
+            cursorClipPosition = 0;
+            cursorClip.selectNext();
+        }else if(cursorClipPosition < -5){
+            cursorClipPosition = 0;
+            cursorClip.selectPrevious();
+        }*/
+    }else if(enc == ENC.OVERVIEW.VOLUME){
+        cursorTrack.getVolume().set(val,127);
         /*var tempIndex = scaleValue(val, 127, 0, 10);
         var tempChannel = deviceTrackBank.getChannel(tempIndex);
         deviceTrackBank.scrollToChannel(scaleValue(val, 127, 0, 10));
@@ -99,6 +108,7 @@ overviewPage.onRightBottomPressed = function(isActive){
 }
 
 overviewPage.onRightBottomReleased = function(isActive){
+    setActivePage(userPage);
 }
 
 overviewPage.onLeftTopPressed = function(isActive){
@@ -128,6 +138,17 @@ overviewPage.updateRGBLEDs = function(){
     setRGBLED(ENC.OVERVIEW.TRACK_SEL, cursorTrackColor[0], STROBE.OFF);
     setRGBLED(ENC.OVERVIEW.PAN, cursorTrackColor[0], STROBE.OFF);
     setRGBLED(ENC.OVERVIEW.VOLUME, cursorTrackColor[0], STROBE.OFF);
+
+    if (cursorClipIsPlaying){
+        setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.PULSE1);
+    }else if (cursorClipIsRecording){
+        setRGBLED(ENC.OVERVIEW.CLIP, COLOR.RED, STROBE.PULSE1);
+    }else if(cursorClipHasContent){
+        setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.OFF);
+    }else{
+        setRGBLED(ENC.OVERVIEW.CLIP, COLOR.BLACK, STROBE.OFF);
+    }
+    
 }
 
 overviewPage.update11segLEDs = function(){

@@ -21,6 +21,8 @@ var masterArm = initArray(0, 0);
 var masterColor = initArray(0, 0);
 var masterIsSelected = initArray(0, 0);
 var cursorTrackColor = initArray(0, 0);
+var cursorClipColor = initArray(0, 0);
+var cursorClipPosition = 0;
 
 var activePage = null;
 var channelStepSize = 1;
@@ -28,7 +30,7 @@ var channelStepSizeArray = [1, 4];
 var cursorTrackName;
 var cursorTrackVolume = initArray(0, 0);
 var cursorTrackPan = initArray(0, 0);
-var cursorTrackPosition = 0;//initArray(0, 0);
+var cursorTrackPosition = 0;
 //var cursorTrackPositionObserver = 0;
 var tempCursorDRCPI = 0;
 var tempCursorDI = 0;
