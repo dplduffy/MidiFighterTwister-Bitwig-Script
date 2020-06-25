@@ -11,6 +11,7 @@ load("MidiFighterTwister.MelodicSequencer.js")
 load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
 load("MidiFighterTwister.User.js")
+load("MidiFighterTwister.perform.js")
 
 
 function init() {
@@ -18,28 +19,57 @@ function init() {
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
 	
-	mainTrackBank = host.createMainTrackBank(4, 12, 8);
+	mainTrackBank = host.createMainTrackBank(8, 12, 8);
 
-    for(var t=0; t<4; t++) {
-		var track = mainTrackBank.getChannel(t);
-		track.getVolume().addValueObserver(126, getTrackObserverFunc(t, mainVolume));
-		track.getPan().addValueObserver(126, getTrackObserverFunc(t, mainPan));
+    for(var t=0; t<8; t++) {
+		track[t] = mainTrackBank.getChannel(t);
+		track[t].volume().addValueObserver(126, getTrackObserverFunc(t, mainVolume));
+		track[t].pan().addValueObserver(126, getTrackObserverFunc(t, mainPan));
 		
 		for(var s=0; s<12; s++) {
-			track.getSend(s).addValueObserver(126, getSendObserverFunc(t, s));
+			track[t].getSend(s).addValueObserver(126, getSendObserverFunc(t, s));
 		}
-			
-		track.getMute().addValueObserver(getTrackObserverFunc(t, mainMute));
-		track.getSolo().addValueObserver(getTrackObserverFunc(t, mainSolo));
-		track.addIsSelectedInMixerObserver(getTrackObserverFunc(t, mainIsSelected));
-		track.color().addValueObserver(getTrackObserverFunc(t, mainColor));
-		track.getArm().addValueObserver(getTrackObserverFunc(t, mainArm));
+		
+		track[t].mute().addValueObserver(getTrackObserverFunc(t, mainMute));
+		track[t].getSolo().addValueObserver(getTrackObserverFunc(t, mainSolo));
+		track[t].addIsSelectedInMixerObserver(getTrackObserverFunc(t, mainIsSelected));
+		track[t].color().addValueObserver(getTrackObserverFunc(t, mainColor));
+		track[t].getArm().addValueObserver(getTrackObserverFunc(t, mainArm));
     }
 	
 	mainTrackBank.canScrollChannelsUp().addValueObserver(function(canScroll){
 		mixerPage.canScrollMainChannelsUp = canScroll;});
 	mainTrackBank.canScrollChannelsDown().addValueObserver(function(canScroll){
 		mixerPage.canScrollMainChannelsDown = canScroll;});
+	
+	performTrackBank1 = host.createMainTrackBank(1, 12, 0);
+	performTrack1 = performTrackBank1.getChannel(0);
+	performTrack1.name().addValueObserver(getPerformTrack1Name);
+	performTrack1.volume().markInterested();
+	performTrack1.color().addValueObserver(getTrackObserverFunc(0, performTrack1Color));
+	performDeviceBank1 = performTrack1.createDeviceBank(1);
+	performDevice1 = performDeviceBank1.getDevice(0);
+	performDevice1.name().addValueObserver(getPerformDevice1Name);
+	performDRCP1 = performDevice1.createCursorRemoteControlsPage(8);
+	
+
+	for (var i=0; i<8; i++){
+		performDRCP1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, performDevice1Param));
+	}
+	
+	performTrackBank2 = host.createMainTrackBank(1, 12, 0);
+	performTrack2 = performTrackBank2.getChannel(0);
+	performTrack2.name().addValueObserver(getPerformTrack2Name);
+	performTrack2.volume().markInterested();
+	performTrack2.color().addValueObserver(getTrackObserverFunc(0, performTrack2Color));
+	performDeviceBank2 = performTrack2.createDeviceBank(1);
+	performDevice2 = performDeviceBank2.getDevice(0);
+	performDevice2.name().addValueObserver(getPerformDevice2Name);
+	performDRCP2 = performDevice2.createCursorRemoteControlsPage(8);
+
+	for (var i=0; i<8; i++){
+		performDRCP2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, performDevice2Param));
+	}
 	
 	effectTrackBank = host.createEffectTrackBank(4, 8)
 	for(var t=0; t<4; t++) {
@@ -91,9 +121,11 @@ function init() {
 	cursorTrack = host.createCursorTrack("ct", "ct", 2, 0, true)
 	cursorTrack.color().addValueObserver(getTrackObserverFunc(0, cursorTrackColor));
 	cursorTrack.color().markInterested();
-	cursorTrack.volume().addValueObserver(127, getCursorTrackVar(0, cursorTrackVolume));
-	cursorTrack.pan().addValueObserver(127, getCursorTrackVar(0, cursorTrackPan));
-	//cursorTrack.position().addValueObserver(getCursorTrackPositionObserver);
+	cursorTrack.volume().markInterested();
+	cursorTrack.pan().markInterested();
+	cursorTrack.arm().markInterested();
+	cursorTrack.mute().markInterested();
+	cursorTrack.solo().markInterested();
 
 	//deviceTrackBank.followCursorTrack(cursorTrack);
 	deviceTrackBank.channelCount().markInterested();
@@ -103,10 +135,10 @@ function init() {
 	cursorDevice.name().addValueObserver(getCursorDeviceName);
 	cursorDevice.position().addValueObserver(getDevicePositionObserver);
 
-	deviceBank1 = cursorTrack.createDeviceBank(32);
-	deviceBank1.canScrollBackwards().addValueObserver(getDeviceBank1CanScrollBackwards);
-	deviceBank1.canScrollForwards().addValueObserver(getDeviceBank1CanScrollForwards);
-	deviceBank1.addDeviceCountObserver(getDeviceBank1Count);
+	cursorDeviceBank = cursorTrack.createDeviceBank(32);
+	cursorDeviceBank.canScrollBackwards().addValueObserver(getcursorDeviceBankCanScrollBackwards);
+	cursorDeviceBank.canScrollForwards().addValueObserver(getcursorDeviceBankCanScrollForwards);
+	cursorDeviceBank.addDeviceCountObserver(getcursorDeviceBankCount);
 
 	cursorDRCP = cursorDevice.createCursorRemoteControlsPage(8);
 	cursorDRCP.getName().addValueObserver(getCursorDRCPName);
@@ -127,7 +159,10 @@ function init() {
 	//knob.targetName().markInterested();
 	//}
 
-	MIXERMODE = mixerMode.MAIN;
+	MIXERMODE = mixerMode.EIGHT;
+	OVMODE = ovMode.OVERVIEW;
+	P1MODE = pMode.DEVICE;
+	P2MODE = pMode.DEVICE;
 	pageIndex = 0;
 	activePage = overviewPage;
 	setActivePage(overviewPage);
@@ -143,7 +178,9 @@ function getTrackObserverFunc(track, varToStore) {
 	if (varToStore == mainColor 
 		|| varToStore == effectColor 
 		|| varToStore == masterColor
-		|| varToStore == cursorTrackColor) {
+		|| varToStore == cursorTrackColor
+		|| varToStore == performTrack1Color
+		|| varToStore == performTrack2Color) {
 			return function(r, g, b) {
 				varToStore[track] = handleColor(r,g,b);
 			}
@@ -178,12 +215,6 @@ function getCursorDRCPCount (value) {
 	cursorDRCPCount = value;
 }
 
-function getCursorTrackVar (i, varToStore) {
-	return function(value){
-		varToStore[i] = value;
-	}
-}
-
 function getCursorDRCPIndex (value) {
 	cursorDRCPIndex = value;
 }
@@ -197,12 +228,12 @@ function getDeviceTrackBankScrollPosition (value){
 	deviceTrackBankScrollPosition = value;
 }
 
-function getDeviceBank1CanScrollBackwards (value){
-	deviceBank1CanScrollBackwards = value;
+function getcursorDeviceBankCanScrollBackwards (value){
+	cursorDeviceBankCanScrollBackwards = value;
 }
 
-function getDeviceBank1CanScrollForwards(value){
-	deviceBank1CanScrollForwards = value;
+function getcursorDeviceBankCanScrollForwards(value){
+	cursorDeviceBankCanScrollForwards = value;
 }
 
 function getDevicePositionObserver(value){
@@ -214,12 +245,28 @@ function getDevicePositionObserver(value){
 //	cursorTrackPositionObserver = value;
 //}
 
+function getPerformDevice1Name(value){
+	performDevice1Name = value;
+}
+
+function getPerformDevice2Name(value){
+	performDevice2Name = value;
+}
+
+function getPerformTrack1Name(value){
+	performTrack1Name = value;
+}
+
+function getPerformTrack2Name(value){
+	performTrack2Name = value;
+}
+
 function getCursorDeviceName(value){
 	cursorDeviceName = value;
 }
 
-function getDeviceBank1Count(value){
-	deviceBank1Count = value;
+function getcursorDeviceBankCount(value){
+	cursorDeviceBankCount = value;
 }
 
 function getCursorClipIsPlaying(value){
@@ -345,9 +392,13 @@ function flushLEDs(){
 clearIndicators = function(){
 
     for (var i=0; i<8; i++){
-        cursorDRCP.getParameter(i).setIndication(false);
+		cursorDRCP.getParameter(i).setIndication(false);
+		performDRCP1.getParameter(i).setIndication(false);
+		performDRCP2.getParameter(i).setIndication(false);
     }
-    cursorTrack.getVolume().setIndication(false);
+	cursorTrack.getVolume().setIndication(false);
+	performTrack1.getVolume().setIndication(false);
+	performTrack2.getVolume().setIndication(false);
 	cursorTrack.getPan().setIndication(false);
 
 	for(var i=0; i<4; i++){

@@ -1,11 +1,12 @@
 var masterTrack;
-var mainVolume = initArray(0, 4);
-var mainPan = initArray(0, 4);
-var mainMute = initArray(0, 4);
-var mainSolo = initArray(0, 4);
-var mainArm = initArray(0, 4);
-var mainColor = initArray(0, 4);
-var mainIsSelected = initArray(0, 4);
+var mainVolume = initArray(0, 8);
+var mainPan = initArray(0, 8);
+var mainMute = initArray(0, 8);
+var mainSolo = initArray(0, 8);
+var mainArm = initArray(0, 8);
+var mainColor = initArray(0, 8);
+var mainIsSelected = initArray(0, 8);
+var track = initArray(0, 8);
 var effectVolume = initArray(0, 4);
 var effectPan = initArray(0, 4);
 var effectMute = initArray(0, 4);
@@ -21,6 +22,8 @@ var masterArm = initArray(0, 0);
 var masterColor = initArray(0, 0);
 var masterIsSelected = initArray(0, 0);
 var cursorTrackColor = initArray(0, 0);
+var performTrack1Color = initArray(0, 0);
+var performTrack2Color = initArray(0, 0);
 var cursorClipColor = initArray(0, 0);
 var cursorClipPosition = 0;
 
@@ -28,8 +31,6 @@ var activePage = null;
 var channelStepSize = 1;
 var channelStepSizeArray = [1, 4];
 var cursorTrackName;
-var cursorTrackVolume = initArray(0, 0);
-var cursorTrackPan = initArray(0, 0);
 var cursorTrackPosition = 0;
 //var cursorTrackPositionObserver = 0;
 var tempCursorDRCPI = 0;
@@ -111,8 +112,8 @@ var INDICATOR_COLOR = [
 ]
 var STROBE = {
    RAINBOW:127,
-   PULSE1:12,
-   PULSE2:13,
+   PULSE1:13,
+   PULSE2:14,
    ON:1,
    OFF:0,
 }
@@ -147,12 +148,31 @@ var trackColors = [
 ]
 
 var MIXERMODE = 0;
-var mixerModeArray = ["Main", "Effect", "Master"];
+var mixerModeArray = ["Main", "Effect", "Master", "Eight"];
 var mixerMode = {
    MAIN:0,
    EFFECT:1,
    MASTER:2,
+   EIGHT:3,
 }
+
+var OVMODE = 0;
+var ovMode = {
+   OVERVIEW:0,
+   PERFORM:1,
+}
+
+var P1MODE = 0;
+var P2MODE = 0;
+var pMode = {
+   DEVICE:0,
+   TRACK:1,
+}
+
+trackIndex1 = 0;
+trackIndex2 = 0;
+deviceIndex1 = 0;
+deviceIndex2 = 0;
 
 var Mix4 = {
    BANK1 : 0,
@@ -185,7 +205,8 @@ var OVERVIEW = {
    TRACK_SEL: 10,
    PAN: 11,
    CLIP: 12,
-   SEND_SEL: 14,
+   SEND_SEL: 13,
+   SELD_LVL: 14,
    VOLUME: 15,
 }
 
@@ -420,3 +441,5 @@ var deviceBank1CanScrollDown = false;
 var deviceBank1PositionObserver = 0;
 var deviceBank1Count = 0;
 var selectedParamPage = 0;
+var performDevice1Param = initArray (0, 8);
+var performDevice2Param = initArray (0, 8);

@@ -29,7 +29,7 @@ userPage.onRightTopPressed = function(isActive){
 }
 
 userPage.onRightTopReleased = function(isActive){
-    setActivePage(overviewPage);
+    (OVMODE == ovMode.OVERVIEW) ? setActivePage(overviewPage) : setActivePage(performPage);
 }
 
 userPage.onRightMiddlePressed = function(isActive){
