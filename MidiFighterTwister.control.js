@@ -46,7 +46,18 @@ function init() {
 	performTrack1 = performTrackBank1.getChannel(0);
 	performTrack1.name().addValueObserver(getPerformTrack1Name);
 	performTrack1.volume().markInterested();
+	performTrack1.pan().markInterested();
+	performTrack1.getSend(0).markInterested();
+	performTrack1.getSend(1).markInterested();
+	performTrack1.getSend(2).markInterested();
+	performTrack1.getSend(3).markInterested();
+	performTrack1.getSend(4).markInterested();
+	performTrack1.getSend(5).markInterested();
 	performTrack1.color().addValueObserver(getTrackObserverFunc(0, performTrack1Color));
+	performTrack1.mute().markInterested();
+	performTrack1.solo().markInterested();
+	performTrack1.addIsSelectedInMixerObserver(getTrackObserverFunc(0, performTrack1IsSelected));
+	performTrack1.arm().markInterested();
 	performDeviceBank1 = performTrack1.createDeviceBank(1);
 	performDevice1 = performDeviceBank1.getDevice(0);
 	performDevice1.name().addValueObserver(getPerformDevice1Name);
@@ -61,7 +72,18 @@ function init() {
 	performTrack2 = performTrackBank2.getChannel(0);
 	performTrack2.name().addValueObserver(getPerformTrack2Name);
 	performTrack2.volume().markInterested();
+	performTrack2.pan().markInterested();
+	performTrack2.getSend(0).markInterested();
+	performTrack2.getSend(1).markInterested();
+	performTrack2.getSend(2).markInterested();
+	performTrack2.getSend(3).markInterested();
+	performTrack2.getSend(4).markInterested();
+	performTrack2.getSend(5).markInterested();
 	performTrack2.color().addValueObserver(getTrackObserverFunc(0, performTrack2Color));
+	performTrack2.mute().markInterested();
+	performTrack2.solo().markInterested();
+	performTrack2.addIsSelectedInMixerObserver(getTrackObserverFunc(0, performTrack2IsSelected));
+	performTrack2.arm().markInterested();
 	performDeviceBank2 = performTrack2.createDeviceBank(1);
 	performDevice2 = performDeviceBank2.getDevice(0);
 	performDevice2.name().addValueObserver(getPerformDevice2Name);
@@ -71,8 +93,8 @@ function init() {
 		performDRCP2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, performDevice2Param));
 	}
 	
-	effectTrackBank = host.createEffectTrackBank(4, 8)
-	for(var t=0; t<4; t++) {
+	effectTrackBank = host.createEffectTrackBank(8, 8)
+	for(var t=0; t<8; t++) {
 		var effectTrack = effectTrackBank.getChannel(t);
 		effectTrack.getVolume().addValueObserver(126, getTrackObserverFunc(t, effectVolume));
 		effectTrack.getPan().addValueObserver(126, getTrackObserverFunc(t, effectPan));
@@ -395,23 +417,38 @@ clearIndicators = function(){
 		cursorDRCP.getParameter(i).setIndication(false);
 		performDRCP1.getParameter(i).setIndication(false);
 		performDRCP2.getParameter(i).setIndication(false);
-    }
-	cursorTrack.getVolume().setIndication(false);
-	performTrack1.getVolume().setIndication(false);
-	performTrack2.getVolume().setIndication(false);
-	cursorTrack.getPan().setIndication(false);
-
-	for(var i=0; i<4; i++){
-        mainTrackBank.getChannel(i).getVolume().setIndication(false);
-        mainTrackBank.getChannel(i).getPan().setIndication(false);
-        for (var s=0; s<11; s++){
+		mainTrackBank.getChannel(i).getVolume().setIndication(false);
+		mainTrackBank.getChannel(i).getPan().setIndication(false);
+		effectTrackBank.getChannel(i).getVolume().setIndication(false);
+		effectTrackBank.getChannel(i).getPan().setIndication(false);
+		for (var s=0; s<11; s++){
             mainTrackBank.getChannel(i).getSend(s).setIndication(false);
         }
-        effectTrackBank.getChannel(i).getVolume().setIndication(false);
-        effectTrackBank.getChannel(i).getPan().setIndication(false);
-    }
+	}
+	
+	cursorTrack.getVolume().setIndication(false);
+	cursorTrack.getPan().setIndication(false);
+	performTrack1.getVolume().setIndication(false);
+	performTrack1.getPan().setIndication(false);
+	performTrack2.getVolume().setIndication(false);
+	performTrack2.getPan().setIndication(false);
     masterTrack.getVolume().setIndication(false);
-    masterTrack.getPan().setIndication(false);
+	masterTrack.getPan().setIndication(false);
+	
+
+	performTrack1.getSend(0).setIndication(false);
+	performTrack1.getSend(1).setIndication(false);
+	performTrack1.getSend(2).setIndication(false);
+	performTrack1.getSend(3).setIndication(false);
+	performTrack1.getSend(4).setIndication(false);
+	performTrack1.getSend(5).setIndication(false);
+
+	performTrack2.getSend(0).setIndication(false);
+	performTrack2.getSend(1).setIndication(false);
+	performTrack2.getSend(2).setIndication(false);
+	performTrack2.getSend(3).setIndication(false);
+	performTrack2.getSend(4).setIndication(false);
+	performTrack2.getSend(5).setIndication(false);
 	
 }
 

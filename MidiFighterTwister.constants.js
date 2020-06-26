@@ -21,6 +21,8 @@ var masterSolo = initArray(0, 0);
 var masterArm = initArray(0, 0);
 var masterColor = initArray(0, 0);
 var masterIsSelected = initArray(0, 0);
+var performTrack1IsSelected = initArray(0, 0);
+var performTrack2IsSelected = initArray(0, 0);
 var cursorTrackColor = initArray(0, 0);
 var performTrack1Color = initArray(0, 0);
 var performTrack2Color = initArray(0, 0);
@@ -182,6 +184,9 @@ var Mix4 = {
 var CURRENT_MIX4 = 0;
 var Mix4Array = [32,28];
 var Mix4ArrayRGB = [0,4];
+
+var currentPT1Send = 0;
+var currentPT2Send = 0;
 
 var currentSend = 0;
 var currentSend11Seg = 1;
