@@ -21,36 +21,80 @@ performPage.onEncoderPress = function(isActive){
         P1MODE = P1MODE ^= true;
         setActivePage(performPage);
     }else if(enc == 1){
-        P1MODE == pMode.DEVICE ? performDRCP1.selectPrevious() : performTrack1.arm().toggle();
+        if (P1MODE == pMode.DEVICE){
+            performDRCP1.selectPrevious();
+            performTrack1.selectInMixer();
+            performDevice1.selectInEditor();
+            performDevice1.isRemoteControlsSectionVisible().set(1);
+        }else{
+            performTrack1.arm().toggle();
+        }
     }else if(enc == 2){
         performTrackBank1.scrollChannelsUp();
+        performTrack1.selectInMixer();
     }else if(enc == 3){
         performTrackBank1.scrollChannelsDown();
+        performTrack1.selectInMixer();
     }else if(enc == 4){
         performTrack1.mute().toggle();
     }else if(enc == 5){
-        P1MODE == pMode.DEVICE ? performDRCP1.selectNext() : performTrack1.solo().toggle();
+        if (P1MODE == pMode.DEVICE){
+            performDRCP1.selectNext();
+            performTrack1.selectInMixer();
+            performDevice1.selectInEditor();
+            performDevice1.isRemoteControlsSectionVisible().set(1);
+        }else{
+            performTrack1.arm().toggle();
+        }
     }else if(enc == 6){
         performDeviceBank1.scrollUp();
+        performTrack1.selectInMixer();
+        performDevice1.selectInEditor();
+        performDevice1.isRemoteControlsSectionVisible().set(1);
     }else if(enc == 7){
         performDeviceBank1.scrollDown();
+        performTrack1.selectInMixer();
+        performDevice1.selectInEditor();
+        performDevice1.isRemoteControlsSectionVisible().set(1);
     }else if(enc == 8){
         P2MODE = P2MODE ^= true;
         setActivePage(performPage);
     }else if(enc == 9){
-        P2MODE == pMode.DEVICE ? performDRCP2.selectPrevious() : performTrack2.arm().toggle();
+        if (P2MODE == pMode.DEVICE){
+            performDRCP2.selectPrevious();
+            performTrack2.selectInMixer();
+            performDevice2.selectInEditor();
+            performDevice2.isRemoteControlsSectionVisible().set(1);
+        }else{
+            performTrack2.arm().toggle();
+        }
     }else if(enc == 10){
         performTrackBank2.scrollChannelsUp();
+        performTrack2.selectInMixer();
     }else if(enc == 11){
         performTrackBank2.scrollChannelsDown();
+        performTrack2.selectInMixer();
     }else if(enc == 12){
         performTrack2.mute().toggle();
     }else if(enc == 13){
-        P2MODE == pMode.DEVICE ? performDRCP2.selectNext() : performTrack2.solo().toggle();
+        if (P2MODE == pMode.DEVICE){
+            performDRCP2.selectNext();
+            performTrack2.selectInMixer();
+            performDevice2.selectInEditor();
+            performDevice2.isRemoteControlsSectionVisible().set(1);
+        }else{
+            performTrack2.solo().toggle();
+        }
     }else if(enc == 14){
         performDeviceBank2.scrollUp();
+        performTrack2.selectInMixer();
+        performDevice2.selectInEditor();
+        performDevice2.isRemoteControlsSectionVisible().set(1);
     }else if(enc == 15){
         performDeviceBank2.scrollDown();
+        performTrack2.selectInMixer();
+        performDevice2.selectInEditor();
+        performDevice2.isRemoteControlsSectionVisible().set(1);
     }
 }
 
@@ -233,7 +277,7 @@ performPage.update11segLEDs = function(){
 }
 
 performPage.updateIndicators = function(){
-    host.showPopupNotification(performTrack1Name + ' : ' + performDevice1Name + ' :: ' + performTrack2Name + ' : ' + performDevice2Name);
+    //host.showPopupNotification(performTrack1Name + ' : ' + performDevice1Name + ' :: ' + performTrack2Name + ' : ' + performDevice2Name);
     
     if(P1MODE == pMode.DEVICE){
         for (var i=0; i<8; i++){

@@ -61,6 +61,7 @@ function init() {
 	performDeviceBank1 = performTrack1.createDeviceBank(1);
 	performDevice1 = performDeviceBank1.getDevice(0);
 	performDevice1.name().addValueObserver(getPerformDevice1Name);
+	performDevice1.isRemoteControlsSectionVisible().markInterested();
 	performDRCP1 = performDevice1.createCursorRemoteControlsPage(8);
 	
 
