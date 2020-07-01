@@ -41,59 +41,33 @@ function init() {
 		mixerPage.canScrollMainChannelsUp = canScroll;});
 	mainTrackBank.canScrollChannelsDown().addValueObserver(function(canScroll){
 		mixerPage.canScrollMainChannelsDown = canScroll;});
-	
-	performTrackBank1 = host.createMainTrackBank(1, 12, 0);
-	performTrack1 = performTrackBank1.getChannel(0);
-	performTrack1.name().addValueObserver(getPerformTrack1Name);
-	performTrack1.volume().markInterested();
-	performTrack1.pan().markInterested();
-	performTrack1.getSend(0).markInterested();
-	performTrack1.getSend(1).markInterested();
-	performTrack1.getSend(2).markInterested();
-	performTrack1.getSend(3).markInterested();
-	performTrack1.getSend(4).markInterested();
-	performTrack1.getSend(5).markInterested();
-	performTrack1.color().addValueObserver(getTrackObserverFunc(0, performTrack1Color));
-	performTrack1.mute().markInterested();
-	performTrack1.solo().markInterested();
-	performTrack1.addIsSelectedInMixerObserver(getTrackObserverFunc(0, performTrack1IsSelected));
-	performTrack1.arm().markInterested();
-	performDeviceBank1 = performTrack1.createDeviceBank(1);
-	performDevice1 = performDeviceBank1.getDevice(0);
-	performDevice1.name().addValueObserver(getPerformDevice1Name);
-	performDevice1.isRemoteControlsSectionVisible().markInterested();
-	performDRCP1 = performDevice1.createCursorRemoteControlsPage(8);
-	
+		
+	for (var i=0; i<4; i++){
+		pTrackBank[i] = host.createMainTrackBank(1, 12, 0);
+		pTrack[i] = pTrackBank[i].getChannel(0);
+		//pTrack[i].name().addValueObserver(getpTrackName);
+		pTrack[i].volume().markInterested();
+		pTrack[i].pan().markInterested();
 
-	for (var i=0; i<8; i++){
-		performDRCP1.getParameter(i).addValueObserver(127, getDeviceParamValue(i, performDevice1Param));
-	}
-	
-	performTrackBank2 = host.createMainTrackBank(1, 12, 0);
-	performTrack2 = performTrackBank2.getChannel(0);
-	performTrack2.name().addValueObserver(getPerformTrack2Name);
-	performTrack2.volume().markInterested();
-	performTrack2.pan().markInterested();
-	performTrack2.getSend(0).markInterested();
-	performTrack2.getSend(1).markInterested();
-	performTrack2.getSend(2).markInterested();
-	performTrack2.getSend(3).markInterested();
-	performTrack2.getSend(4).markInterested();
-	performTrack2.getSend(5).markInterested();
-	performTrack2.color().addValueObserver(getTrackObserverFunc(0, performTrack2Color));
-	performTrack2.mute().markInterested();
-	performTrack2.solo().markInterested();
-	performTrack2.addIsSelectedInMixerObserver(getTrackObserverFunc(0, performTrack2IsSelected));
-	performTrack2.arm().markInterested();
-	performDeviceBank2 = performTrack2.createDeviceBank(1);
-	performDevice2 = performDeviceBank2.getDevice(0);
-	performDevice2.name().addValueObserver(getPerformDevice2Name);
-	performDRCP2 = performDevice2.createCursorRemoteControlsPage(8);
+		for (var j=0; j<6; j++){
+			pTrack[i].getSend(j).markInterested();
+		}
 
-	for (var i=0; i<8; i++){
-		performDRCP2.getParameter(i).addValueObserver(127, getDeviceParamValue(i, performDevice2Param));
+		pTrack[i].color().addValueObserver(getTrackObserverFunc(0, pTrackColor[i]));
+		pTrack[i].mute().markInterested();
+		pTrack[i].solo().markInterested();
+		pTrack[i].addIsSelectedInMixerObserver(getTrackObserverFunc(0, pTrackIsSelected[i]));
+		pTrack[i].arm().markInterested();
+		pDeviceBank[i] = pTrack[i].createDeviceBank(1);
+		pDevice[i] = pDeviceBank[i].getDevice(0);
+		//pDevice[i].name().addValueObserver(getpDeviceName);
+		pDevice[i].isRemoteControlsSectionVisible().markInterested();
+		pDRCP[i] = pDevice[i].createCursorRemoteControlsPage(8);
+		for (var k=0; k<8; k++){
+			pDRCP[i].getParameter(k).addValueObserver(127, getDeviceParamValue(k, pDeviceParam[i]));
+		}
 	}
-	
+
 	effectTrackBank = host.createEffectTrackBank(8, 8)
 	for(var t=0; t<8; t++) {
 		var effectTrack = effectTrackBank.getChannel(t);
@@ -202,8 +176,7 @@ function getTrackObserverFunc(track, varToStore) {
 		|| varToStore == effectColor 
 		|| varToStore == masterColor
 		|| varToStore == cursorTrackColor
-		|| varToStore == performTrack1Color
-		|| varToStore == performTrack2Color) {
+		|| varToStore == pTrackColor[0]) {
 			return function(r, g, b) {
 				varToStore[track] = handleColor(r,g,b);
 			}
@@ -268,21 +241,15 @@ function getDevicePositionObserver(value){
 //	cursorTrackPositionObserver = value;
 //}
 
-function getPerformDevice1Name(value){
-	performDevice1Name = value;
+/*
+function getpDeviceName(value){
+	pDeviceName[i] = value;
 }
 
-function getPerformDevice2Name(value){
-	performDevice2Name = value;
+function getpTrackName(value){
+	pTrackName[i] = value;
 }
-
-function getPerformTrack1Name(value){
-	performTrack1Name = value;
-}
-
-function getPerformTrack2Name(value){
-	performTrack2Name = value;
-}
+*/
 
 function getCursorDeviceName(value){
 	cursorDeviceName = value;
@@ -414,42 +381,29 @@ function flushLEDs(){
 
 clearIndicators = function(){
 
-    for (var i=0; i<8; i++){
-		cursorDRCP.getParameter(i).setIndication(false);
-		performDRCP1.getParameter(i).setIndication(false);
-		performDRCP2.getParameter(i).setIndication(false);
-		mainTrackBank.getChannel(i).getVolume().setIndication(false);
-		mainTrackBank.getChannel(i).getPan().setIndication(false);
-		effectTrackBank.getChannel(i).getVolume().setIndication(false);
-		effectTrackBank.getChannel(i).getPan().setIndication(false);
-		for (var s=0; s<11; s++){
-            mainTrackBank.getChannel(i).getSend(s).setIndication(false);
-        }
+	for (var k=0; k<4; k++){
+		for (var i=0; i<8; i++){
+			cursorDRCP.getParameter(i).setIndication(false);
+			pDRCP[k].getParameter(i).setIndication(false);
+			mainTrackBank.getChannel(i).getVolume().setIndication(false);
+			mainTrackBank.getChannel(i).getPan().setIndication(false);
+			effectTrackBank.getChannel(i).getVolume().setIndication(false);
+			effectTrackBank.getChannel(i).getPan().setIndication(false);
+			for (var s=0; s<11; s++){
+				mainTrackBank.getChannel(i).getSend(s).setIndication(false);
+			}
+		}
+		pTrack[k].getVolume().setIndication(false);
+		pTrack[k].getPan().setIndication(false);
+		for (var j=0; j<6; j++){
+			pTrack[k].getSend(j).setIndication(false);
+		}
 	}
 	
 	cursorTrack.getVolume().setIndication(false);
 	cursorTrack.getPan().setIndication(false);
-	performTrack1.getVolume().setIndication(false);
-	performTrack1.getPan().setIndication(false);
-	performTrack2.getVolume().setIndication(false);
-	performTrack2.getPan().setIndication(false);
     masterTrack.getVolume().setIndication(false);
 	masterTrack.getPan().setIndication(false);
-	
-
-	performTrack1.getSend(0).setIndication(false);
-	performTrack1.getSend(1).setIndication(false);
-	performTrack1.getSend(2).setIndication(false);
-	performTrack1.getSend(3).setIndication(false);
-	performTrack1.getSend(4).setIndication(false);
-	performTrack1.getSend(5).setIndication(false);
-
-	performTrack2.getSend(0).setIndication(false);
-	performTrack2.getSend(1).setIndication(false);
-	performTrack2.getSend(2).setIndication(false);
-	performTrack2.getSend(3).setIndication(false);
-	performTrack2.getSend(4).setIndication(false);
-	performTrack2.getSend(5).setIndication(false);
 	
 }
 

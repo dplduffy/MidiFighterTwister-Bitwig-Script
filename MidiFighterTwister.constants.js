@@ -164,12 +164,24 @@ var ovMode = {
    PERFORM:1,
 }
 
-var P1MODE = 0;
-var P2MODE = 0;
+var pTrackBank = initArray(0, 4);
+var pTrack = initArray(0, 4);
+var pTrackIsSelected = initArray(0, 4);
+var pTrackColor = initArray(0, 4);
+var pDeviceBank = initArray(0, 4);
+var pDeviceName = initArray(0, 4);
+var pTrackName = initArray(0, 4);
+var pDRCP = initArray(0, 4);
+var pDeviceParam = initArray(0, 4);
+var pDevice = initArray(0, 4);
+var PMODE = initArray(0, 4);
 var pMode = {
    DEVICE:0,
    TRACK:1,
+   FOURTHS:2,
 }
+
+
 
 trackIndex1 = 0;
 trackIndex2 = 0;
