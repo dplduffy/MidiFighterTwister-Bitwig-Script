@@ -114,19 +114,22 @@ mixerPage.onRightTopPressed = function(isActive){
 }
 
 mixerPage.onRightTopReleased = function(isActive){
-    (OVMODE == ovMode.OVERVIEW) ? setActivePage(overviewPage) : setActivePage(performPage);
+    if (OVMODE == ovMode.OVERVIEW){
+        setActivePage(overviewPage)
+    }else if(OVMODE == ovMode.PERFORM2){
+        setActivePage(perform2Page)
+    }else if(OVMODE == ovMode.PERFORM4){
+        setActivePage(perform4Page);
+    }    
 }
 
 mixerPage.onRightMiddlePressed = function(isActive){
 }
 
 mixerPage.onRightMiddleReleased = function(isActive){
-    var index = channelStepSizeArray.indexOf(channelStepSize);
-    index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
-    channelStepSize = channelStepSizeArray[index];
-    host.showPopupNotification("Channel Step Size: "+channelStepSize);
-    mainTrackBank.setChannelScrollStepSize(channelStepSize);
-    effectTrackBank.setChannelScrollStepSize(channelStepSize);
+    (MIXERMODE < 3) ? (MIXERMODE++) : (MIXERMODE = 0);
+    clearIndicators();
+    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
 }
 
 mixerPage.onRightBottomPressed = function(isActive){
@@ -151,9 +154,12 @@ mixerPage.onLeftMiddlePressed = function(isActive){
 }
 
 mixerPage.onLeftMiddleReleased = function(isActive){
-    (MIXERMODE < 3) ? (MIXERMODE++) : (MIXERMODE = 0);
-    clearIndicators();
-    host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
+    var index = channelStepSizeArray.indexOf(channelStepSize);
+    index == (channelStepSizeArray.length - 1) ? index = 0 : index++;
+    channelStepSize = channelStepSizeArray[index];
+    host.showPopupNotification("Channel Step Size: "+channelStepSize);
+    mainTrackBank.setChannelScrollStepSize(channelStepSize);
+    effectTrackBank.setChannelScrollStepSize(channelStepSize);
 }
 
 mixerPage.onLeftBottomPressed = function(isActive){

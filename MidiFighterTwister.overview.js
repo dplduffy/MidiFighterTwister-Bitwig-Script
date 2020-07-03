@@ -44,9 +44,11 @@ overviewPage.onEncoderTurn = function(isActive){
         if (tempCursorDI > 5){
             tempCursorDI = 0;
             cursorDevice.selectNext();
+            cursorDevice.selectInEditor();
         }else if(tempCursorDI < -5){
             tempCursorDI = 0;
             cursorDevice.selectPrevious();
+            cursorDevice.selectInEditor();
         }
         /*var tempIndex = scaleValue(val, 127, 0, (cursorDeviceBankCount-1));
         var tempDevice = cursorDeviceBank.getDevice(tempIndex);
@@ -71,9 +73,11 @@ overviewPage.onEncoderTurn = function(isActive){
         if (cursorTrackPosition > 5){
             cursorTrackPosition = 0;
             cursorTrack.selectNext();
+            cursorTrack.makeVisibleInMixer();
         }else if(cursorTrackPosition < -5){
             cursorTrackPosition = 0;
             cursorTrack.selectPrevious();
+            cursorTrack.makeVisibleInMixer();
         }
     }else if(enc == ENC.OVERVIEW.CLIP){
         /*(val > 64) ? (cursorClipPosition ++) : (cursorClipPosition --);

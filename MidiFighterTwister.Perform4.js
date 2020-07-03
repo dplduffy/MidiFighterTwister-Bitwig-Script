@@ -35,6 +35,7 @@ perform4Page.onEncoderRelease = function(isActive){
             if (ROW_SHIFT[i]){
                 pDeviceBank[i].scrollUp();
                 pTrack[i].selectInMixer();
+                pTrack[i].makeVisibleInMixer();
                 pDevice[i].selectInEditor();
                 pDevice[i].isRemoteControlsSectionVisible().set(1);
             }else{
@@ -45,11 +46,13 @@ perform4Page.onEncoderRelease = function(isActive){
             if (ROW_SHIFT[i]){
                 pDeviceBank[i].scrollDown();
                 pTrack[i].selectInMixer();
+                pTrack[i].makeVisibleInMixer();
                 pDevice[i].selectInEditor();
                 pDevice[i].isRemoteControlsSectionVisible().set(1);
             }else{
                 pTrack[i].mute().toggle();
                 pTrack[i].selectInMixer();
+                pTrack[i].makeVisibleInMixer();
                 pDevice[i].selectInEditor();
                 pDevice[i].isRemoteControlsSectionVisible().set(1);
             }
@@ -58,6 +61,7 @@ perform4Page.onEncoderRelease = function(isActive){
             if (ROW_SHIFT[i]){
                 pTrackBank[i].scrollChannelsUp();
                 pTrack[i].selectInMixer();
+                pTrack[i].makeVisibleInMixer();
             }else{ 
             }
         }else if((enc%4) == 3){
@@ -65,6 +69,7 @@ perform4Page.onEncoderRelease = function(isActive){
             if (ROW_SHIFT[i]){
                 pTrackBank[i].scrollChannelsDown();
                 pTrack[i].selectInMixer();
+                pTrack[i].makeVisibleInMixer();
             }else{
             }
         }

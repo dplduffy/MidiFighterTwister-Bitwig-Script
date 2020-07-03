@@ -343,33 +343,42 @@ function flush(){
 
 function setRGBLED(loc, color, strobe){
 	loc = loc + activePage.bankEncOffset;
-	pendingRGBLEDs[loc] = color;
-	pendingRGBSTROBEs[loc] = strobe;
+	sendMidi(177, loc, color);
+	sendMidi(178, loc, strobe);
+	//pendingRGBLEDs[loc] = color;
+	//pendingRGBSTROBEs[loc] = strobe;
 }
 
 function set11segLED(loc, value){
 	loc = loc + activePage.bankEncOffset;
-	pending11segLEDs[loc] = value;
+	sendMidi(176, loc, value);
+	//pending11segLEDs[loc] = value;
 }
 
 function flushLEDs(){
-	var changedRGBCount = 0;
+	/*var changedRGBCount = 0;
 	var changedRGBStrobeCount = 0;
-	var changed11segCount = 0;
-   
-	for(var i=0; i<64; i++){
+	var changed11segCount = 0;*/
+
+	
+	/*for(var i=0; i<64; i++){
     	if (pendingRGBLEDs[i] != activeRGBLEDs[i]) changedRGBCount++;
 		if (pending11segLEDs[i] != active11segLEDs[i]) changed11segCount++;
 		if (pendingRGBSTROBEs[i] != activeRGBSTROBEs[i]) changedRGBStrobeCount++;
    	}
 
-	if (changedRGBCount == 0 && changed11segCount == 0 && changedRGBStrobeCount == 0) return;
-   
+	if (changedRGBCount == 0 && changed11segCount == 0 && changedRGBStrobeCount == 0) return;*/
+
+	/*
 	for(var i = 0; i<64; i++){
+		println('pending: ' + pendingRGBLEDs[i]);
+		println('active1: ' + activeRGBLEDs[i]);
+		println('i= ' + i);
 		if (pendingRGBLEDs[i] != activeRGBLEDs[i]){
 			activeRGBLEDs[i] = pendingRGBLEDs[i];
 			var color = activeRGBLEDs[i];
 			sendMidi(177, i, color);
+			println('i= ' + i + ': color= ' + color);
 		}
 		if (pendingRGBSTROBEs[i] != activeRGBSTROBEs[i]){
 			activeRGBSTROBEs[i] = pendingRGBSTROBEs[i];
@@ -381,7 +390,9 @@ function flushLEDs(){
 			var value = active11segLEDs[i];
 			sendMidi(176, i, value);
 		}
-	}
+	}*/
+
+	//println('active2: ' + activeRGBLEDs);
 }
 
 clearIndicators = function(){
