@@ -11,7 +11,8 @@ load("MidiFighterTwister.MelodicSequencer.js")
 load("MidiFighterTwister.SequencerFunctions.js")
 load("MidiFighterTwister.DrumSequencer.js")
 load("MidiFighterTwister.User.js")
-load("MidiFighterTwister.perform.js")
+load("MidiFighterTwister.perform2.js")
+load("MidiFighterTwister.perform4.js")
 
 
 function init() {
@@ -53,7 +54,6 @@ function init() {
 			pTrack[i].getSend(j).markInterested();
 		}
 
-		pTrack[i].color().addValueObserver(getTrackObserverFunc(0, pTrackColor[i]));
 		pTrack[i].mute().markInterested();
 		pTrack[i].solo().markInterested();
 		pTrack[i].addIsSelectedInMixerObserver(getTrackObserverFunc(0, pTrackIsSelected[i]));
@@ -67,6 +67,11 @@ function init() {
 			pDRCP[i].getParameter(k).addValueObserver(127, getDeviceParamValue(k, pDeviceParam[i]));
 		}
 	}
+
+	pTrack[0].color().addValueObserver(getTrackObserverFunc(0, pTrackColor1));
+	pTrack[1].color().addValueObserver(getTrackObserverFunc(0, pTrackColor2));
+	pTrack[2].color().addValueObserver(getTrackObserverFunc(0, pTrackColor3));
+	pTrack[3].color().addValueObserver(getTrackObserverFunc(0, pTrackColor4));
 
 	effectTrackBank = host.createEffectTrackBank(8, 8)
 	for(var t=0; t<8; t++) {

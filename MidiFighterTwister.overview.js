@@ -1,7 +1,7 @@
 
 overviewPage = new page();
 
-overviewPage.title = "Device";
+overviewPage.title = "Track Overveiw";
 overviewPage.bank = BANK[0];
 overviewPage.bankEncOffset = BANK_ENC_OFFSET[0];
 overviewPage.bankSBOffset = BANK_SB_OFFSET[0];
@@ -100,8 +100,8 @@ overviewPage.onRightTopPressed = function(isActive){
 }
 
 overviewPage.onRightTopReleased = function(isActive){
-    setActivePage(performPage);
-    OVMODE = ovMode.PERFORM;
+    setActivePage(perform2Page);
+    OVMODE = ovMode.PERFORM2;
 }
 
 overviewPage.onRightMiddlePressed = function(isActive){

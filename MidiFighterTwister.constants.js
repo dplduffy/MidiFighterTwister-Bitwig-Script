@@ -116,6 +116,7 @@ var STROBE = {
    RAINBOW:127,
    PULSE1:13,
    PULSE2:14,
+   PULSE3:16,
    ON:1,
    OFF:0,
 }
@@ -161,24 +162,32 @@ var mixerMode = {
 var OVMODE = 0;
 var ovMode = {
    OVERVIEW:0,
-   PERFORM:1,
+   PERFORM2:1,
+   PERFORM4:2,
 }
 
 var pTrackBank = initArray(0, 4);
 var pTrack = initArray(0, 4);
 var pTrackIsSelected = initArray(0, 4);
+var pTrackColor1 = initArray(0, 0);
+var pTrackColor2 = initArray(0, 0);
+var pTrackColor3 = initArray(0, 0);
+var pTrackColor4 = initArray(0, 0);
 var pTrackColor = initArray(0, 4);
 var pDeviceBank = initArray(0, 4);
 var pDeviceName = initArray(0, 4);
 var pTrackName = initArray(0, 4);
 var pDRCP = initArray(0, 4);
-var pDeviceParam = initArray(0, 4);
+var pDeviceParam = [
+   [0,0,0,0],
+   [0,0,0,0],
+   [0,0,0,0],
+   [0,0,0,0]];
 var pDevice = initArray(0, 4);
 var PMODE = initArray(0, 4);
 var pMode = {
    DEVICE:0,
    TRACK:1,
-   FOURTHS:2,
 }
 
 
@@ -213,6 +222,8 @@ var sendArray = [
 	[0,0,0,0,0,0,0,0,0,0,0] , //track4
 ];
 
+var ENC_SHIFT = initArray(0,16);
+var ROW_SHIFT = initArray(0,4);
 var enc = -1;
 var val = 0;
 

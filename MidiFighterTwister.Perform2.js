@@ -1,29 +1,28 @@
 
-performPage = new page();
+perform2Page = new page();
 
-performPage.title = "Perform";
-performPage.bank = BANK[1];
-performPage.bankEncOffset = BANK_ENC_OFFSET[1];
-performPage.bankSBOffset = BANK_SB_OFFSET[1];
+perform2Page.title = "Perform 2";
+perform2Page.bank = BANK[1];
+perform2Page.bankEncOffset = BANK_ENC_OFFSET[1];
+perform2Page.bankSBOffset = BANK_SB_OFFSET[1];
 
 var rgbDeviceDone = false;
 var tempRainbow = 80;
 
-performPage.updateOutputState = function(){
+perform2Page.updateOutputState = function(){
     clear();
     this.updateRGBLEDs();
     this.update11segLEDs();
     this.updateIndicators();
 }
 
-performPage.onEncoderPress = function(isActive){
+perform2Page.onEncoderPress = function(isActive){
 }
 
-performPage.onEncoderRelease = function(isActive){
+perform2Page.onEncoderRelease = function(isActive){
     if(enc == 0){
-        //PMODE[0] == 2 ? PMODE[0] = 0 : PMODE[0]++;
         PMODE[0] = PMODE[0] ^= true;
-        setActivePage(performPage);
+        setActivePage(perform2Page);
     }else if(enc == 1){
         if (PMODE[0] == pMode.DEVICE){
             pDRCP[0].selectPrevious();
@@ -32,8 +31,6 @@ performPage.onEncoderRelease = function(isActive){
             pDevice[0].isRemoteControlsSectionVisible().set(1);
         }else if(PMODE[0] == pMode.TRACK){
             pTrack[0].arm().toggle();
-        }else if(PMODE[0] == pMode.FOURTHS){
-
         }
     }else if(enc == 2){
         pTrackBank[0].scrollChannelsUp();
@@ -64,7 +61,7 @@ performPage.onEncoderRelease = function(isActive){
         pDevice[0].isRemoteControlsSectionVisible().set(1);
     }else if(enc == 8){
         PMODE[2] = PMODE[2] ^= true;
-        setActivePage(performPage);
+        setActivePage(perform2Page);
     }else if(enc == 9){
         if (PMODE[2] == pMode.DEVICE){
             pDRCP[2].selectPrevious();
@@ -104,7 +101,7 @@ performPage.onEncoderRelease = function(isActive){
     }
 }
 
-performPage.onEncoderTurn = function(isActive){
+perform2Page.onEncoderTurn = function(isActive){
     if(enc < 8){
         if (PMODE[0] == pMode.DEVICE){
             pDRCP[0].getParameter(enc).set(val,127);
@@ -152,47 +149,47 @@ performPage.onEncoderTurn = function(isActive){
     }
 }
 
-performPage.onRightTopPressed = function(isActive){
+perform2Page.onRightTopPressed = function(isActive){
 }
 
-performPage.onRightTopReleased = function(isActive){
-    setActivePage(overviewPage);
-    OVMODE = ovMode.OVERVIEW;
+perform2Page.onRightTopReleased = function(isActive){
+    setActivePage(perform4Page);
+    OVMODE = ovMode.PERFORM4;
 }
 
-performPage.onRightMiddlePressed = function(isActive){
+perform2Page.onRightMiddlePressed = function(isActive){
 }
 
-performPage.onRightMiddleReleased = function(isActive){
+perform2Page.onRightMiddleReleased = function(isActive){
     setActivePage(mixerPage)
 }
 
-performPage.onRightBottomPressed = function(isActive){
+perform2Page.onRightBottomPressed = function(isActive){
 }
 
-performPage.onRightBottomReleased = function(isActive){
+perform2Page.onRightBottomReleased = function(isActive){
     setActivePage(userPage);
 }
 
-performPage.onLeftTopPressed = function(isActive){
+perform2Page.onLeftTopPressed = function(isActive){
 }
 
-performPage.onLeftTopReleased = function(isActive){
+perform2Page.onLeftTopReleased = function(isActive){
 }
 
-performPage.onLeftMiddlePressed = function(isActive){
+perform2Page.onLeftMiddlePressed = function(isActive){
 }
 
-performPage.onLeftMiddleReleased = function(isActive){
+perform2Page.onLeftMiddleReleased = function(isActive){
 }
 
-performPage.onLeftBottomPressed = function(isActive){
+perform2Page.onLeftBottomPressed = function(isActive){
 }
 
-performPage.onLeftBottomReleased = function(isActive){
+perform2Page.onLeftBottomReleased = function(isActive){
 }
 
-performPage.updateRGBLEDs = function(){
+perform2Page.updateRGBLEDs = function(){
     for(var i=0; i<16; i++){
         if (i<8){
             if (PMODE[0] == pMode.DEVICE){
@@ -247,7 +244,7 @@ performPage.updateRGBLEDs = function(){
     }
 }
 
-performPage.update11segLEDs = function(){
+perform2Page.update11segLEDs = function(){
     for(var i=0; i<16; i++){
         if (i<8){
             if (PMODE[0] == pMode.DEVICE){
@@ -261,7 +258,6 @@ performPage.update11segLEDs = function(){
                 set11segLED(5, scaleValue(pTrack[0].getSend(3).get(), 1, 0, 127));
                 set11segLED(6, scaleValue(pTrack[0].getSend(4).get(), 1, 0, 127));
                 set11segLED(7, scaleValue(pTrack[0].getSend(5).get(), 1, 0, 127));
-                println('here')
             }
         }else if(i<16){
             if (PMODE[2] == pMode.DEVICE){
@@ -280,7 +276,7 @@ performPage.update11segLEDs = function(){
     }
 }
 
-performPage.updateIndicators = function(){
+perform2Page.updateIndicators = function(){
     //host.showPopupNotification(pTrack[0]Name + ' : ' + pDevice[0]Name + ' :: ' + pTrack[2]Name + ' : ' + pDevice[2]Name);
     
     if(PMODE[0] == pMode.DEVICE){
@@ -314,8 +310,8 @@ performPage.updateIndicators = function(){
     }
 }
 
-performPage.deviceChangePopup = function(){
+perform2Page.deviceChangePopup = function(){
 }
 
-performPage.clearIndication = function(){
+perform2Page.clearIndication = function(){
 }
