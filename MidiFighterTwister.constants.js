@@ -1,31 +1,11 @@
 var masterTrack;
-var mainVolume = initArray(0, 8);
-var mainPan = initArray(0, 8);
-var mainMute = initArray(0, 8);
-var mainSolo = initArray(0, 8);
-var mainArm = initArray(0, 8);
-var mainColor = initArray(0, 8);
-var mainIsSelected = initArray(0, 8);
 var track = initArray(0, 8);
-var effectVolume = initArray(0, 4);
-var effectPan = initArray(0, 4);
-var effectMute = initArray(0, 4);
-var effectSolo = initArray(0, 4);
-var effectArm = initArray(0, 4);
-var effectColor = initArray(0, 4);
+var mainIsSelected = initArray(0, 8);
+var effectTrack = initArray(0, 8);
 var effectIsSelected = initArray(0, 4);
-var masterVolume = initArray(0, 0);
-var masterPan = initArray(0, 0);
-var masterMute = initArray(0, 0);
-var masterSolo = initArray(0, 0);
-var masterArm = initArray(0, 0);
-var masterColor = initArray(0, 0);
-var masterIsSelected = initArray(0, 0);
+var masterIsSelected = initArray(0, 1);
 var performTrack1IsSelected = initArray(0, 0);
 var performTrack2IsSelected = initArray(0, 0);
-var cursorTrackColor = initArray(0, 0);
-var performTrack1Color = initArray(0, 0);
-var performTrack2Color = initArray(0, 0);
 var cursorClipColor = initArray(0, 0);
 var cursorClipPosition = 0;
 
@@ -151,12 +131,12 @@ var trackColors = [
 ]
 
 var MIXERMODE = 0;
-var mixerModeArray = ["Main", "Effect", "Master", "Eight"];
+var mixerModeArray = ["Main", "Effect", "Eight", "Master"];
 var mixerMode = {
    MAIN:0,
    EFFECT:1,
-   MASTER:2,
-   EIGHT:3,
+   EIGHT:2,
+   MASTER:3,
 }
 
 var OVMODE = 0;
@@ -169,10 +149,6 @@ var ovMode = {
 var pTrackBank = initArray(0, 4);
 var pTrack = initArray(0, 4);
 var pTrackIsSelected = initArray(0, 4);
-var pTrackColor1 = initArray(0, 0);
-var pTrackColor2 = initArray(0, 0);
-var pTrackColor3 = initArray(0, 0);
-var pTrackColor4 = initArray(0, 0);
 var pTrackColor = initArray(0, 4);
 var pDeviceBank = initArray(0, 4);
 var pDeviceName = initArray(0, 4);

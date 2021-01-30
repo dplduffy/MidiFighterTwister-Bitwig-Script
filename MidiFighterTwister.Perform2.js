@@ -22,8 +22,12 @@ perform2Page.onEncoderPress = function(isActive){
 perform2Page.onEncoderRelease = function(isActive){
 
     var j = Math.floor((enc/16)*2);
+    
+    println("j = "+ j)
+    println("color1 = " + getTrackColor(pTrack[0]))
 
     if((enc%8) == 0){
+        
         PMODE[j] = PMODE[j] ^= true;
         setActivePage(perform2Page);
     }else if((enc%8) == 1){
@@ -32,7 +36,7 @@ perform2Page.onEncoderRelease = function(isActive){
             pTrack[j].selectInMixer();
             pTrack[j].makeVisibleInMixer();
             pDevice[j].selectInEditor();
-            pDevice[j].isRemoteControlsSectionVisible().set(1);
+            pDevice[j].isRemoteControlsSectionVisible().set(true);
         }else if(PMODE[j] == pMode.TRACK){
             pTrack[j].arm().toggle();
         }
@@ -52,7 +56,7 @@ perform2Page.onEncoderRelease = function(isActive){
             pTrack[j].selectInMixer();
             pTrack[j].makeVisibleInMixer();
             pDevice[j].selectInEditor();
-            pDevice[j].isRemoteControlsSectionVisible().set(1);
+            pDevice[j].isRemoteControlsSectionVisible().set(true);
         }else{
             pTrack[j].solo().toggle();
         }
@@ -61,13 +65,13 @@ perform2Page.onEncoderRelease = function(isActive){
         pTrack[j].selectInMixer();
         pTrack[j].makeVisibleInMixer();
         pDevice[j].selectInEditor();
-        pDevice[j].isRemoteControlsSectionVisible().set(1);
+        pDevice[j].isRemoteControlsSectionVisible().set(true);
     }else if((enc%8) == 7){
         pDeviceBank[j].scrollDown();
         pTrack[j].selectInMixer();
         pTrack[j].makeVisibleInMixer();
         pDevice[j].selectInEditor();
-        pDevice[j].isRemoteControlsSectionVisible().set(1);
+        pDevice[j].isRemoteControlsSectionVisible().set(true);
     }
 }
 
@@ -139,15 +143,16 @@ perform2Page.onLeftBottomReleased = function(isActive){
 }
 
 perform2Page.updateRGBLEDs = function(){
+
     for(var i=0; i<16; i++){
 
         var j = Math.floor((i/16)*2);
         var tempTrackColor;
 
         if (j == 0){
-            tempTrackColor = pTrackColor1;
+            tempTrackColor = getTrackColor(pTrack[0]);
         }else if(j == 1){
-            tempTrackColor = pTrackColor2;
+            tempTrackColor = getTrackColor(pTrack[1]);
         }
         
         if (PMODE[j] == pMode.DEVICE){
@@ -180,6 +185,9 @@ perform2Page.update11segLEDs = function(){
     for(var i=0; i<16; i++){
 
         var j = Math.floor((i/16)*2);
+
+        //println("i= " + i + "j= " + j)
+        //println(pDeviceParam[j][i%8])
 
         if(PMODE[j] == pMode.DEVICE){
             set11segLED(i, pDeviceParam[j][i%8]);

@@ -127,7 +127,7 @@ mixerPage.onRightMiddlePressed = function(isActive){
 }
 
 mixerPage.onRightMiddleReleased = function(isActive){
-    (MIXERMODE < 3) ? (MIXERMODE++) : (MIXERMODE = 0);
+    (MIXERMODE < 2) ? (MIXERMODE++) : (MIXERMODE = 0);
     clearIndicators();
     host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
 }
@@ -179,87 +179,88 @@ mixerPage.updateRGBLEDs = function(){
                 if(i<4){
                     mainIsSelected[i] ?
                         setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) :
-                            setRGBLED(i, mainColor[i], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(track[i]), STROBE.OFF);
                 }else if(i>=4 && i <8){
-                    mainArm[i-4] ?
+                    (track[i-4].arm().get()) ?
                         setRGBLED(i, COLOR.RED, STROBE.PULSE1) :
-                            setRGBLED(i, mainColor[i-4], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(track[i-4]), STROBE.OFF);
                 }else if(i>=8 && i<12){
-                    mainSolo[i-8] ?
+                    (track[i-8].color().get()) ?
                         setRGBLED(i, COLOR.DARK_BLUE, STROBE.PULSE1) :
-                            setRGBLED(i, mainColor[i-8], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(track[i-8]), STROBE.OFF);
                 }else if(i>=12){
-                    mainMute[i-12] ?
+                    (track[i-12].mute().get()) ?
                         setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) :
-                            setRGBLED(i, mainColor[i-12], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(track[i-12]), STROBE.OFF);
                 }
         }else if (MIXERMODE == mixerMode.EFFECT){
                 if(i<4){
                     effectIsSelected[i] ?
                         setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) :
-                            setRGBLED(i, effectColor[i], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(effectTrack[i]), STROBE.OFF);
                 }else if(i>=4 && i <8){
                     effectArm[i-4] ?
                         setRGBLED(i, COLOR.RED, STROBE.PULSE1) :
-                            setRGBLED(i, effectColor[i-4], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(effectTrack[i-4]), STROBE.OFF);
                 }else if(i>=8 && i<12){
                     effectSolo[i-8] ?
                         setRGBLED(i, COLOR.DARK_BLUE, STROBE.PULSE1) :
-                            setRGBLED(i, effectColor[i-8], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(effectTrack[i-8]), STROBE.OFF);
                 }else if(i>=12){
                     effectMute[i-12] ?
                         setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) :
-                            setRGBLED(i, effectColor[i-12], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(effectTrack[i-12]), STROBE.OFF);
                 }
         }else if (MIXERMODE == mixerMode.MASTER){
                 if(i==0){
                     masterIsSelected[i] ?
                         setRGBLED(i, COLOR.GREEN, STROBE.PULSE1) :
-                            setRGBLED(i, masterColor[0], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(masterTrack), STROBE.OFF);
                 }else if(i==4){
                     masterArm[i-4] ?
                         setRGBLED(i, COLOR.RED, STROBE.PULSE1) :
-                            setRGBLED(i, masterColor[0], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(masterTrack), STROBE.OFF);
                 }else if(i==8){
                     masterSolo[i-8] ?
                         setRGBLED(i, COLOR.DARK_BLUE, STROBE.PULSE1) :
-                            setRGBLED(i, effectColor[0], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(masterTrack), STROBE.OFF);
                 }else if(i==12){
                     masterMute[i-12] ?
                         setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) :
-                            setRGBLED(i, masterColor[0], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(masterTrack), STROBE.OFF);
                 }else{
                     setRGBLED(i, COLOR.BLACK, STROBE.OFF);
                 }
         }else if (MIXERMODE == mixerMode.EIGHT){
+            println(mainIsSelected[0])
             if(i<4){
                 if (mainIsSelected[i]){
-                    if (mainArm[i]){
+                    if (track[i].arm().get()){
                         setRGBLED(i, COLOR.RED, STROBE.PULSE1);
                     }else{
                         setRGBLED(i, COLOR.GREEN, STROBE.PULSE1);
                     }
                 }else{
-                    setRGBLED(i, mainColor[i], STROBE.OFF);
+                    setRGBLED(i, getTrackColor(track[i]), STROBE.OFF);
                 }
             }else if(i<8){
-                mainMute[i-4] ?
+                (track[i-4].mute().get()) ?
                         setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) :
-                            setRGBLED(i, mainColor[i-4], STROBE.OFF);
+                            setRGBLED(i, getTrackColor(track[i-4]), STROBE.OFF);
             }else if(i<12){
                 if (mainIsSelected[i-4]){
-                    if (mainArm[i-4]){
+                    if (track[i-4].arm().get()){
                         setRGBLED(i, COLOR.RED, STROBE.PULSE1);
                     }else{
                         setRGBLED(i, COLOR.GREEN, STROBE.PULSE1);
                     }
                 }else{
-                    setRGBLED(i, mainColor[i-4], STROBE.OFF);
+                    setRGBLED(i, getTrackColor(track[i-4]), STROBE.OFF);
                 }
             }else{
-                mainMute[i-8] ?
+                (track[i-8].mute().get()) ?
                     setRGBLED(i, COLOR.BROWN, STROBE.PULSE1) :
-                        setRGBLED(i, mainColor[i-8], STROBE.OFF);
+                        setRGBLED(i, getTrackColor(track[i-8]), STROBE.OFF);
             }
         }
     }
@@ -269,9 +270,9 @@ mixerPage.update11segLEDs = function(){
     for(var i=0; i<16; i++){
         if (MIXERMODE == mixerMode.MAIN){
                 if(i<4){
-                    set11segLED(i, mainVolume[i]);
+                    set11segLED(i, scaleValue(track[i].volume().get(), 1, 0, 127));
                 }else if(i <8){
-                    set11segLED(i, mainPan[i-4]);
+                    set11segLED(i, scaleValue(track[i-4].pan().get(), 1, 0, 127));
                 }else if(i<12){
                     set11segLED(i, sendArray[i-8][currentSend]);
                 }else{
@@ -279,9 +280,9 @@ mixerPage.update11segLEDs = function(){
                 }
         }else if (MIXERMODE == mixerMode.EFFECT){
                 if(i<4){
-                    set11segLED(i, effectVolume[i]);
+                    set11segLED(i, effectTrack[i].volume().get());
                 }else if(i>=4 && i <8){
-                    set11segLED(i, effectPan[i-4]);
+                    set11segLED(i, effectTrack[i-4].pan().get());
                 }else if(i>=8 && i<12){
                     set11segLED(i, 0);
                 }else if(i>=12){
@@ -289,21 +290,21 @@ mixerPage.update11segLEDs = function(){
                 }
         }else if (MIXERMODE == mixerMode.MASTER){
                 if(i==0){
-                    set11segLED(i, masterVolume[0]);
+                    set11segLED(i, masterTrack.volume().get());
                 }else if(i==4){
-                    set11segLED(i, masterPan[0]);
+                    set11segLED(i, masterTrack.pan().get());
                 }else{
                     set11segLED(i, 0);
                 }
         }else if (MIXERMODE == mixerMode.EIGHT){
             if(i<4){
-                set11segLED(i, mainPan[i]);
+                set11segLED(i, scaleValue(track[i].pan().get(), 1, 0, 127));
             }else if(i<8){
-                set11segLED(i, mainVolume[i-4]);
+                set11segLED(i, scaleValue(track[i-4].volume().get(), 1, 0, 127));
             }else if(i<12){
-                set11segLED(i, mainPan[i-4]);
+                set11segLED(i, scaleValue(track[i-4].pan().get(), 1, 0, 127));
             }else{
-                set11segLED(i, mainVolume[i-8]);
+                set11segLED(i, scaleValue(track[i-8].volume().get(), 1, 0, 127));
             }
         }
     }

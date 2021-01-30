@@ -23,19 +23,19 @@ function init() {
 	mainTrackBank = host.createMainTrackBank(8, 12, 8);
 
     for(var t=0; t<8; t++) {
-		track[t] = mainTrackBank.getChannel(t);
-		track[t].volume().addValueObserver(126, getTrackObserverFunc(t, mainVolume));
-		track[t].pan().addValueObserver(126, getTrackObserverFunc(t, mainPan));
-		
+		track[t] = mainTrackBank.getItemAt(t);
+		track[t].volume().markInterested();
+		track[t].pan().markInterested();	
+		track[t].mute().markInterested();
+		track[t].solo().markInterested();
+		track[t].color().markInterested();
+		track[t].arm().markInterested();
+
+		track[t].addIsSelectedInMixerObserver(getTrackObserverFunc(t, mainIsSelected));
+
 		for(var s=0; s<12; s++) {
 			track[t].getSend(s).addValueObserver(126, getSendObserverFunc(t, s));
 		}
-		
-		track[t].mute().addValueObserver(getTrackObserverFunc(t, mainMute));
-		track[t].getSolo().addValueObserver(getTrackObserverFunc(t, mainSolo));
-		track[t].addIsSelectedInMixerObserver(getTrackObserverFunc(t, mainIsSelected));
-		track[t].color().addValueObserver(getTrackObserverFunc(t, mainColor));
-		track[t].getArm().addValueObserver(getTrackObserverFunc(t, mainArm));
     }
 	
 	mainTrackBank.canScrollChannelsUp().addValueObserver(function(canScroll){
@@ -49,15 +49,17 @@ function init() {
 		//pTrack[i].name().addValueObserver(getpTrackName);
 		pTrack[i].volume().markInterested();
 		pTrack[i].pan().markInterested();
+		pTrack[i].mute().markInterested();
+		pTrack[i].solo().markInterested();
+		pTrack[i].arm().markInterested();
+		pTrack[i].color().markInterested();
 
 		for (var j=0; j<6; j++){
 			pTrack[i].getSend(j).markInterested();
 		}
 
-		pTrack[i].mute().markInterested();
-		pTrack[i].solo().markInterested();
-		pTrack[i].addIsSelectedInMixerObserver(getTrackObserverFunc(0, pTrackIsSelected[i]));
-		pTrack[i].arm().markInterested();
+		pTrack[i].addIsSelectedInMixerObserver(getTrackObserverFunc(i, pTrackIsSelected));
+		
 		pDeviceBank[i] = pTrack[i].createDeviceBank(1);
 		pDevice[i] = pDeviceBank[i].getDevice(0);
 		//pDevice[i].name().addValueObserver(getpDeviceName);
@@ -68,21 +70,17 @@ function init() {
 		}
 	}
 
-	pTrack[0].color().addValueObserver(getTrackObserverFunc(0, pTrackColor1));
-	pTrack[1].color().addValueObserver(getTrackObserverFunc(0, pTrackColor2));
-	pTrack[2].color().addValueObserver(getTrackObserverFunc(0, pTrackColor3));
-	pTrack[3].color().addValueObserver(getTrackObserverFunc(0, pTrackColor4));
-
 	effectTrackBank = host.createEffectTrackBank(8, 8)
-	for(var t=0; t<8; t++) {
-		var effectTrack = effectTrackBank.getChannel(t);
-		effectTrack.getVolume().addValueObserver(126, getTrackObserverFunc(t, effectVolume));
-		effectTrack.getPan().addValueObserver(126, getTrackObserverFunc(t, effectPan));
-		effectTrack.getMute().addValueObserver(getTrackObserverFunc(t, effectMute));
-		effectTrack.getSolo().addValueObserver(getTrackObserverFunc(t, effectSolo));
-		effectTrack.addIsSelectedInMixerObserver(getTrackObserverFunc(t, effectIsSelected));
-		effectTrack.color().addValueObserver(getTrackObserverFunc(t, effectColor));
-		effectTrack.getArm().addValueObserver(getTrackObserverFunc(t, effectArm));
+
+	for(var i=0; i<8; i++) {
+		effectTrack[i] = effectTrackBank.getChannel(i);
+		effectTrack[i].volume().markInterested();
+		effectTrack[i].pan().markInterested();
+		effectTrack[i].mute().markInterested();
+		effectTrack[i].solo().markInterested();
+		effectTrack[i].color().markInterested();
+		effectTrack[i].arm().markInterested();
+		effectTrack[i].addIsSelectedInMixerObserver(getTrackObserverFunc(t, effectIsSelected));
     }
 	
 	effectTrackBank.canScrollChannelsUp().addValueObserver(function(canScroll){
@@ -90,14 +88,15 @@ function init() {
 	effectTrackBank.canScrollChannelsDown().addValueObserver(function(canScroll){
 		mixerPage.canScrollEffectChannelsDown = canScroll;});
 	
+	
 	masterTrack = host.createMasterTrack(8);
-	masterTrack.getVolume().addValueObserver(126, getTrackObserverFunc(0, masterVolume));
-	masterTrack.getPan().addValueObserver(126, getTrackObserverFunc(0, masterPan));
-	masterTrack.getMute().addValueObserver(getTrackObserverFunc(0, masterMute));
-	masterTrack.getSolo().addValueObserver(getTrackObserverFunc(0, masterSolo));
+	masterTrack.volume().markInterested;
+	masterTrack.pan().markInterested;
+	masterTrack.mute().markInterested;
+	masterTrack.solo().markInterested;
+	masterTrack.color().markInterested;
+	masterTrack.arm().markInterested;
 	masterTrack.addIsSelectedInMixerObserver(getTrackObserverFunc(0, masterIsSelected));
-	masterTrack.color().addValueObserver(getTrackObserverFunc(0, masterColor));
-	masterTrack.getArm().addValueObserver(getTrackObserverFunc(0, masterArm));
 	
 	for (var i=0; i<SEQ_STEPS; i++){
 		prevStepData[i] = initArray(false, SEQ_KEYS);
@@ -121,7 +120,7 @@ function init() {
 	deviceTrackBank.addTrackScrollPositionObserver(getDeviceTrackBankScrollPosition, 0);
 
 	cursorTrack = host.createCursorTrack("ct", "ct", 2, 0, true)
-	cursorTrack.color().addValueObserver(getTrackObserverFunc(0, cursorTrackColor));
+	//cursorTrack.color().addValueObserver(getTrackObserverFunc(0, cursorTrackColor));
 	cursorTrack.color().markInterested();
 	cursorTrack.volume().markInterested();
 	cursorTrack.pan().markInterested();
@@ -154,19 +153,11 @@ function init() {
     mainTrackBank.setChannelScrollStepSize(channelStepSize);
 	effectTrackBank.setChannelScrollStepSize(channelStepSize);
 
-	hardwareSurface = host.createHardwareSurface();
-
-	//for (var i=0; i<16; i++){
-	//knob = hardwareSurface.createAbsoluteHardwareKnob('temp');
-	//knob.targetName().markInterested();
-	//}
-
 	MIXERMODE = mixerMode.EIGHT;
 	OVMODE = ovMode.OVERVIEW;
 	P1MODE = pMode.DEVICE;
 	P2MODE = pMode.DEVICE;
 	pageIndex = 0;
-	activePage = overviewPage;
 	setActivePage(overviewPage);
 }
 
@@ -177,18 +168,8 @@ function getSendObserverFunc(t, s){
 }
 
 function getTrackObserverFunc(track, varToStore) {
-	if (varToStore == mainColor 
-		|| varToStore == effectColor 
-		|| varToStore == masterColor
-		|| varToStore == cursorTrackColor
-		|| varToStore == pTrackColor[0]) {
-			return function(r, g, b) {
-				varToStore[track] = handleColor(r,g,b);
-			}
-	} else {
-		return function(value) {
-			varToStore[track] = value;
-		}
+	return function(value) {
+		varToStore[track] = value;
 	}
 }
 
@@ -337,62 +318,19 @@ function clear(){
 
 function flush(){
 	activePage.updateOutputState();
-	flushLEDs();
-	//println('knob binding = ' + knob.targetName().get())
 }
 
 function setRGBLED(loc, color, strobe){
 	loc = loc + activePage.bankEncOffset;
 	sendMidi(177, loc, color);
 	sendMidi(178, loc, strobe);
-	//pendingRGBLEDs[loc] = color;
-	//pendingRGBSTROBEs[loc] = strobe;
 }
 
 function set11segLED(loc, value){
+	//println("loc = " + loc)
+	//println("value = " + value)
 	loc = loc + activePage.bankEncOffset;
 	sendMidi(176, loc, value);
-	//pending11segLEDs[loc] = value;
-}
-
-function flushLEDs(){
-	/*var changedRGBCount = 0;
-	var changedRGBStrobeCount = 0;
-	var changed11segCount = 0;*/
-
-	
-	/*for(var i=0; i<64; i++){
-    	if (pendingRGBLEDs[i] != activeRGBLEDs[i]) changedRGBCount++;
-		if (pending11segLEDs[i] != active11segLEDs[i]) changed11segCount++;
-		if (pendingRGBSTROBEs[i] != activeRGBSTROBEs[i]) changedRGBStrobeCount++;
-   	}
-
-	if (changedRGBCount == 0 && changed11segCount == 0 && changedRGBStrobeCount == 0) return;*/
-
-	/*
-	for(var i = 0; i<64; i++){
-		println('pending: ' + pendingRGBLEDs[i]);
-		println('active1: ' + activeRGBLEDs[i]);
-		println('i= ' + i);
-		if (pendingRGBLEDs[i] != activeRGBLEDs[i]){
-			activeRGBLEDs[i] = pendingRGBLEDs[i];
-			var color = activeRGBLEDs[i];
-			sendMidi(177, i, color);
-			println('i= ' + i + ': color= ' + color);
-		}
-		if (pendingRGBSTROBEs[i] != activeRGBSTROBEs[i]){
-			activeRGBSTROBEs[i] = pendingRGBSTROBEs[i];
-			var strobe = activeRGBSTROBEs[i];
-			sendMidi(178, i, strobe);
-		}
-		if (pending11segLEDs[i] != active11segLEDs[i]){
-			active11segLEDs[i] = pending11segLEDs[i];
-			var value = active11segLEDs[i];
-			sendMidi(176, i, value);
-		}
-	}*/
-
-	//println('active2: ' + activeRGBLEDs);
 }
 
 clearIndicators = function(){
@@ -452,14 +390,17 @@ function cyclePage(){
 }
 
 function setActivePage(page){
+	activePage = page;
 	for (var i=0; i<16; i++){
-        set11segLED(i, 0);
-		setRGBLED(i, COLOR.BLACK, STROBE.OFF);
+		set11segLED(i, 0);
 	}
 	clearIndicators();
-	activePage = page;
 	changeEncoderBank(activePage.bank);
 	host.showPopupNotification(page.title);
+}
+
+function getTrackColor(track){
+	return handleColor(track.color().red(), track.color().green(), track.color().blue())
 }
 
 function handleColor(red, green, blue){
@@ -471,6 +412,21 @@ function handleColor(red, green, blue){
 		}
     }    
 };
+
+function scaleValue(value, scaleIn, outMin, outMax){
+    if (scaleIn != 0){
+        var temp = Math.round((value/scaleIn) * (outMax-outMin));
+    }else{
+        temp = 0;
+    }
+    
+    if (temp <= 0){
+        temp = 0
+    }else if (temp >= 127){
+        temp = 127
+    }
+    return temp;
+}
 
 function changeEncoderBank(bank){
 	sendMidi(179, bank, 127);

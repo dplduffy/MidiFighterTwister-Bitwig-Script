@@ -26,13 +26,8 @@ overviewPage.onEncoderRelease = function(isActive){
     }else if (enc == ENC.OVERVIEW.PAN){
         cursorTrack.solo().toggle();
     }else if (enc == ENC.OVERVIEW.VOLUME){
-            cursorTrack.mute().toggle();
+        cursorTrack.mute().toggle();
     }else if(enc == ENC.OVERVIEW.CLIP){
-        if(cursorClipIsPlaying){
-            cursorClip.getTrack().stop();
-        }else if(cursorClipIsRecording || cursorClipHasContent){
-            cursorClip.launch();
-        }
     }
 }
 
@@ -147,25 +142,36 @@ overviewPage.updateRGBLEDs = function(){
 
     if (cursorTrack.arm().get()){
         setRGBLED(ENC.OVERVIEW.TRACK_SEL, COLOR.RED, STROBE.PULSE1);
-    }else{
-        setRGBLED(ENC.OVERVIEW.TRACK_SEL, cursorTrackColor[0], STROBE.OFF);
+    }else if (getTrackColor(cursorTrack) != null){
+        setRGBLED(ENC.OVERVIEW.TRACK_SEL, getTrackColor(cursorTrack), STROBE.OFF);
     }
 
-    setRGBLED(ENC.OVERVIEW.DEVICE, RAINBOW_ARRAY[(devicePositionObserver%cursorDeviceBankCount)%(RAINBOW_ARRAY.length-1)], STROBE.OFF);
-    setRGBLED(ENC.OVERVIEW.PAGE, RAINBOW_ARRAY[(cursorDRCPIndex%cursorDRCPCount)%(RAINBOW_ARRAY.length-1)], STROBE.OFF);
-    
+    if (devicePositionObserver > -1){
+        if ((devicePositionObserver != 0) && (cursorDeviceBankCount != 0)){
+            setRGBLED(ENC.OVERVIEW.DEVICE, RAINBOW_ARRAY[(devicePositionObserver%cursorDeviceBankCount)%(RAINBOW_ARRAY.length-1)], STROBE.OFF);
+        }else{
+            setRGBLED(ENC.OVERVIEW.DEVICE, RAINBOW_ARRAY[0], STROBE.OFF);
+        }
+
+        if ((cursorDRCPIndex != 0) && (cursorDRCPCount != 0)){
+            setRGBLED(ENC.OVERVIEW.PAGE, RAINBOW_ARRAY[(cursorDRCPIndex%cursorDRCPCount)%(RAINBOW_ARRAY.length-1)], STROBE.OFF);
+        }else{
+            setRGBLED(ENC.OVERVIEW.PAGE, RAINBOW_ARRAY[0], STROBE.OFF);
+        }
+    }
+
     if (cursorTrack.solo().get()){
         setRGBLED(ENC.OVERVIEW.PAN, COLOR.DARK_BLUE, STROBE.PULSE1);
-    }else{
-        setRGBLED(ENC.OVERVIEW.PAN, cursorTrackColor[0], STROBE.OFF);
+    }else if (getTrackColor(cursorTrack) != null){
+        setRGBLED(ENC.OVERVIEW.PAN, getTrackColor(cursorTrack), STROBE.OFF);
     }
     
     if (cursorTrack.mute().get()){
         setRGBLED(ENC.OVERVIEW.VOLUME, COLOR.BROWN, STROBE.PULSE1);
-    }else{
-        setRGBLED(ENC.OVERVIEW.VOLUME, cursorTrackColor[0], STROBE.OFF);
+    }else if (getTrackColor(cursorTrack) != null){
+        setRGBLED(ENC.OVERVIEW.VOLUME, getTrackColor(cursorTrack), STROBE.OFF);
     }
-
+    
     if (cursorClipIsPlaying){
         setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.PULSE1);
     }else if (cursorClipIsRecording){
@@ -175,7 +181,7 @@ overviewPage.updateRGBLEDs = function(){
     }else{
         setRGBLED(ENC.OVERVIEW.CLIP, COLOR.BLACK, STROBE.OFF);
     }
-    
+ 
 }
 
 overviewPage.update11segLEDs = function(){
@@ -184,6 +190,8 @@ overviewPage.update11segLEDs = function(){
     }
     set11segLED(ENC.OVERVIEW.DEVICE, scaleValue(devicePositionObserver, (cursorDeviceBankCount-1), 0, 127));
     set11segLED(ENC.OVERVIEW.PAGE, scaleValue(cursorDRCPIndex, (cursorDRCPCount-1), 1, 127));
+    
+    
     set11segLED(ENC.OVERVIEW.TRACK_SEL, 0);
     set11segLED(ENC.OVERVIEW.PAN, scaleValue(cursorTrack.pan().get(), 1, 0, 127));
     set11segLED(ENC.OVERVIEW.VOLUME, scaleValue(cursorTrack.volume().get(), 1, 0, 127));
@@ -199,14 +207,4 @@ overviewPage.updateIndicators = function(){
 
 overviewPage.deviceChangePopup = function(){
     //host.showPopupNotification('Device: ' + cursorDeviceName + ', ' + cursorDRCPName);
-}
-
-function scaleValue(value, scaleIn, outMin, outMax){
-    var temp = Math.round((value/scaleIn) * (outMax-outMin));
-    if (temp < 0){
-        temp = 0
-    }else if (temp > 127){
-        temp = 127
-    }
-    return temp;
 }

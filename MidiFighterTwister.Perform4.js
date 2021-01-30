@@ -141,13 +141,13 @@ perform4Page.updateRGBLEDs = function(){
         var tempTrackColor;
 
         if (j == 0){
-            tempTrackColor = pTrackColor1;
+            tempTrackColor = getTrackColor(pTrack[0]);
         }else if(j == 1){
-            tempTrackColor = pTrackColor2;
+            tempTrackColor = getTrackColor(pTrack[1]);
         }else if(j == 2){
-            tempTrackColor = pTrackColor3;
+            tempTrackColor = getTrackColor(pTrack[2]);
         }else if(j == 3){
-            tempTrackColor = pTrackColor4;
+            tempTrackColor = getTrackColor(pTrack[3]);
         }
         
         if (PMODE[j] == pMode.DEVICE){
