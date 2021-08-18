@@ -14,7 +14,6 @@ load("MidiFighterTwister.User.js")
 load("MidiFighterTwister.perform2.js")
 load("MidiFighterTwister.perform4.js")
 
-
 function init() {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
@@ -329,6 +328,8 @@ function setRGBLED(loc, color, strobe){
 function set11segLED(loc, value){
 	//println("loc = " + loc)
 	//println("value = " + value)
+	value == null ? value = 0 : value = value;
+	//println("value2 = " + value)
 	loc = loc + activePage.bankEncOffset;
 	sendMidi(176, loc, value);
 }
