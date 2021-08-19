@@ -86,8 +86,8 @@ var INDICATOR_COLOR = [
    COLOR.RED,
    COLOR.DARK_ORANGE,
    COLOR.GOLD,
+   COLOR.GREEN,
    COLOR.LIGHT_GREEN,
-   COLOR.MINT,
    COLOR.LIGHT_BLUE,
    COLOR.LIGHT_PURPLE,
    COLOR.DARK_PINK
@@ -131,11 +131,11 @@ var trackColors = [
 ]
 
 var MIXERMODE = 0;
-var mixerModeArray = ["Main", "Effect", "Eight", "Master"];
+var mixerModeArray = ["Main", "Eight", "Effect", "Master"];
 var mixerMode = {
    MAIN:0,
-   EFFECT:1,
-   EIGHT:2,
+   EIGHT:1,
+   EFFECT:2,
    MASTER:3,
 }
 

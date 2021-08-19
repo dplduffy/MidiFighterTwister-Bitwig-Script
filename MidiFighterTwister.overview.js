@@ -21,14 +21,20 @@ overviewPage.onEncoderPress = function(isActive){
 }
 
 overviewPage.onEncoderRelease = function(isActive){
-    if (enc == ENC.OVERVIEW.TRACK_SEL){
+    //TODO make show hide device view for 9 and show hide pages for 10
+    if (enc == ENC.OVERVIEW.DEVICE){
+        application.toggleDevices();
+    }else if (enc == ENC.OVERVIEW.PAGE){
+        cursorDevice.isRemoteControlsSectionVisible().toggle();
+    }else if (enc == ENC.OVERVIEW.TRACK_SEL){
         cursorTrack.arm().toggle();
     }else if (enc == ENC.OVERVIEW.PAN){
         cursorTrack.solo().toggle();
     }else if (enc == ENC.OVERVIEW.VOLUME){
         cursorTrack.mute().toggle();
-    }else if(enc == ENC.OVERVIEW.CLIP){
-    }
+    }//else if(enc == ENC.OVERVIEW.CLIP){
+        //TODO
+    //}
 }
 
 overviewPage.onEncoderTurn = function(isActive){
@@ -74,7 +80,7 @@ overviewPage.onEncoderTurn = function(isActive){
             cursorTrack.selectPrevious();
             cursorTrack.makeVisibleInMixer();
         }
-    }else if(enc == ENC.OVERVIEW.CLIP){
+    //}else if(enc == ENC.OVERVIEW.CLIP){
         /*(val > 64) ? (cursorClipPosition ++) : (cursorClipPosition --);
         if (cursorClipPosition > 5){
             cursorClipPosition = 0;
@@ -99,8 +105,9 @@ overviewPage.onRightTopPressed = function(isActive){
 }
 
 overviewPage.onRightTopReleased = function(isActive){
-    setActivePage(perform2Page);
-    OVMODE = ovMode.PERFORM2;
+    //setActivePage(perform2Page);
+    //OVMODE = ovMode.PERFORM2;
+    //TODO
 }
 
 overviewPage.onRightMiddlePressed = function(isActive){
@@ -161,26 +168,27 @@ overviewPage.updateRGBLEDs = function(){
     }
 
     if (cursorTrack.solo().get()){
-        setRGBLED(ENC.OVERVIEW.PAN, COLOR.DARK_BLUE, STROBE.PULSE1);
+        setRGBLED(ENC.OVERVIEW.PAN, COLOR.GOLD, STROBE.PULSE1);
     }else if (getTrackColor(cursorTrack) != null){
         setRGBLED(ENC.OVERVIEW.PAN, getTrackColor(cursorTrack), STROBE.OFF);
     }
     
     if (cursorTrack.mute().get()){
-        setRGBLED(ENC.OVERVIEW.VOLUME, COLOR.BROWN, STROBE.PULSE1);
+        setRGBLED(ENC.OVERVIEW.VOLUME, COLOR.DARK_ORANGE, STROBE.PULSE1);
     }else if (getTrackColor(cursorTrack) != null){
         setRGBLED(ENC.OVERVIEW.VOLUME, getTrackColor(cursorTrack), STROBE.OFF);
     }
     
-    if (cursorClipIsPlaying){
-        setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.PULSE1);
-    }else if (cursorClipIsRecording){
-        setRGBLED(ENC.OVERVIEW.CLIP, COLOR.RED, STROBE.PULSE1);
-    }else if(cursorClipHasContent){
-        setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.OFF);
-    }else{
-        setRGBLED(ENC.OVERVIEW.CLIP, COLOR.BLACK, STROBE.OFF);
-    }
+    //TODO
+    // if (cursorClipIsPlaying){
+    //     setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.PULSE1);
+    // }else if (cursorClipIsRecording){
+    //     setRGBLED(ENC.OVERVIEW.CLIP, COLOR.RED, STROBE.PULSE1);
+    // }else if(cursorClipHasContent){
+    //     setRGBLED(ENC.OVERVIEW.CLIP, cursorClipColor[0], STROBE.OFF);
+    // }else{
+    //     setRGBLED(ENC.OVERVIEW.CLIP, COLOR.BLACK, STROBE.OFF);
+    // }
  
 }
 

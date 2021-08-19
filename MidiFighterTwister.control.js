@@ -1,5 +1,5 @@
 
-loadAPI(11);
+loadAPI(14);
 host.defineController("DJ Tech Tools", "Midi Fighter Twister", "1.0", "d6b9adc4-81d0-11e5-8bcf-feff819cdc9f");
 host.defineMidiPorts(1, 1);
 host.addDeviceNameBasedDiscoveryPair(["Midi Fighter Twister"], ["Midi Fighter Twister"]);
@@ -18,6 +18,7 @@ function init() {
 	host.getMidiInPort(0).setMidiCallback(onMidi);
     noteInput = host.getMidiInPort(0).createNoteInput("Midi Fighter Twister", "80????", "90????");
     noteInput.setShouldConsumeEvents(false);
+	application = host.createApplication();
 	
 	mainTrackBank = host.createMainTrackBank(8, 12, 8);
 
@@ -134,6 +135,7 @@ function init() {
 	cursorDevice =  cursorTrack.createCursorDevice("cd", "cd", 2, CursorDeviceFollowMode.FOLLOW_SELECTION);
 	cursorDevice.name().addValueObserver(getCursorDeviceName);
 	cursorDevice.position().addValueObserver(getDevicePositionObserver);
+	cursorDevice.isRemoteControlsSectionVisible().markInterested();
 
 	cursorDeviceBank = cursorTrack.createDeviceBank(32);
 	cursorDeviceBank.canScrollBackwards().addValueObserver(getcursorDeviceBankCanScrollBackwards);
@@ -152,7 +154,7 @@ function init() {
     mainTrackBank.setChannelScrollStepSize(channelStepSize);
 	effectTrackBank.setChannelScrollStepSize(channelStepSize);
 
-	MIXERMODE = mixerMode.EIGHT;
+	MIXERMODE = mixerMode.MAIN;
 	OVMODE = ovMode.OVERVIEW;
 	P1MODE = pMode.DEVICE;
 	P2MODE = pMode.DEVICE;
@@ -321,6 +323,7 @@ function flush(){
 
 function setRGBLED(loc, color, strobe){
 	loc = loc + activePage.bankEncOffset;
+	color == null ? color = 0 : color = color;
 	sendMidi(177, loc, color);
 	sendMidi(178, loc, strobe);
 }
@@ -362,33 +365,30 @@ clearIndicators = function(){
 	
 }
 
-function cyclePage(){
-	
-    switch(pageIndex){
-		case 0:
-			setActivePage(overviewPage);
-			pageIndex ++ 
-            break;
-		case 1: 
-			setActivePage(mixerPage);
-			pageIndex ++ 
-            break;
-        case 2:
-			setActivePage(userPage);
-			pageIndex ++ 
-			break;
-		case 3: 
-			if (CURRENTSEQMODE == currentSeqMode.DRUM){
-				setActivePage(drumSequencerPage);
-			}else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
-				setActivePage(melodicSequencerPage);
-			}
-			pageIndex = 0;
-			break;
-	}
-	
-	
-}
+// function cyclePage(){
+//     switch(pageIndex){
+// 		case 0:
+// 			setActivePage(overviewPage);
+// 			pageIndex ++ 
+//             break;
+// 		case 1: 
+// 			setActivePage(mixerPage);
+// 			pageIndex ++ 
+//             break;
+//         case 2:
+// 			setActivePage(userPage);
+// 			pageIndex ++ 
+// 			break;
+// 		case 3: 
+// 			if (CURRENTSEQMODE == currentSeqMode.DRUM){
+// 				setActivePage(drumSequencerPage);
+// 			}else if (CURRENTSEQMODE == currentSeqMode.MELODIC){
+// 				setActivePage(melodicSequencerPage);
+// 			}
+// 			pageIndex = 0;
+// 			break;
+// 	}	
+// }
 
 function setActivePage(page){
 	activePage = page;
@@ -397,7 +397,12 @@ function setActivePage(page){
 	}
 	clearIndicators();
 	changeEncoderBank(activePage.bank);
-	host.showPopupNotification(page.title);
+	if (activePage == mixerPage) {
+		host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
+	}else{
+		host.showPopupNotification(page.title);
+	}
+
 }
 
 function getTrackColor(track){

@@ -127,7 +127,7 @@ mixerPage.onRightMiddlePressed = function(isActive){
 }
 
 mixerPage.onRightMiddleReleased = function(isActive){
-    (MIXERMODE < 2) ? (MIXERMODE++) : (MIXERMODE = 0);
+    (MIXERMODE < 1) ? (MIXERMODE++) : (MIXERMODE = 0); //TODO: Add other modes back
     clearIndicators();
     host.showPopupNotification("Mixer Mode: "+mixerModeArray[MIXERMODE]);
 }
