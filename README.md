@@ -1,4 +1,7 @@
 # Welcome to the MidiFighterTwister-Bitwig-Script wiki!
+# MidiFighterTwister-Bitwig-Script
+Bitwig Script for DJ Tech Tools Midi Fighter Twister,
+See Wiki for documentation
 
 Script updated 08/18/2021. Bitwig Version 4.0.1.  Check the "Issues" section of GitHub for known issues and future plans.
 
